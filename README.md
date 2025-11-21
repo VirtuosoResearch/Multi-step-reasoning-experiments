@@ -1,7 +1,7 @@
 
-# Learning Algorithms — Training & Task Generators
+# Overview
 
-Brief guide and layout for the learning-algorithms repository. This project contains training scripts, task generators, and data modules for experimenting with algorithmic and math-language tasks (CLRS-style and graph tasks), plus model wrappers used in research experiments.
+Brief guide for the learning-algorithms folder. This project contains training scripts, task generators, and data modules for experimenting with algorithmic and math-language tasks (CLRS-style and graph tasks). 
 
 ## Quick start
 
