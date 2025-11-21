@@ -1,0 +1,14 @@
+RUN_NAME: 'SAGE'
+MODEL:
+  DECODER_USE_LAST_HIDDEN: False
+  PROCESSOR_USE_LAST_HIDDEN: False
+  MSG_PASSING_STEPS: 3
+  NUM_CLASSES: 15
+  PROCESSOR:
+    NAME: "SAGEConv"
+    KWARGS: [{"aggr": "max"}]
+    LAYERNORM:
+      ENABLE: True
+      MODE: "node"
+  GRU:
+    ENABLE: True
