@@ -1,2 +1,5 @@
 lmms-eval/
 lmms-finetune/
+*.bin
+outputs/
+checkpoints/
