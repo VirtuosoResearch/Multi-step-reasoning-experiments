@@ -9,6 +9,7 @@ from src.custom.clrs_text_task_graph_data_module import TextGraphCLRSDataModule
 from src.custom.multitask_model import MultitaskModel
 from src.model.GraphLlama import GraphLlamaForCausalLM
 from src.model.gnn_models.config import load_cfg
+from src.model.projectors import create_intrinsic_model
 
 from functools import partial
 from pytorch_lightning.trainer.states import RunningStage, TrainerFn
@@ -304,6 +305,8 @@ if __name__ == "__main__":
     parser.add_argument("--write_results", action="store_true")
     parser.add_argument("--use_wandb", action="store_true")
     parser.add_argument("--generate_output", action="store_true")
+    
+    parser.add_argument("--intrinsic_dim", type=int, default=10000)
 
     args = parser.parse_args()
     args.enable_checkpointing = not args.disable_checkpointing
@@ -323,6 +326,16 @@ if __name__ == "__main__":
     metrics = {}
     for run in range(args.runs):
         model, tokenizer, hf_key, model_type, append_eos = initialize_model(args)
+        
+        if args.intrinsic_dim > 0:
+            model = create_intrinsic_model(base_net=model,
+                                            ckpt_path=None,
+                                            intrinsic_mode="rdkronqr",
+                                            intrinsic_dim=args.intrinsic_dim,
+                                            seed=137)
+            # TODO: modify model generation behavior to the same as decoder-only models
+            
+            print(f"trainable params (M) after applying projection = {model.get_num_params(only_trainable=True)}")
 
         batch_size = args.batch_size
         if args.inference_batch_size is None:
