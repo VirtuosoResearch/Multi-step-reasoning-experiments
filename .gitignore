@@ -3,3 +3,5 @@ lmms-finetune/
 *.bin
 outputs/
 checkpoints/
+G-Retriever/
+*.npy
