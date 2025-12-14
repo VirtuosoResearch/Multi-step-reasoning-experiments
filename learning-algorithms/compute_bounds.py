@@ -402,11 +402,15 @@ def compute_bounds(args):
         max_input_length=args.max_length,
         max_output_length=args.max_output_length,
         eval_all=True,
-        eval_split=0.2,
+        eval_split=args.eval_split,
+        downsample_ratio=args.downsample_ratio,
+        minimum_samples=args.minimum_samples,
+        minimum_samples_validation=args.minimum_samples_validation,
         train_lengths=args.train_lengths,
         test_lengths=args.test_lengths,
-        only_answer_output=args.only_answer_output
-    )
+        use_few_shot=(args.few_shot_k > 0), 
+        few_shot_k=args.few_shot_k,
+        only_answer_output=args.only_answer_output)
     data_module.setup(stage="fit")
     train_dataloader = data_module.train_dataloader()
     
@@ -631,6 +635,12 @@ if __name__ == "__main__":
     parser.add_argument("--max_output_length", type=int, default=64)
     parser.add_argument("--train_lengths", type=int, nargs="+", default=[4])
     parser.add_argument("--test_lengths", type=int, nargs="+", default=[4])
+    parser.add_argument("--eval_split", type=float, default=0.2)
+    parser.add_argument("--downsample_ratio", type=float, default=1.0)
+    parser.add_argument("--minimum_samples", type=int, default=1e6)
+    parser.add_argument("--minimum_samples_validation", type=int, default=1e6)
+    parser.add_argument("--few_shot_k", type=int, default=0,
+                       help="Number of few-shot examples to prepend (0 to disable)")
     parser.add_argument("--only_answer_output", action="store_true")
     
     # Bound computation arguments
