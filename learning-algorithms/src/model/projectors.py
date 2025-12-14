@@ -127,25 +127,22 @@ class IDModule(nn.Module):
         super().__init__()
 
         self.d = dimension
-        self._forward_net = [net]
+        self._forward_net = net
         initnet = deepcopy(net)
         for orig_name, orig_p in initnet.named_parameters():
             if orig_p.requires_grad:
                 _delchainattr(net, orig_name)
         aux = [(n, p) for n, p in initnet.named_parameters() if p.requires_grad]
         self.names, self.trainable_initparams = zip(*aux)
-        self.trainable_initparams = [param for param in self.trainable_initparams]
+        self.trainable_initparams = nn.ParameterList([param for param in self.trainable_initparams])
+        for param in self.trainable_initparams:
+            param.requires_grad = False
         self.names = list(self.names)
         self.D = sum([param.numel() for param in self.trainable_initparams])
         self.subspace_params = nn.Parameter(torch.zeros(self.d))
         self.P = projector(self.D, self.d, self.trainable_initparams, self.names)
 
-    def to(self, *args, **kwargs):
-        self._forward_net[0].to(*args, **kwargs)
-        self.trainable_initparams = [
-            param.to(*args, **kwargs) for param in self.trainable_initparams
-        ]
-        return super().to(*args, **kwargs)
+
     
     
     def get_num_params(self, only_trainable=False):
@@ -156,40 +153,40 @@ class IDModule(nn.Module):
             n_params = sum(p.numel() for p in self.parameters())    
             return n_params
         
-    def configure_optimizers(self, weight_decay, learning_rate, betas, device_type, correct_bias, adam_epislon, no_decay_bias):
-        # start with all of the candidate parameters
-        param_dict = {pn: p for pn, p in self.named_parameters()}
-        # filter out those that do not require grad
-        param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
-        # create optim groups. Any parameters that is 2D will be weight decayed, otherwise no.
-        # i.e. all weight tensors in matmuls + embeddings decay, all biases and layernorms don't.
-        if not no_decay_bias:
-            optim_groups = [
-                {'params': [p for n, p in param_dict.items()], 'weight_decay': weight_decay},
-            ]
-            print("using all params")
-        else:
-            decay_params = [p for n, p in param_dict.items() if p.dim() >= 2]
-            nodecay_params = [p for n, p in param_dict.items() if p.dim() < 2]
-            optim_groups = [
-                {'params': decay_params, 'weight_decay': weight_decay},
-                {'params': nodecay_params, 'weight_decay': 0.0}
-            ]
-            num_decay_params = sum(p.numel() for p in decay_params)
-            num_nodecay_params = sum(p.numel() for p in nodecay_params)
-            print(f"num decayed parameter tensors: {len(decay_params)}, with {num_decay_params:,} parameters")
-            print(f"num non-decayed parameter tensors: {len(nodecay_params)}, with {num_nodecay_params:,} parameters")
+    # def configure_optimizers(self, weight_decay, learning_rate, betas, device_type, correct_bias, adam_epislon, no_decay_bias):
+    #     # start with all of the candidate parameters
+    #     param_dict = {pn: p for pn, p in self.named_parameters()}
+    #     # filter out those that do not require grad
+    #     param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
+    #     # create optim groups. Any parameters that is 2D will be weight decayed, otherwise no.
+    #     # i.e. all weight tensors in matmuls + embeddings decay, all biases and layernorms don't.
+    #     if not no_decay_bias:
+    #         optim_groups = [
+    #             {'params': [p for n, p in param_dict.items()], 'weight_decay': weight_decay},
+    #         ]
+    #         print("using all params")
+    #     else:
+    #         decay_params = [p for n, p in param_dict.items() if p.dim() >= 2]
+    #         nodecay_params = [p for n, p in param_dict.items() if p.dim() < 2]
+    #         optim_groups = [
+    #             {'params': decay_params, 'weight_decay': weight_decay},
+    #             {'params': nodecay_params, 'weight_decay': 0.0}
+    #         ]
+    #         num_decay_params = sum(p.numel() for p in decay_params)
+    #         num_nodecay_params = sum(p.numel() for p in nodecay_params)
+    #         print(f"num decayed parameter tensors: {len(decay_params)}, with {num_decay_params:,} parameters")
+    #         print(f"num non-decayed parameter tensors: {len(nodecay_params)}, with {num_nodecay_params:,} parameters")
         
-        # Create AdamW optimizer and use the fused version if it is available
-        fused_available = 'fused' in inspect.signature(torch.optim.AdamW).parameters
-        use_fused = fused_available and device_type == 'cuda'
-        extra_args = dict(fused=True) if use_fused else dict()
-        # optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=betas, correct_bias=correct_bias, eps=adam_epislon, **extra_args)
-        optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=betas, eps=adam_epislon, **extra_args)
+    #     # Create AdamW optimizer and use the fused version if it is available
+    #     fused_available = 'fused' in inspect.signature(torch.optim.AdamW).parameters
+    #     use_fused = fused_available and device_type == 'cuda'
+    #     extra_args = dict(fused=True) if use_fused else dict()
+    #     # optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=betas, correct_bias=correct_bias, eps=adam_epislon, **extra_args)
+    #     optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=betas, eps=adam_epislon, **extra_args)
 
-        print(f"using fused AdamW: {use_fused}")
+    #     print(f"using fused AdamW: {use_fused}")
 
-        return optimizer
+    #     return optimizer
 
     def forward(self, *args, **kwargs):
         flat_projected_params = self.P @ self.subspace_params
@@ -199,35 +196,25 @@ class IDModule(nn.Module):
         iterables = zip(self.names, self.trainable_initparams, unflattened_params)
         for p_name, init, proj_param in iterables:
             p = init + proj_param.view(*init.shape)
-            _setchainattr(self._forward_net[0], p_name, p)
-        return self._forward_net[0](*args, **kwargs)
+            _setchainattr(self._forward_net, p_name, p)
+        return self._forward_net(*args, **kwargs)
     
     @torch.no_grad()
-    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
-        """
-        Take a conditioning sequence of indices idx (LongTensor of shape (b,t)) and complete
-        the sequence max_new_tokens times, feeding the predictions back into the model each time.
-        Most likely you'll want to make sure to be in model.eval() mode of operation for this.
-        """
-        for _ in range(max_new_tokens):
-            # if the sequence context is growing too long we must crop it at block_size
-            idx_cond = idx if idx.size(1) <= self._forward_net[0].config.block_size else idx[:, -self._forward_net[0].config.block_size:]
-            # forward the model to get the logits for the index in the sequence
-            logits, _ = self(idx_cond)
-            # pluck the logits at the final step and scale by desired temperature
-            logits = logits[:, -1, :] / temperature
-            # optionally crop the logits to only the top k options
-            if top_k is not None:
-                v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
-                logits[logits < v[:, [-1]]] = -float('Inf')
-            # apply softmax to convert logits to (normalized) probabilities
-            probs = F.softmax(logits, dim=-1)
-            # sample from the distribution
-            idx_next = torch.multinomial(probs, num_samples=1)
-            # append sampled index to the running sequence and continue
-            idx = torch.cat((idx, idx_next), dim=1)
-
-        return idx
+    def generate(self, *args, **kwargs):
+        flat_projected_params = self.P @ self.subspace_params
+        unflattened_params = unflatten_like(
+            flat_projected_params, self.trainable_initparams
+        )
+        iterables = zip(self.names, self.trainable_initparams, unflattened_params)
+        for p_name, init, proj_param in iterables:
+            p = init + proj_param.view(*init.shape)
+            _setchainattr(self._forward_net, p_name, p)
+        return self._forward_net.generate(*args, **kwargs)
+    
+    # when access model.config, return the forward_net's config
+    @property
+    def config(self):
+        return self._forward_net.config
 
 
 class RandomMultiply(torch.autograd.Function):
@@ -286,11 +273,12 @@ class LazyRandom(LinearOperator):
 
 
 class LazyRandomQR(LinearOperator):
-    def __init__(self, D, d, params, names, seed=_DEFAULT_SEED):
+    def __init__(self, D, d, params, names, seed=_DEFAULT_SEED, data_type="float32"):
         super().__init__(None, (D, d))
         self.info = (D, d, seed)
         self.P = torch.randn(D, d)
         self.P, _ = torch.linalg.qr(self.P, mode="reduced")
+        self.P = self.P.type(getattr(torch, data_type))
 
     def _matvec(self, v):
         return self.P.to(v.device) @ v
@@ -369,7 +357,7 @@ def RoundedDoubleKron(D, d, params, names, order=2, seed=_DEFAULT_SEED):
     return LazyPerm(perm) @ M
 
 
-def RoundedDoubleKronQR(D, d, params, names, order=2, seed=_DEFAULT_SEED):
+def RoundedDoubleKronQR(D, d, params, names, order=2, seed=_DEFAULT_SEED, data_type="float32"):
     rounded_D = int(np.floor(D ** (1 / order)))
     rounded_d = int(np.floor(d ** (1 / order)))
 
@@ -377,16 +365,16 @@ def RoundedDoubleKronQR(D, d, params, names, order=2, seed=_DEFAULT_SEED):
         seed = int(torch.randint(high=2**31, size=(1,))[0])
         Rs = []
         for i in range(order):
-            Rs.append(LazyRandomQR(rounded_D, rounded_d, params, names, seed))
+            Rs.append(LazyRandomQR(rounded_D, rounded_d, params, names, seed, data_type=data_type))
             seed = int(torch.randint(high=2**31, size=(1,))[0])
         RkR = LazyKron(Rs)
         if rounded_D**order == D or rounded_d**order == d:
             extra = Lazy(
-                torch.randn(D - rounded_D**order, d - rounded_d**order) / np.sqrt(D)
+                torch.randn(D - rounded_D**order, d - rounded_d**order, dtype=getattr(torch, data_type)) / np.sqrt(D),
             )
         else:
             extra = LazyRandom(
-                D - rounded_D**order, d - rounded_d**order, params, names, seed
+                D - rounded_D**order, d - rounded_d**order, params, names, seed, data_type=data_type
             )
 
         M = LazyDirectSum([RkR, extra])
@@ -596,6 +584,7 @@ def create_intrinsic_model(
     intrinsic_dim=1000,
     seed=None,
     device=None,
+    data_type="float32",
 ):
     if seed is None:
         raise ValueError(
@@ -650,13 +639,13 @@ def create_intrinsic_model(
 
     elif intrinsic_mode == "rdkronqr":
         class RoundedDoubleKronQRIDNet(IDModule):
-            def __init__(self, net, dimension=1000, order=2, seed=None, **_):
+            def __init__(self, net, dimension=1000, order=2, seed=None, data_type="float32", **_):
                 super().__init__(
                     net,
-                    partial(RoundedDoubleKronQR, order=order, seed=seed),
+                    partial(RoundedDoubleKronQR, order=order, seed=seed, data_type=data_type),
                     dimension=dimension,
                 )
-        net = RoundedDoubleKronQRIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = RoundedDoubleKronQRIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     elif intrinsic_mode == "film":
         class FiLMIDNet(IDModule):

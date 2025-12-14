@@ -5,3 +5,5 @@ outputs/
 checkpoints/
 G-Retriever/
 *.npy
+*.pyc
+learning-algorithms/external_lightning_logs/*

@@ -306,7 +306,8 @@ if __name__ == "__main__":
     parser.add_argument("--use_wandb", action="store_true")
     parser.add_argument("--generate_output", action="store_true")
     
-    parser.add_argument("--intrinsic_dim", type=int, default=10000)
+    parser.add_argument("--intrinsic_dim", type=int, default=0)
+    parser.add_argument("--intrinsic_mode", type=str, default="rdkronqr")
 
     args = parser.parse_args()
     args.enable_checkpointing = not args.disable_checkpointing
@@ -330,10 +331,10 @@ if __name__ == "__main__":
         if args.intrinsic_dim > 0:
             model = create_intrinsic_model(base_net=model,
                                             ckpt_path=None,
-                                            intrinsic_mode="rdkronqr",
+                                            intrinsic_mode=args.intrinsic_mode,
                                             intrinsic_dim=args.intrinsic_dim,
-                                            seed=137)
-            # TODO: modify model generation behavior to the same as decoder-only models
+                                            seed=137,
+                                            data_type="bfloat16" if args.precision == "bf16-true" else "float32")  
             
             print(f"trainable params (M) after applying projection = {model.get_num_params(only_trainable=True)}")
 
@@ -465,11 +466,17 @@ if __name__ == "__main__":
                 state_dict = checkpoint["state_dict"]
                 state_dict = {k[6:]: v for k, v in state_dict.items() if ("graph" in k or "lora" in k)}
                 torch.save(state_dict, checkpoint_callback.best_model_path.replace(".ckpt", ".pt"))
-            elif args.train_lora:
+            elif args.train_lora and args.intrinsic_dim == 0:
                 from lightning_fabric.utilities.cloud_io import _load as pl_load
                 checkpoint = pl_load(checkpoint_callback.best_model_path, map_location=lm.device)
                 state_dict = checkpoint["state_dict"]
                 state_dict = {k[6:]: v for k, v in state_dict.items() if "lora" in k}
+                torch.save(state_dict, checkpoint_callback.best_model_path.replace(".ckpt", ".pt"))
+            elif args.train_lora and args.intrinsic_dim > 0:
+                from lightning_fabric.utilities.cloud_io import _load as pl_load
+                checkpoint = pl_load(checkpoint_callback.best_model_path, map_location=lm.device)
+                state_dict = checkpoint["state_dict"]
+                state_dict = {k[6:]: v for k, v in state_dict.items() if ("trainable_initparams" in k or "subspace_params" in k)}
                 torch.save(state_dict, checkpoint_callback.best_model_path.replace(".ckpt", ".pt"))
             elif args.train_adapter:
                 from lightning_fabric.utilities.cloud_io import _load as pl_load
