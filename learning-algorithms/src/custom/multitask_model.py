@@ -450,6 +450,7 @@ class MultitaskModel(pl.LightningModule):
             if len(batch["answers"]) == 0:
                 continue
             summary[f"{task_name}_loss"] += batch["loss"].item()*len(batch["answers"]) if torch.isnan(batch["loss"]) == False else 0
+            # accuracy score is the token-level accuracy conditioned on the correct input (even for the intermediate steps)
             summary[f"{task_name}_accuracy_score"] += accuracy_score(batch["label_ids"], batch["pred_ids"])*len(batch["label_ids"])*100
             if generate_output:
                 pred_answers = self.tokenizer.batch_decode(batch['generates'], skip_special_tokens=True)

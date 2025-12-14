@@ -223,6 +223,7 @@ class RandomMultiply(torch.autograd.Function):
     @staticmethod
     def forward(ctx, v, D, d, seed):
         ctx.info = (D, d, seed)
+        ctx.dtype = v.dtype
         with FixedPytorchSeed(seed):
             D_chunks = int(np.ceil((D * d) / RandomMultiply.CHUNK_MAX))
             D_chunksize = D // D_chunks
@@ -232,7 +233,7 @@ class RandomMultiply(torch.autograd.Function):
                 D_chunk = min(D_chunksize, D - D_tot)
                 D_tot += D_chunk
                 Pv_chunks.append(
-                    torch.randn(D_chunk, d, device=v.device) @ v / np.sqrt(D)
+                    torch.randn(D_chunk, d, device=v.device, dtype=v.dtype) @ v / np.sqrt(D)
                 )
             Pv = torch.cat(Pv_chunks, dim=0)
         return Pv
@@ -241,6 +242,7 @@ class RandomMultiply(torch.autograd.Function):
     def backward(ctx, grad_output):
 
         D, d, seed = ctx.info
+        dtype = ctx.dtype
         grad_in = 0.0
         with FixedPytorchSeed(seed):
             D_chunks = int(np.ceil((D * d) / RandomMultiply.CHUNK_MAX))
@@ -248,7 +250,7 @@ class RandomMultiply(torch.autograd.Function):
             split_grad_outs = torch.split(grad_output, D_chunksize, dim=0)
             for grad_out in split_grad_outs:
                 grad_in += (
-                    torch.randn(grad_out.shape[0], d, device=grad_output.device).T
+                    torch.randn(grad_out.shape[0], d, device=grad_output.device, dtype=dtype).T
                     @ grad_out
                     / np.sqrt(D)
                 )
@@ -256,7 +258,7 @@ class RandomMultiply(torch.autograd.Function):
 
 
 class LazyRandom(LinearOperator):
-    def __init__(self, D, d, params, names, seed=_DEFAULT_SEED):
+    def __init__(self, D, d, params, names, seed=_DEFAULT_SEED, data_type="float32"):
         super().__init__(None, (D, d))
         self.info = (D, d, seed)
 
@@ -291,7 +293,7 @@ class LazyRandomQR(LinearOperator):
 
 
 class LazyOneSidedKron(LinearOperator):
-    def __init__(self, D, d, params, names, order=2, seed=_DEFAULT_SEED):
+    def __init__(self, D, d, params, names, order=2, seed=_DEFAULT_SEED, data_type="float32"):
         super().__init__(None, (D, d))
         self.seed = seed
         assert np.floor(D ** (1 / order)) == D ** (1 / order)
@@ -316,22 +318,22 @@ class LazyOneSidedKron(LinearOperator):
         return out_tensor
 
 
-def RoundedKron(D, d, params, names, order=2, seed=_DEFAULT_SEED):
+def RoundedKron(D, d, params, names, order=2, seed=_DEFAULT_SEED, data_type="float32"):
     rounded_D = int(np.floor(D ** (1 / order))) ** order
     with FixedPytorchSeed(seed):
-        fitting_kron = LazyOneSidedKron(rounded_D, d, params, names, order, seed)
+        fitting_kron = LazyOneSidedKron(rounded_D, d, params, names, order, seed, data_type=data_type)
         perm = torch.randperm(D)
         if rounded_D == D:
             return LazyPerm(perm) @ fitting_kron
         else:
             newseed = int(torch.randint(high=2**31, size=(1,))[0])
-            leftover_random = LazyRandom(D - rounded_D, d, params, names, newseed) * (
+            leftover_random = LazyRandom(D - rounded_D, d, params, names, newseed, data_type=data_type) * (
                 1 / np.sqrt(D / (D - rounded_D))
             )
             return LazyPerm(perm) @ ConcatLazy([fitting_kron, leftover_random])
 
 
-def RoundedDoubleKron(D, d, params, names, order=2, seed=_DEFAULT_SEED):
+def RoundedDoubleKron(D, d, params, names, order=2, seed=_DEFAULT_SEED, data_type="float32"):
     rounded_D = int(np.floor(D ** (1 / order)))
     rounded_d = int(np.floor(d ** (1 / order)))
 
@@ -339,16 +341,16 @@ def RoundedDoubleKron(D, d, params, names, order=2, seed=_DEFAULT_SEED):
         seed = int(torch.randint(high=2**31, size=(1,))[0])
         Rs = []
         for i in range(order):
-            Rs.append(LazyRandom(rounded_D, rounded_d, params, names, seed))
+            Rs.append(LazyRandom(rounded_D, rounded_d, params, names, seed, data_type=data_type))
             seed = int(torch.randint(high=2**31, size=(1,))[0])
         RkR = LazyKron(Rs)
         if rounded_D**order == D or rounded_d**order == d:
             extra = Lazy(
-                torch.randn(D - rounded_D**order, d - rounded_d**order) / np.sqrt(D)
+                torch.randn(D - rounded_D**order, d - rounded_d**order, dtype=getattr(torch, data_type)) / np.sqrt(D)
             )
         else:
             extra = LazyRandom(
-                D - rounded_D**order, d - rounded_d**order, params, names, seed
+                D - rounded_D**order, d - rounded_d**order, params, names, seed, data_type=data_type
             )
 
         M = LazyDirectSum([RkR, extra])
@@ -383,7 +385,7 @@ def RoundedDoubleKronQR(D, d, params, names, order=2, seed=_DEFAULT_SEED, data_t
     return LazyPerm(perm) @ M
 
 
-def FiLMLazyRandom(D, d, params, names, seed=_DEFAULT_SEED):
+def FiLMLazyRandom(D, d, params, names, seed=_DEFAULT_SEED, data_type="float32"):
     def bn_or_fc(name):
         return (
             ("bn" in name)
@@ -392,11 +394,11 @@ def FiLMLazyRandom(D, d, params, names, seed=_DEFAULT_SEED):
             or ("classifier" in name)
         )
 
-    return FilterLazyRandom(D, d, params, names, bn_or_fc, seed)
+    return FilterLazyRandom(D, d, params, names, bn_or_fc, seed, data_type=data_type)
 
 
 class FilterLazyRandom(LinearOperator):
-    def __init__(self, D, d, params, names, condition, seed=_DEFAULT_SEED):
+    def __init__(self, D, d, params, names, condition, seed=_DEFAULT_SEED, data_type="float32"):
         super().__init__(None, (D, d))
         i = 0
         ids = []
@@ -407,7 +409,7 @@ class FilterLazyRandom(LinearOperator):
         self.ids = np.concatenate(ids)
         assert len(ids) > 0
         assert i == D
-        self.dense_random = LazyRandom(len(self.ids), d, params, names, seed)
+        self.dense_random = LazyRandom(len(self.ids), d, params, names, seed, data_type=data_type)
         print(D, len(self.ids), d)
 
     def _matvec(self, v):
@@ -418,7 +420,7 @@ class FilterLazyRandom(LinearOperator):
 
 
 class LazySTFiLMRDKronQR(LinearOperator):
-    def __init__(self, D, d, params, names, seed=_DEFAULT_SEED):
+    def __init__(self, D, d, params, names, seed=_DEFAULT_SEED, data_type="float32"):
         super().__init__(None, (D, d))
         def condition_fn1(x): return x.find('bn') >= 0
         def condition_fn2(x): return not condition_fn1(x)
@@ -426,7 +428,7 @@ class LazySTFiLMRDKronQR(LinearOperator):
         ids2 = find_locations_from_condition(names, params, condition_fn2)
         self.bn_d = len(ids1)
         self.ids = np.argsort(np.concatenate([ids1, ids2]))
-        self.P = RoundedDoubleKronQR(D - self.bn_d, d - self.bn_d, params, names)
+        self.P = RoundedDoubleKronQR(D - self.bn_d, d - self.bn_d, params, names, data_type=data_type)
 
     def _matvec(self, v):
         return self._matmat(v)
@@ -480,22 +482,22 @@ def selective_apply(module, counter, leaf_criteria):
             selective_apply(c, counter, leaf_criteria)
 
 
-def CombinedRDKronFiLM(D, d, params, names, seed=_DEFAULT_SEED):
-    rdkron = RoundedDoubleKron(D, d, params, names, seed=seed)
-    FiLM = FiLMLazyRandom(D, d, params, names, seed=seed)
+def CombinedRDKronFiLM(D, d, params, names, seed=_DEFAULT_SEED, data_type="float32"):
+    rdkron = RoundedDoubleKron(D, d, params, names, seed=seed, data_type=data_type)
+    FiLM = FiLMLazyRandom(D, d, params, names, seed=seed, data_type=data_type)
 
     return (rdkron + FiLM) * (1 / np.sqrt(2))
 
 
-def CombinedRDKronQRFiLM(D, d, params, names, seed=_DEFAULT_SEED):
-    rdkronqr = RoundedDoubleKronQR(D, d, params, names, seed=seed)
-    FiLM = FiLMLazyRandom(D, d, params, names, seed=seed)
+def CombinedRDKronQRFiLM(D, d, params, names, seed=_DEFAULT_SEED, data_type="float32"):
+    rdkronqr = RoundedDoubleKronQR(D, d, params, names, seed=seed, data_type=data_type)
+    FiLM = FiLMLazyRandom(D, d, params, names, seed=seed, data_type=data_type)
 
     return (rdkronqr + FiLM) * (1 / np.sqrt(2))
 
 
 class SparseOperator(LinearOperator):
-    def __init__(self, D, d, params, names, seed=_DEFAULT_SEED):
+    def __init__(self, D, d, params, names, seed=_DEFAULT_SEED, data_type="float32"):
         super().__init__(None, (D, d))
         s = np.sqrt(D)
         with FixedNumpySeed(seed):
@@ -508,8 +510,8 @@ class SparseOperator(LinearOperator):
             # sample values from +-1
             nonzero_values = np.random.choice([-1, 1], number_nonzero) / np.sqrt(s)
             self.V = torch.sparse_coo_tensor(
-                nonzero_indices2d, nonzero_values, size=(D, d)
-            ).float()
+                nonzero_indices2d, nonzero_values, size=(D, d), dtype=getattr(torch, data_type)
+            )
 
     def _matvec(self, x):
         assert x.shape[0] == self.shape[-1], f"{x.shape[0]} != {self.shape[-1]}"
@@ -544,7 +546,7 @@ class FastfoodOperator(LinearOperator):
         def backward(_, grad_outputs):
             return FastfoodOperator.FWHT.transform(grad_outputs)
 
-    def __init__(self, D, d, params, names, scale=1, seed=_DEFAULT_SEED):
+    def __init__(self, D, d, params, names, scale=1, seed=_DEFAULT_SEED, data_type="float32"):
         super().__init__(None, (D, d))
 
         self.D = D
@@ -553,9 +555,9 @@ class FastfoodOperator(LinearOperator):
         self.sigma = scale
         blocks = np.ceil(self.D / self.d).astype(int)
         with FixedPytorchSeed(seed):
-            self.S = torch.rand(blocks, self.d)
-            self.G = torch.randn(blocks, self.d)
-            self.B = 2 * (torch.rand(blocks, self.d) > 0.5).float() - 1
+            self.S = torch.rand(blocks, self.d, dtype=getattr(torch, data_type))
+            self.G = torch.randn(blocks, self.d, dtype=getattr(torch, data_type))
+            self.B = 2 * (torch.rand(blocks, self.d) > 0.5).type(getattr(torch, data_type)) - 1
             self.Pi = torch.randperm(self.d)
 
     def _matvec(self, x):
@@ -595,47 +597,47 @@ def create_intrinsic_model(
 
     if intrinsic_mode == "dense":
         class DenseIDNet(IDModule):
-            def __init__(self, net, dimension=1000, seed=None, **_):
+            def __init__(self, net, dimension=1000, seed=None, data_type="float32", **_):
                 super().__init__(
-                    net, partial(LazyRandom, seed=seed), dimension=dimension
+                    net, partial(LazyRandom, seed=seed, data_type=data_type), dimension=dimension
                 )
-        net = DenseIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = DenseIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     elif intrinsic_mode == "sparse":
         class SparseIDNet(IDModule):
-            def __init__(self, net, dimension=1000, seed=None, **_):
+            def __init__(self, net, dimension=1000, seed=None, data_type="float32", **_):
                 super().__init__(
-                    net, partial(SparseOperator, seed=seed), dimension=dimension
+                    net, partial(SparseOperator, seed=seed, data_type=data_type), dimension=dimension
                 )
-        net = SparseIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = SparseIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     elif intrinsic_mode == "fastfood":
         class FastfoodIDNet(IDModule):
-            def __init__(self, net, dimension=1000, seed=None, **_):
+            def __init__(self, net, dimension=1000, seed=None, data_type="float32", **_):
                 super().__init__(
-                    net, partial(FastfoodOperator, seed=seed), dimension=dimension
+                    net, partial(FastfoodOperator, seed=seed, data_type=data_type), dimension=dimension
                 )
-        net = FastfoodIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = FastfoodIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     elif intrinsic_mode == "rkron":
         class RoundedKronIDNet(IDModule):
-            def __init__(self, net, dimension=1000, order=2, seed=None, **_):
+            def __init__(self, net, dimension=1000, order=2, seed=None, data_type="float32", **_):
                 super().__init__(
                     net,
-                    partial(RoundedKron, order=order, seed=seed),
+                    partial(RoundedKron, order=order, seed=seed, data_type=data_type),
                     dimension=dimension,
                 )
-        net = RoundedKronIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = RoundedKronIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     elif intrinsic_mode == "rdkron":
         class RoundedDoubleKronIDNet(IDModule):
-            def __init__(self, net, dimension=1000, order=2, seed=None, **_):
+            def __init__(self, net, dimension=1000, order=2, seed=None, data_type="float32", **_):
                 super().__init__(
                     net,
-                    partial(RoundedDoubleKron, order=order, seed=seed),
+                    partial(RoundedDoubleKron, order=order, seed=seed, data_type=data_type),
                     dimension=dimension,
                 )
-        net = RoundedDoubleKronIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = RoundedDoubleKronIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     elif intrinsic_mode == "rdkronqr":
         class RoundedDoubleKronQRIDNet(IDModule):
@@ -649,35 +651,35 @@ def create_intrinsic_model(
 
     elif intrinsic_mode == "film":
         class FiLMIDNet(IDModule):
-            def __init__(self, net, dimension=1000, seed=None, **_):
+            def __init__(self, net, dimension=1000, seed=None, data_type="float32", **_):
                 super().__init__(
-                    net, partial(FiLMLazyRandom, seed=seed), dimension=dimension
+                    net, partial(FiLMLazyRandom, seed=seed, data_type=data_type), dimension=dimension
                 )
-        net = FiLMIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = FiLMIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     elif intrinsic_mode == "filmrdkron":
         class FiLMRDKronIDNet(IDModule):
-            def __init__(self, net, dimension=1000, seed=None, **_):
+            def __init__(self, net, dimension=1000, seed=None, data_type="float32", **_):
                 super().__init__(
-                    net, partial(CombinedRDKronFiLM, seed=seed), dimension=dimension
+                    net, partial(CombinedRDKronFiLM, seed=seed, data_type=data_type), dimension=dimension
                 )
-        net = FiLMRDKronIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = FiLMRDKronIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     elif intrinsic_mode == "filmrdkronqr":
         class FiLMRDKronQRIDNet(IDModule):
-            def __init__(self, net, dimension=1000, seed=None, **_):
+            def __init__(self, net, dimension=1000, seed=None, data_type="float32", **_):
                 super().__init__(
-                    net, partial(CombinedRDKronQRFiLM, seed=seed), dimension=dimension
+                    net, partial(CombinedRDKronQRFiLM, seed=seed, data_type=data_type), dimension=dimension
                 )
-        net = FiLMRDKronQRIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = FiLMRDKronQRIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     elif intrinsic_mode == "stfilmkronqr":
         class STFiLMRDKronQRIDNet(IDModule):
-            def __init__(self, net, dimension=1000, seed=None, **_):
+            def __init__(self, net, dimension=1000, seed=None, data_type="float32", **_):
                 super().__init__(
-                    net, partial(LazySTFiLMRDKronQR, seed=seed), dimension=dimension
+                    net, partial(LazySTFiLMRDKronQR, seed=seed, data_type=data_type), dimension=dimension
                 )
-        net = STFiLMRDKronQRIDNet(base_net, dimension=intrinsic_dim, seed=seed)
+        net = STFiLMRDKronQRIDNet(base_net, dimension=intrinsic_dim, seed=seed, data_type=data_type)
 
     else:
         raise NotImplementedError
