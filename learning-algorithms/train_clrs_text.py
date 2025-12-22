@@ -241,6 +241,16 @@ def initialize_model(args):
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    if args.intrinsic_dim > 0:
+        model = create_intrinsic_model(base_net=model,
+                                        ckpt_path=None,
+                                        intrinsic_mode=args.intrinsic_mode,
+                                        intrinsic_dim=args.intrinsic_dim,
+                                        seed=137,
+                                        data_type="bfloat16" if args.precision == "bf16-true" else "float32")  
+        
+        print(f"trainable params (M) after applying projection = {model.get_num_params(only_trainable=True)}")
+    
     return model, tokenizer, hf_key, model_type, append_eos
 
 
@@ -327,16 +337,6 @@ if __name__ == "__main__":
     metrics = {}
     for run in range(args.runs):
         model, tokenizer, hf_key, model_type, append_eos = initialize_model(args)
-        
-        if args.intrinsic_dim > 0:
-            model = create_intrinsic_model(base_net=model,
-                                            ckpt_path=None,
-                                            intrinsic_mode=args.intrinsic_mode,
-                                            intrinsic_dim=args.intrinsic_dim,
-                                            seed=137,
-                                            data_type="bfloat16" if args.precision == "bf16-true" else "float32")  
-            
-            print(f"trainable params (M) after applying projection = {model.get_num_params(only_trainable=True)}")
 
         batch_size = args.batch_size
         if args.inference_batch_size is None:

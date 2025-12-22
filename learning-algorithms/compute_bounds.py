@@ -148,6 +148,16 @@ def initialize_model(args):
 
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+        
+    if args.intrinsic_dim > 0:
+        model = create_intrinsic_model(base_net=model,
+                                        ckpt_path=None,
+                                        intrinsic_mode=args.intrinsic_mode,
+                                        intrinsic_dim=args.intrinsic_dim,
+                                        seed=137,
+                                        data_type="bfloat16" if args.precision == "bf16-true" else "float32")  
+        
+        print(f"trainable params (M) after applying projection = {model.get_num_params(only_trainable=True)}")
 
     return model, tokenizer, hf_key, model_type, append_eos
 
@@ -366,21 +376,13 @@ def compute_bounds(args):
     print("Initializing model...")
     model, tokenizer, hf_key, model_type, append_eos = initialize_model(args)
     
-    if args.intrinsic_dim > 0:
-        model = create_intrinsic_model(base_net=model,
-                                        ckpt_path=None,
-                                        intrinsic_mode=args.intrinsic_mode,
-                                        intrinsic_dim=args.intrinsic_dim,
-                                        seed=137,
-                                        data_type="bfloat16" if args.precision == "bf16-true" else "float32")  
-        
-        print(f"trainable params (M) after applying projection = {model.get_num_params(only_trainable=True)}")
-    
     # Load trained checkpoint
     if args.checkpoint_path and os.path.exists(args.checkpoint_path):
         print(f"Loading checkpoint from {args.checkpoint_path}")
         state_dict = torch.load(args.checkpoint_path, map_location='cpu')
         model.load_state_dict(state_dict, strict=False)
+        
+        print(f"Loaded model from {args.checkpoint_path}")
     else:
         raise ValueError(f"Checkpoint not found at {args.checkpoint_path}")
     
