@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Training script for linear attention model on weight prediction
 # Input dimension: 10
 # Number of examples: 20
@@ -23,7 +21,8 @@ python train.py \
   --seed 42 \
   --num_workers 4 \
   --save_dir checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T20 \
-  --device 0
+  --device 0 \
+  --eval_interval 50
 
 #   --use_wandb \
 #   --wandb_project linear-attention-weight-prediction \

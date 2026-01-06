@@ -61,15 +61,41 @@ class LinearAttentionLayerSimplified(nn.Module):
     One-layer linear attention model without softmax normalization.
     Implements: Attn(Q, K, V) = Q(K^T V) where Q, K, V are linear projections.
     """
-    def __init__(self, d_model, n):
+    def __init__(self, d_model, n, input_dim):
         super().__init__()
         self.d_model = d_model
         self.n = n # normalization factor
+        self.input_dim = input_dim
         
         # Linear projections for merging Q and K
         self.W_kq = nn.Linear(d_model, d_model, bias=False)
         # Linear projection for merging V and projecting to output
         self.W_pv = nn.Linear(d_model, d_model, bias=False)
+        
+        # Block initialization according to the paper
+        # d_model = 2*input_dim + 2
+        # Block structure: [x (input_dim), y (1), w (input_dim), indicator (1)]
+        # Blocks: (0: x), (1: y), (2: w), (3: indicator)
+        
+        # Initialize all weights with small random values to break symmetry
+        # Use smaller std for non-important blocks
+        nn.init.normal_(self.W_kq.weight, mean=0.0, std=1e-4 / d_model)
+        nn.init.normal_(self.W_pv.weight, mean=0.0, std=1e-4 / d_model)
+        
+        # W^{KQ}: emphasize (1,3) block - from indicator to y
+        # This maps: indicator (col) -> y (row)
+        # Row indices for y: input_dim to input_dim+1
+        # Col indices for indicator: 2*input_dim+1 to 2*input_dim+2
+        block_13_kq = self.W_kq.weight[2*input_dim:2*input_dim+1, 2*input_dim+1:2*input_dim+2]
+        nn.init.normal_(block_13_kq, mean=0.0, std=1.0 / d_model)
+        
+        # W^{PV}: emphasize (3,1) block - from y to indicator
+        # This maps: y (col) -> indicator (row)
+        # Row indices for indicator: 2*input_dim+1 to 2*input_dim+2
+        # Col indices for y: input_dim to input_dim+1
+        block_31_pv = self.W_pv.weight[2*input_dim+1:2*input_dim+2, input_dim:input_dim+1]
+        nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
+        nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
         
     def forward(self, x):
         """
@@ -114,9 +140,13 @@ class WeightPredictionModel(nn.Module):
         super().__init__()
         self.d_model = d_model
         self.n_examples = n_examples
+        
+        # Calculate input_dim from d_model
+        # d_model = 2*input_dim + 2
+        input_dim = (d_model - 2) // 2
                 
         # Linear attention layer
-        self.attention = LinearAttentionLayerSimplified(d_model, n_examples)
+        self.attention = LinearAttentionLayerSimplified(d_model, n_examples, input_dim)
         
         
     def forward(self, Z):
@@ -166,10 +196,10 @@ class WeightPredictionModel(nn.Module):
             if label_masks is not None:
                 # Apply label masks
                 masked_loss = (predictions - targets) ** 2 * label_masks.unsqueeze(-1)  # (batch_size, seq_len-1, d_model)
-                loss = masked_loss.sum() / (label_masks.sum() * d_model + 1e-8)  # Avoid division by zero
+                loss = masked_loss.sum(dim=[1,2]).mean() # / (label_masks.sum() * d_model + 1e-8)  # Avoid division by zero
             else:
                 # Compute MSE loss over all positions
-                loss = torch.mean((predictions - targets) ** 2)
+                loss = torch.mean(((predictions - targets) ** 2).sum(dim=[1,2]))  # Sum over batch
         else:
             # If sequence length is 1, no next token to predict
             loss = torch.tensor(0.0, device=Z.device)
@@ -303,14 +333,14 @@ def evaluate(model, dataloader, device):
             # Extract predicted w_star from the last generated position
             w_star_pred = Z_generated[:, -1, input_dim+1:2*input_dim+1]  # (batch_size, input_dim)
             
-            # Check for NaN values
-            if torch.isnan(w_star_pred).any() or torch.isnan(w_star_true).any():
-                print(f"Warning: NaN detected in predictions or targets")
-                print(f"NaN in pred: {torch.isnan(w_star_pred).any()}, NaN in true: {torch.isnan(w_star_true).any()}")
-                continue
+            # # Check for NaN values
+            # if torch.isnan(w_star_pred).any() or torch.isnan(w_star_true).any():
+            #     print(f"Warning: NaN detected in predictions or targets")
+            #     print(f"NaN in pred: {torch.isnan(w_star_pred).any()}, NaN in true: {torch.isnan(w_star_true).any()}")
+            #     continue
             
             # Compute MSE between predicted and true w_star
-            loss = torch.mean((w_star_pred - w_star_true) ** 2)
+            loss = torch.sum((w_star_pred - w_star_true) ** 2)
             
             total_loss += loss.item() * batch_size
             total_samples += batch_size
@@ -433,7 +463,8 @@ def train(args):
                 val_loss = evaluate(model, test_loader, device)
                 
                 print(f"Steps {steps} - Train Loss: {avg_train_loss:.6f}, Test Loss: {val_loss:.6f}")
-                
+                print(model.attention.W_kq.weight)
+                print(model.attention.W_pv.weight)
                 # Log to wandb
                 if args.use_wandb:
                     wandb.log({
