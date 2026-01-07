@@ -4,8 +4,6 @@
 # Learning rate: 0.001
 # Batch size: 1000
 
-for T in 10 20 30 40
-do
 python train.py \
   --input_dim 10 \
   --n_examples 20 \
@@ -22,11 +20,12 @@ python train.py \
   --grad_clip 1.0 \
   --seed 42 \
   --num_workers 4 \
-  --save_dir "checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T${T}" \
+  --save_dir checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T20_no_cot \
   --device 0 \
   --eval_interval 50 \
-  --sigma 0.002 \
-  --use_wandb \
-  --wandb_project linear-self-attention-weight-prediction \
-  --wandb_run_name "input10_examples20_T${T}"
-done
+  --no_cot --sigma 0.002
+
+#   --use_wandb \
+#   --wandb_project linear-attention-weight-prediction \
+#   --wandb_run_name input10_examples20_lr0.001_bs1000
+#   --use_scheduler \

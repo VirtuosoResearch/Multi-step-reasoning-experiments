@@ -1,7 +1,7 @@
 # %%
 import torch
 
-checkpoint = torch.load('./checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T20_initialize_0/best_model.pt', map_location='cpu')
+checkpoint = torch.load('./checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T20_no_cot/best_model.pt', map_location='cpu')
 state_dict = checkpoint['model_state_dict']
 
 # %%

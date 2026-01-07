@@ -61,7 +61,7 @@ class LinearAttentionLayerSimplified(nn.Module):
     One-layer linear attention model without softmax normalization.
     Implements: Attn(Q, K, V) = Q(K^T V) where Q, K, V are linear projections.
     """
-    def __init__(self, d_model, n, input_dim):
+    def __init__(self, d_model, n, input_dim, no_cot=False):
         super().__init__()
         self.d_model = d_model
         self.n = n # normalization factor
@@ -98,14 +98,16 @@ class LinearAttentionLayerSimplified(nn.Module):
         block_31_pv = self.W_pv.weight[input_dim+1:2*input_dim+1, 0:input_dim]
         nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
         
-        # Register hook to zero out gradients for block_24_kq
-        def zero_block_24_grad(grad):
-            grad_copy = grad.clone()
-            grad_copy[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2] = 0
-            return grad_copy
-        
-        self.W_kq.weight.register_hook(zero_block_24_grad)
-        
+        self.no_cot = no_cot
+        if not self.no_cot:
+            # Register hook to zero out gradients for block_24_kq
+            def zero_block_24_grad(grad):
+                grad_copy = grad.clone()
+                grad_copy[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2] = 0
+                return grad_copy
+            
+            self.W_kq.weight.register_hook(zero_block_24_grad)
+            
     def forward(self, x):
         """
         Args:
@@ -145,17 +147,18 @@ class WeightPredictionModel(nn.Module):
     Model for predicting linear function weights from in-context examples.
     Causal language modeling style: predict next position from all preceding positions.
     """
-    def __init__(self, d_model, n_examples):
+    def __init__(self, d_model, n_examples, no_cot=False):
         super().__init__()
         self.d_model = d_model
         self.n_examples = n_examples
+        self.no_cot = no_cot
         
         # Calculate input_dim from d_model
         # d_model = 2*input_dim + 2
         input_dim = (d_model - 2) // 2
                 
         # Linear attention layer
-        self.attention = LinearAttentionLayerSimplified(d_model, n_examples, input_dim)
+        self.attention = LinearAttentionLayerSimplified(d_model, n_examples, input_dim, no_cot)
         
         
     def forward(self, Z):
@@ -194,6 +197,13 @@ class WeightPredictionModel(nn.Module):
         if seq_len > 1:
             predictions = Z_pred[:, :-1, :]  # (batch_size, seq_len-1, d_model)
             targets = Z[:, 1:, :]  # (batch_size, seq_len-1, d_model)
+            
+            # if self.no_cot:
+            #     # compute loss on the last position only
+            #     final_pred = predictions[:, -1, :]  # (batch_size, d_model)
+            #     final_target = targets[:, -1, :]    # (batch_size, d_model)
+            #     loss = torch.mean(((final_pred - final_target) ** 2).sum(dim=1))
+            #     return loss
             
             # Create default label mask if n_examples is provided
             if label_masks is None and n_examples is not None:
@@ -261,7 +271,7 @@ class LinearFunctionDataset(Dataset):
     Generates random linear functions w* and examples (x, y) where y = w* · x.
     """
     def __init__(self, n_tasks, n_examples, input_dim, noise_std=0.0, 
-                lr=0.4, T=20, split='train'):
+                lr=0.4, T=20, split='train', no_cot=False):
         self.n_tasks = n_tasks
         self.task_seeds = np.arange(n_tasks) if split == 'train' else np.arange(10000000, 10000000 + n_tasks)
         self.n_examples = n_examples
@@ -269,6 +279,7 @@ class LinearFunctionDataset(Dataset):
         self.noise_std = noise_std
         self.lr = lr
         self.T = T
+        self.no_cot = no_cot
         
     def __len__(self):
         return self.n_tasks
@@ -292,12 +303,15 @@ class LinearFunctionDataset(Dataset):
         w_0 = torch.zeros_like(w_star)
         w_t = w_0.clone()
         
-        cot = [w_0.unsqueeze(0)]  # list of (1, input_dim)
-        for t in range(self.T):
-            grad = x.T @ (torch.matmul(x, w_t.unsqueeze(-1)) - y).squeeze(-1) / self.n_examples
-            w_t = w_t - self.lr * grad
-            cot.append(w_t.unsqueeze(0))
-        cot = torch.cat(cot, dim=0)  # (T+1, input_dim)
+        if self.no_cot:
+            cot = torch.zeros((self.T + 1, self.input_dim))  # (T+1, input_dim)
+        else:
+            cot = [w_0.unsqueeze(0)]  # list of (1, input_dim)
+            for t in range(self.T):
+                grad = x.T @ (torch.matmul(x, w_t.unsqueeze(-1)) - y).squeeze(-1) / self.n_examples
+                w_t = w_t - self.lr * grad
+                cot.append(w_t.unsqueeze(0))
+            cot = torch.cat(cot, dim=0)  # (T+1, input_dim)
         
         # format the input sequences
         # Z structure: [x, y, w_cot, w_star] with indicator rows
@@ -318,6 +332,25 @@ class LinearFunctionDataset(Dataset):
         
         return Z_final
 
+def evaluate_noise_stability(model, dataloader, device, sigma, runs=10):
+    # copy the current model weights
+    state_dict_original = model.state_dict()
+    state_dict_original = {k: v.clone() for k, v in state_dict_original.items()}
+    
+    perturbed_loss = []
+    for i in range(runs):
+        # add Gaussian noise to model weights
+        for name, param in model.named_parameters():
+            noise = torch.randn_like(param) * sigma * (param.data != 0)
+            param.data.add_(noise)
+        
+        # evaluate on the dataset
+        loss = evaluate(model, dataloader, device)
+        perturbed_loss.append(loss)
+        
+        # restore original weights
+        model.load_state_dict(state_dict_original)
+    return np.mean(perturbed_loss), np.std(perturbed_loss)
 
 def evaluate(model, dataloader, device):
     """
@@ -392,7 +425,8 @@ def train(args):
         noise_std=args.noise_std,
         lr=args.gd_lr,
         T=args.T,
-        split='train'
+        split='train',
+        no_cot=args.no_cot
     )
     
     test_dataset = LinearFunctionDataset(
@@ -402,7 +436,8 @@ def train(args):
         noise_std=args.noise_std,
         lr=args.gd_lr,
         T=args.T,
-        split='test'
+        split='test',
+        no_cot=args.no_cot
     )
     
     # Create dataloaders
@@ -425,7 +460,8 @@ def train(args):
     d_model = 2 * args.input_dim + 2
     model = WeightPredictionModel(
         d_model=d_model,
-        n_examples=args.n_examples
+        n_examples=args.n_examples,
+        no_cot=args.no_cot
     ).to(device)
     
     print(f"Model parameters: {sum(p.numel() for p in model.parameters())}")
@@ -477,15 +513,22 @@ def train(args):
                 # Validation
                 val_loss = evaluate(model, test_loader, device)
                 
+                # Evaluate noise stability
+                perturbed_mean_loss, perturbed_std_loss = evaluate_noise_stability(model, test_loader, device, sigma=args.sigma, runs=5)
+                perturbed_mean_loss = perturbed_mean_loss - val_loss
+                
                 print(f"Steps {steps} - Train Loss: {avg_train_loss:.6f}, Test Loss: {val_loss:.6f}")
-                print(model.attention.W_kq.weight)
-                print(model.attention.W_pv.weight)
+                print(f"Perturbed Loss: {perturbed_mean_loss:.6f} ± {perturbed_std_loss:.6f}")
+                # print(model.attention.W_kq.weight)
+                # print(model.attention.W_pv.weight)
                 # Log to wandb
                 if args.use_wandb:
                     wandb.log({
-                        'epoch': epoch + 1,
+                        'step': steps,
                         'train_loss': avg_train_loss,
                         'val_loss': val_loss,
+                        'perturbed_mean_loss': perturbed_mean_loss,
+                        'perturbed_std_loss': perturbed_std_loss,
                         'lr': optimizer.param_groups[0]['lr']
                     })
                 
@@ -541,6 +584,8 @@ def main():
                         help='Learning rate for gradient descent in CoT generation')
     parser.add_argument('--T', type=int, default=20,
                         help='Number of gradient descent steps in CoT')
+    parser.add_argument('--no_cot', action='store_true', 
+                        help='Disable chain-of-thought generation')
     
     # Training parameters
     parser.add_argument('--batch_size', type=int, default=64,
@@ -560,6 +605,8 @@ def main():
     parser.add_argument('--device', type=str, default='0')
     parser.add_argument('--eval_interval', type=int, default=10,
                         help='Evaluation interval (in steps)')
+    parser.add_argument('--sigma', type=float, default=1e-3,
+                        help='Standard deviation of weight perturbation for noise stability evaluation')
     
     # Other parameters
     parser.add_argument('--seed', type=int, default=42,

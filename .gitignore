@@ -4,6 +4,8 @@ lmms-finetune/
 outputs/
 checkpoints/
 G-Retriever/
+GVM/
 *.npy
 *.pyc
 learning-algorithms/external_lightning_logs/*
+wandb/
