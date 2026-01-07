@@ -13,14 +13,14 @@ python train.py \
   --gd_lr 0.4 \
   --T 20 \
   --batch_size 1000 \
-  --epochs 1 \
+  --epochs 2 \
   --lr 0.001 \
   --lr_min 1e-5 \
   --weight_decay 0.0 \
   --grad_clip 1.0 \
   --seed 42 \
   --num_workers 4 \
-  --save_dir checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T20 \
+  --save_dir checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T20_initialize_0 \
   --device 0 \
   --eval_interval 50
 

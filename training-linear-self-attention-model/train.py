@@ -79,23 +79,32 @@ class LinearAttentionLayerSimplified(nn.Module):
         
         # Initialize all weights with small random values to break symmetry
         # Use smaller std for non-important blocks
-        nn.init.normal_(self.W_kq.weight, mean=0.0, std=1e-4 / d_model)
-        nn.init.normal_(self.W_pv.weight, mean=0.0, std=1e-4 / d_model)
+        nn.init.zeros_(self.W_kq.weight)
+        nn.init.zeros_(self.W_pv.weight)
         
         # W^{KQ}: emphasize (1,3) block - from indicator to y
         # This maps: indicator (col) -> y (row)
         # Row indices for y: input_dim to input_dim+1
         # Col indices for indicator: 2*input_dim+1 to 2*input_dim+2
-        block_13_kq = self.W_kq.weight[2*input_dim:2*input_dim+1, 2*input_dim+1:2*input_dim+2]
+        block_13_kq = self.W_kq.weight[:input_dim, input_dim+1:2*input_dim+1]
         nn.init.normal_(block_13_kq, mean=0.0, std=1.0 / d_model)
+        block_24_kq = self.W_kq.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
+        nn.init.constant_(block_24_kq, -1.0)
         
         # W^{PV}: emphasize (3,1) block - from y to indicator
         # This maps: y (col) -> indicator (row)
         # Row indices for indicator: 2*input_dim+1 to 2*input_dim+2
         # Col indices for y: input_dim to input_dim+1
-        block_31_pv = self.W_pv.weight[2*input_dim+1:2*input_dim+2, input_dim:input_dim+1]
+        block_31_pv = self.W_pv.weight[input_dim+1:2*input_dim+1, 0:input_dim]
         nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
-        nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
+        
+        # Register hook to zero out gradients for block_24_kq
+        def zero_block_24_grad(grad):
+            grad_copy = grad.clone()
+            grad_copy[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2] = 0
+            return grad_copy
+        
+        self.W_kq.weight.register_hook(zero_block_24_grad)
         
     def forward(self, x):
         """
@@ -194,12 +203,20 @@ class WeightPredictionModel(nn.Module):
                 label_masks[:, n_examples:] = 1.0  # Enable loss after n_examples positions
             
             if label_masks is not None:
-                # Apply label masks
-                masked_loss = (predictions - targets) ** 2 * label_masks.unsqueeze(-1)  # (batch_size, seq_len-1, d_model)
-                loss = masked_loss.sum(dim=[1,2]).mean() # / (label_masks.sum() * d_model + 1e-8)  # Avoid division by zero
+                # Apply label masks and compute mean per batch example
+                squared_error = (predictions - targets) ** 2  # (batch_size, seq_len-1, d_model)
+                masked_squared_error = squared_error * label_masks.unsqueeze(-1)  # (batch_size, seq_len-1, d_model)
+                
+                # Sum over seq_len and d_model dimensions, then divide by number of active elements per example
+                loss_per_example = masked_squared_error.sum(dim=[1, 2])  # (batch_size,)
+                num_active_elements = label_masks.sum(dim=1)  # (batch_size,)
+                loss_per_example = loss_per_example / (num_active_elements + 1e-8)  # Avoid division by zero
+                
+                # Mean over batch
+                loss = loss_per_example.mean()
             else:
                 # Compute MSE loss over all positions
-                loss = torch.mean(((predictions - targets) ** 2).sum(dim=[1,2]))  # Sum over batch
+                loss = torch.mean(((predictions - targets) ** 2).sum(dim=[2]))  
         else:
             # If sequence length is 1, no next token to predict
             loss = torch.tensor(0.0, device=Z.device)
@@ -339,9 +356,7 @@ def evaluate(model, dataloader, device):
             #     print(f"NaN in pred: {torch.isnan(w_star_pred).any()}, NaN in true: {torch.isnan(w_star_true).any()}")
             #     continue
             
-            # Compute MSE between predicted and true w_star
-            loss = torch.sum((w_star_pred - w_star_true) ** 2)
-            
+            loss = torch.mean(((w_star_pred - w_star_true) ** 2).sum(dim=1))  # mean over batch
             total_loss += loss.item() * batch_size
             total_samples += batch_size
     
