@@ -1,5 +1,5 @@
 import pprint
-from fraction import Fraction
+from fractions import Fraction
 import re
 
 def last_boxed_only(sample):
