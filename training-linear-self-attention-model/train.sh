@@ -11,7 +11,7 @@ do
 python train.py \
   --input_dim 10 \
   --n_examples 20 \
-  --n_train_tasks 1000 \
+  --n_train_tasks 10 \
   --n_test_tasks 1000 \
   --noise_std 0.0 \
   --gd_lr 0.4 \
@@ -29,7 +29,7 @@ python train.py \
   --sigma 0.002 \
   --use_wandb \
   --wandb_project linear-self-attention-weight-prediction \
-  --wandb_run_name "input10_examples20_T${T}_seed${seed}_training_tasks1e3" \
+  --wandb_run_name "input10_examples20_T${T}_seed${seed}_training_tasks1e1" \
   --seed $seed
 done
 done

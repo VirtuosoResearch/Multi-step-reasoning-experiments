@@ -405,7 +405,8 @@ def evaluate(model, dataloader, device):
     return total_loss / total_samples if total_samples > 0 else float('nan')
 
 
-def generate_and_filter_cot(model, no_cot_dataset, device, error_threshold, batch_size=64):
+def generate_and_filter_cot(model, no_cot_dataset, device, error_threshold, batch_size=64,
+                            inject_noise=False, noise_sigma=0.001):
     """
     Generate CoT sequences for samples without CoT and filter based on prediction error.
     
@@ -421,6 +422,14 @@ def generate_and_filter_cot(model, no_cot_dataset, device, error_threshold, batc
     """
     model.eval()
     filtered_samples = []
+    
+    if inject_noise:
+        state_dict_original = model.state_dict()
+        state_dict_original = {k: v.clone() for k, v in state_dict_original.items()}
+        # add Gaussian noise to model weights
+        for name, param in model.named_parameters():
+            noise = torch.randn_like(param) * noise_sigma * (param.data != 0)
+            param.data.add_(noise)
     
     dataloader = DataLoader(no_cot_dataset, batch_size=batch_size, shuffle=False)
     
@@ -461,6 +470,9 @@ def generate_and_filter_cot(model, no_cot_dataset, device, error_threshold, batc
                 for i in range(len(valid_indices)):
                     filtered_samples.append((valid_Z[i:i+1], valid_errors[i].item()))
     
+    if inject_noise:
+        # restore original weights
+        model.load_state_dict(state_dict_original)
     model.train()
     print(f"Generated CoT for {len(no_cot_dataset)} samples, {len(filtered_samples)} passed threshold {error_threshold}")
     return filtered_samples
@@ -616,13 +628,14 @@ def train(args):
     train_samples = 0
     steps = 0
     
+    max_steps = args.epochs * len(train_loader)
     for epoch in range(args.epochs):
         model.train()
         
         # Check if we should regenerate CoT for no_cot_dataset
         if (no_cot_dataset is not None and 
-            # args.regen_interval > 0 and steps % args.regen_interval == 0
-            steps > 0):
+            args.regen_interval > 0 and 
+            steps > 0 and steps % args.regen_interval == 0):
             
             print(f"\n[Step {steps}] Regenerating CoT sequences for no-CoT dataset...")
             
@@ -632,8 +645,12 @@ def train(args):
                 no_cot_dataset, 
                 device, 
                 args.cot_error_threshold,
-                batch_size=args.batch_size
+                batch_size=args.batch_size,
+                inject_noise=args.cot_inject_noise,
+                noise_sigma=args.cot_noise_sigma
             )
+            # shuffle
+            filtered_samples = sorted(filtered_samples, key=lambda x: x[1])
             
             if len(filtered_samples) > 0:
                 # Create new mixed dataset
@@ -715,7 +732,12 @@ def train(args):
             if args.use_scheduler:
                 scheduler.step()
                 
-    
+            if args.regen_interval > 0 and steps % args.regen_interval == 0:
+                break
+        
+        if steps >= max_steps:
+            break
+                    
     # Final test evaluation
     test_loss = evaluate(model, test_loader, device)
     print(f"\nFinal Test Loss: {test_loss:.6f}")
@@ -755,6 +777,10 @@ def main():
                         help='Steps between CoT regeneration (0 to disable)')
     parser.add_argument('--cot_error_threshold', type=float, default=1.0,
                         help='Maximum MSE error threshold to accept generated CoT')
+    parser.add_argument('--cot_inject_noise', action='store_true',
+                        help='Inject noise into model weights during CoT generation for robustness')
+    parser.add_argument('--cot_noise_sigma', type=float, default=1e-3,
+                        help='Standard deviation of weight noise during CoT generation')
     
     # Training parameters
     parser.add_argument('--batch_size', type=int, default=64,

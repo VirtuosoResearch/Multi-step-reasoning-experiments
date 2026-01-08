@@ -5,7 +5,7 @@
 # - 99% of data has no CoT initially
 # - Every 100 steps, generate CoT for no-CoT data and filter by error threshold
 
-for interval in 10
+for interval in 10 20 30 40 50
 do
 python train.py \
     --input_dim 10 \
@@ -24,13 +24,15 @@ python train.py \
     --device 0 \
     --eval_interval 10 \
     --sigma 0.002 \
-    --use_wandb \``
+    --use_wandb \
     --wandb_project linear-self-attention-weight-prediction \
-    --wandb_run_name "input10_examples20_T${T}_seed${seed}_training_tasks1e6_cot_ratio0.0001_interval${interval}" \
+    --wandb_run_name "input10_examples20_T${T}_seed${seed}_training_tasks1e6_cot_ratio0.001_interval${interval}_noise" \
     --seed 0 \
-    --cot_ratio 0.0001 \
+    --cot_ratio 0.001 \
     --regen_interval $interval \
-    --cot_error_threshold 0.1  
+    --cot_error_threshold 0.1 \
+    --cot_inject_noise \
+    --cot_noise_sigma 0.001 
 done
 
     # --use_scheduler \
