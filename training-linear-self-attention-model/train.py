@@ -87,7 +87,11 @@ class LinearAttentionLayerSimplified(nn.Module):
         # Row indices for y: input_dim to input_dim+1
         # Col indices for indicator: 2*input_dim+1 to 2*input_dim+2
         block_13_kq = self.W_kq.weight[:input_dim, input_dim+1:2*input_dim+1]
-        nn.init.normal_(block_13_kq, mean=0.0, std=1.0 / d_model)
+        # nn.init.normal_(block_13_kq, mean=0.0, std=1.0 / d_model)
+        # Initialize as diagonal matrix with random values from N(0, 1/d_model)
+        with torch.no_grad():
+            diagonal_values = torch.abs(torch.randn(input_dim) * (1.0 / d_model)) + 0.1
+            block_13_kq.copy_(torch.diag(diagonal_values))
         block_24_kq = self.W_kq.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
         nn.init.constant_(block_24_kq, -1.0)
         
@@ -96,7 +100,11 @@ class LinearAttentionLayerSimplified(nn.Module):
         # Row indices for indicator: 2*input_dim+1 to 2*input_dim+2
         # Col indices for y: input_dim to input_dim+1
         block_31_pv = self.W_pv.weight[input_dim+1:2*input_dim+1, 0:input_dim]
-        nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
+        # nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
+        # Initialize as diagonal matrix with random values from N(0, 1/d_model)
+        with torch.no_grad():
+            diagonal_values = -torch.abs(torch.randn(input_dim) * (1.0 / d_model))
+            block_31_pv.copy_(torch.diag(diagonal_values))
         
         self.no_cot = no_cot
         if not self.no_cot:
@@ -219,8 +227,8 @@ class WeightPredictionModel(nn.Module):
                 
                 # Sum over seq_len and d_model dimensions, then divide by number of active elements per example
                 loss_per_example = masked_squared_error.sum(dim=[1, 2])  # (batch_size,)
-                num_active_elements = label_masks.sum(dim=1)  # (batch_size,)
-                loss_per_example = loss_per_example / (num_active_elements + 1e-8)  # Avoid division by zero
+                # num_active_elements = label_masks.sum(dim=1)  # (batch_size,)
+                # loss_per_example = loss_per_example / (num_active_elements + 1e-8)  # Avoid division by zero
                 
                 # Mean over batch
                 loss = loss_per_example.mean()
