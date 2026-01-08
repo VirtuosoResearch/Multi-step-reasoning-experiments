@@ -4,6 +4,8 @@
 # Learning rate: 0.001
 # Batch size: 1000
 
+for seed in 0 1 2 3 4
+do
 python train.py \
   --input_dim 10 \
   --n_examples 20 \
@@ -23,9 +25,9 @@ python train.py \
   --save_dir checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T20_no_cot \
   --device 0 \
   --eval_interval 50 \
-  --no_cot --sigma 0.002
-
-#   --use_wandb \
-#   --wandb_project linear-attention-weight-prediction \
-#   --wandb_run_name input10_examples20_lr0.001_bs1000
-#   --use_scheduler \
+  --no_cot --sigma 0.002 \
+  --use_wandb \
+  --wandb_project linear-self-attention-weight-prediction \
+  --wandb_run_name input10_examples20_not_cot_T20_seed${seed} \
+  --seed $seed
+done

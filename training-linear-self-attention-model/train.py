@@ -87,7 +87,11 @@ class LinearAttentionLayerSimplified(nn.Module):
         # Row indices for y: input_dim to input_dim+1
         # Col indices for indicator: 2*input_dim+1 to 2*input_dim+2
         block_13_kq = self.W_kq.weight[:input_dim, input_dim+1:2*input_dim+1]
-        nn.init.normal_(block_13_kq, mean=0.0, std=1.0 / d_model)
+        # nn.init.normal_(block_13_kq, mean=0.0, std=1.0 / d_model)
+        # Initialize as diagonal matrix with random values from N(0, 1/d_model)
+        with torch.no_grad():
+            diagonal_values = torch.abs(torch.randn(input_dim) * (1.0 / d_model)) + 0.1
+            block_13_kq.copy_(torch.diag(diagonal_values))
         block_24_kq = self.W_kq.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
         nn.init.constant_(block_24_kq, -1.0)
         
@@ -96,7 +100,11 @@ class LinearAttentionLayerSimplified(nn.Module):
         # Row indices for indicator: 2*input_dim+1 to 2*input_dim+2
         # Col indices for y: input_dim to input_dim+1
         block_31_pv = self.W_pv.weight[input_dim+1:2*input_dim+1, 0:input_dim]
-        nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
+        # nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
+        # Initialize as diagonal matrix with random values from N(0, 1/d_model)
+        with torch.no_grad():
+            diagonal_values = -torch.abs(torch.randn(input_dim) * (1.0 / d_model))
+            block_31_pv.copy_(torch.diag(diagonal_values))
         
         self.no_cot = no_cot
         if not self.no_cot:
@@ -219,8 +227,8 @@ class WeightPredictionModel(nn.Module):
                 
                 # Sum over seq_len and d_model dimensions, then divide by number of active elements per example
                 loss_per_example = masked_squared_error.sum(dim=[1, 2])  # (batch_size,)
-                num_active_elements = label_masks.sum(dim=1)  # (batch_size,)
-                loss_per_example = loss_per_example / (num_active_elements + 1e-8)  # Avoid division by zero
+                # num_active_elements = label_masks.sum(dim=1)  # (batch_size,)
+                # loss_per_example = loss_per_example / (num_active_elements + 1e-8)  # Avoid division by zero
                 
                 # Mean over batch
                 loss = loss_per_example.mean()
@@ -273,7 +281,7 @@ class LinearFunctionDataset(Dataset):
     def __init__(self, n_tasks, n_examples, input_dim, noise_std=0.0, 
                 lr=0.4, T=20, split='train', no_cot=False):
         self.n_tasks = n_tasks
-        self.task_seeds = np.arange(n_tasks) if split == 'train' else np.arange(10000000, 10000000 + n_tasks)
+        self.task_seeds = np.arange(n_tasks) if split == 'train' else (np.arange(10000000, 10000000 + n_tasks) if split == 'test' else np.arange(20000000, 20000000 + n_tasks))
         self.n_examples = n_examples
         self.input_dim = input_dim
         self.noise_std = noise_std
@@ -397,6 +405,104 @@ def evaluate(model, dataloader, device):
     return total_loss / total_samples if total_samples > 0 else float('nan')
 
 
+def generate_and_filter_cot(model, no_cot_dataset, device, error_threshold, batch_size=64,
+                            inject_noise=False, noise_sigma=0.001):
+    """
+    Generate CoT sequences for samples without CoT and filter based on prediction error.
+    
+    Args:
+        model: The trained model
+        no_cot_dataset: Dataset without CoT sequences
+        device: Device to run on
+        error_threshold: Maximum MSE error to accept a generated CoT
+        batch_size: Batch size for generation
+        
+    Returns:
+        filtered_samples: List of (Z_with_cot, error) tuples that passed the threshold
+    """
+    model.eval()
+    filtered_samples = []
+    
+    if inject_noise:
+        state_dict_original = model.state_dict()
+        state_dict_original = {k: v.clone() for k, v in state_dict_original.items()}
+        # add Gaussian noise to model weights
+        for name, param in model.named_parameters():
+            noise = torch.randn_like(param) * noise_sigma * (param.data != 0)
+            param.data.add_(noise)
+    
+    dataloader = DataLoader(no_cot_dataset, batch_size=batch_size, shuffle=False)
+    
+    with torch.no_grad():
+        for batch_idx, Z in enumerate(dataloader):
+            Z = Z.to(device)  # (batch_size, seq_len, d_model)
+            batch_size_actual = Z.size(0)
+            
+            # Extract initial sequence: input examples + w_0
+            n_examples = model.n_examples
+            Z_init = Z[:, :n_examples+1, :]  # (batch_size, n_examples+1, d_model)
+            
+            # Extract true w_star from the last position
+            input_dim = (model.d_model - 2) // 2
+            w_star_true = Z[:, -1, input_dim+1:2*input_dim+1]  # (batch_size, input_dim)
+            
+            # Generate T+1 steps
+            T = Z.size(1) - n_examples - 2
+            Z_generated = model.generate(Z_init, T + 1)  # (batch_size, n_examples+1+T+1, d_model)
+            
+            # Extract predicted w_star
+            w_star_pred = Z_generated[:, -1, input_dim+1:2*input_dim+1]  # (batch_size, input_dim)
+            
+            # Compute error for each sample
+            errors = ((w_star_pred - w_star_true) ** 2).sum(dim=1)  # (batch_size,)
+            
+            # Filter samples based on error threshold using tensor operations
+            mask = errors < error_threshold  # (batch_size,)
+            if mask.any():
+                # Get indices where error is below threshold
+                valid_indices = mask.nonzero(as_tuple=True)[0]  # (n_valid,)
+                
+                # Extract valid samples and errors in batch
+                valid_Z = Z_generated[valid_indices].cpu()  # (n_valid, seq_len, d_model)
+                valid_errors = errors[valid_indices].cpu()  # (n_valid,)
+                
+                # Append to filtered samples
+                for i in range(len(valid_indices)):
+                    filtered_samples.append((valid_Z[i:i+1], valid_errors[i].item()))
+    
+    if inject_noise:
+        # restore original weights
+        model.load_state_dict(state_dict_original)
+    model.train()
+    print(f"Generated CoT for {len(no_cot_dataset)} samples, {len(filtered_samples)} passed threshold {error_threshold}")
+    return filtered_samples
+
+
+class MixedCoTDataset(Dataset):
+    """
+    Dataset that mixes samples with ground-truth CoT and generated CoT.
+    """
+    def __init__(self, cot_dataset, generated_samples):
+        """
+        Args:
+            cot_dataset: Dataset with ground-truth CoT
+            generated_samples: List of (Z_with_cot, error) tuples from generate_and_filter_cot
+        """
+        self.cot_dataset = cot_dataset
+        self.generated_samples = [sample[0] for sample in generated_samples]  # Extract Z tensors
+        self.total_len = len(cot_dataset) + len(self.generated_samples)
+        
+    def __len__(self):
+        return self.total_len
+    
+    def __getitem__(self, idx):
+        if idx < len(self.cot_dataset):
+            return self.cot_dataset[idx]
+        else:
+            gen_idx = idx - len(self.cot_dataset)
+            return self.generated_samples[gen_idx].squeeze(0)  # Remove batch dimension
+
+
 def train(args):
     # Set random seed for reproducibility
     torch.manual_seed(args.seed)
@@ -418,16 +524,54 @@ def train(args):
         )
     
     # Create datasets
-    train_dataset = LinearFunctionDataset(
-        n_tasks=args.n_train_tasks,
-        n_examples=args.n_examples,
-        input_dim=args.input_dim,
-        noise_std=args.noise_std,
-        lr=args.gd_lr,
-        T=args.T,
-        split='train',
-        no_cot=args.no_cot
-    )
+    # Split training data into CoT and no-CoT portions
+    if args.cot_ratio < 1.0:
+        n_cot_tasks = int(args.n_train_tasks * args.cot_ratio)
+        n_no_cot_tasks = args.n_train_tasks - n_cot_tasks
+        
+        print(f"Creating mixed dataset: {n_cot_tasks} with CoT, {n_no_cot_tasks} without CoT")
+        
+        # Dataset with CoT
+        cot_dataset = LinearFunctionDataset(
+            n_tasks=n_cot_tasks,
+            n_examples=args.n_examples,
+            input_dim=args.input_dim,
+            noise_std=args.noise_std,
+            lr=args.gd_lr,
+            T=args.T,
+            split='train',
+            no_cot=False
+        )
+        
+        # Dataset without CoT
+        no_cot_dataset = LinearFunctionDataset(
+            n_tasks=n_no_cot_tasks,
+            n_examples=args.n_examples,
+            input_dim=args.input_dim,
+            noise_std=args.noise_std,
+            lr=args.gd_lr,
+            T=args.T,
+            split='train_no_cot',
+            no_cot=True
+        )
+        # Offset the seeds for no_cot_dataset to avoid overlap
+        no_cot_dataset.task_seeds = np.arange(n_cot_tasks, n_cot_tasks + n_no_cot_tasks)
+        
+        # Initially train only on CoT dataset
+        train_dataset = cot_dataset
+    else:
+        # All training data has CoT
+        train_dataset = LinearFunctionDataset(
+            n_tasks=args.n_train_tasks,
+            n_examples=args.n_examples,
+            input_dim=args.input_dim,
+            noise_std=args.noise_std,
+            lr=args.gd_lr,
+            T=args.T,
+            split='train',
+            no_cot=args.no_cot
+        )
+        no_cot_dataset = None
     
     test_dataset = LinearFunctionDataset(
         n_tasks=args.n_test_tasks,
@@ -483,8 +627,43 @@ def train(args):
     train_loss = 0.0
     train_samples = 0
     steps = 0
+    
+    max_steps = args.epochs * len(train_loader)
     for epoch in range(args.epochs):
         model.train()
+        
+        # Check if we should regenerate CoT for no_cot_dataset
+        if (no_cot_dataset is not None and 
+            args.regen_interval > 0 and 
+            steps > 0 and steps % args.regen_interval == 0):
+            
+            print(f"\n[Step {steps}] Regenerating CoT sequences for no-CoT dataset...")
+            
+            # Generate and filter CoT sequences
+            filtered_samples = generate_and_filter_cot(
+                model, 
+                no_cot_dataset, 
+                device, 
+                args.cot_error_threshold,
+                batch_size=args.batch_size,
+                inject_noise=args.cot_inject_noise,
+                noise_sigma=args.cot_noise_sigma
+            )
+            # shuffle
+            filtered_samples = sorted(filtered_samples, key=lambda x: x[1])
+            
+            if len(filtered_samples) > 0:
+                # Create new mixed dataset
+                train_dataset = MixedCoTDataset(cot_dataset, filtered_samples)
+                train_loader = DataLoader(
+                    train_dataset,
+                    batch_size=args.batch_size,
+                    shuffle=True,
+                    num_workers=args.num_workers
+                )
+                print(f"Updated training set: {len(cot_dataset)} original + {len(filtered_samples)} generated = {len(train_dataset)} total")
+            else:
+                print("No samples passed the error threshold, keeping original dataset")
         
         for Z in train_loader:
             Z = Z.to(device)  # (batch_size, d_model, seq_len)
@@ -524,13 +703,12 @@ def train(args):
                 # Log to wandb
                 if args.use_wandb:
                     wandb.log({
-                        'step': steps,
                         'train_loss': avg_train_loss,
                         'val_loss': val_loss,
                         'perturbed_mean_loss': perturbed_mean_loss,
                         'perturbed_std_loss': perturbed_std_loss,
                         'lr': optimizer.param_groups[0]['lr']
-                    })
+                    }, step=steps)
                 
                 # Save best model
                 if val_loss < best_val_loss:
@@ -554,7 +732,12 @@ def train(args):
             if args.use_scheduler:
                 scheduler.step()
                 
-    
+            if args.regen_interval > 0 and steps % args.regen_interval == 0:
+                break
+        
+        if steps >= max_steps:
+            break
+                    
     # Final test evaluation
     test_loss = evaluate(model, test_loader, device)
     print(f"\nFinal Test Loss: {test_loss:.6f}")
@@ -586,6 +769,18 @@ def main():
                         help='Number of gradient descent steps in CoT')
     parser.add_argument('--no_cot', action='store_true', 
                         help='Disable chain-of-thought generation')
+    
+    # CoT generation and filtering parameters
+    parser.add_argument('--cot_ratio', type=float, default=1.0,
+                        help='Ratio of training data with ground-truth CoT (0.0-1.0)')
+    parser.add_argument('--regen_interval', type=int, default=0,
+                        help='Steps between CoT regeneration (0 to disable)')
+    parser.add_argument('--cot_error_threshold', type=float, default=1.0,
+                        help='Maximum MSE error threshold to accept generated CoT')
+    parser.add_argument('--cot_inject_noise', action='store_true',
+                        help='Inject noise into model weights during CoT generation for robustness')
+    parser.add_argument('--cot_noise_sigma', type=float, default=1e-3,
+                        help='Standard deviation of weight noise during CoT generation')
     
     # Training parameters
     parser.add_argument('--batch_size', type=int, default=64,
