@@ -285,6 +285,7 @@ if __name__ == "__main__":
     parser.add_argument("--only_load_last_output", action="store_true")  # for graph-llama, only load the last output
     parser.add_argument("--only_answer_output", action="store_true") # only load the last step
     parser.add_argument("--eval_last_step", action="store_true") # only evaluate the last step of the output
+    parser.add_argument("--eval_step_num", type=int, default=0) # number of intermediate steps to evaluate (0 means only final, N means first N steps + final)
 
     parser.add_argument("--use_graph_llama", action="store_true")
     parser.add_argument("--only_train_graph", action="store_true") # pretraining gnn 
@@ -388,7 +389,7 @@ if __name__ == "__main__":
         extended_task_names = [f"{task_name}" for task_name in args.task_names]
         lm = MultitaskModel(model, tokenizer, model_type, use_cpu_offload=False,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb, 
-                        optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step)
+                        optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
         
         load_model_dir = args.load_model_dir
         load_model_dir = os.path.join("external_lightning_logs", load_model_dir)
@@ -396,7 +397,7 @@ if __name__ == "__main__":
             if ("ckpt" in load_model_dir) and os.path.exists(load_model_dir):
                 lm = MultitaskModel.load_from_checkpoint(load_model_dir, model=model, tokenizer=tokenizer, model_type=model_type,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
-                        optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step)
+                        optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
                 print(f"Loaded model from {load_model_dir}")
             elif ("pt" in load_model_dir) and os.path.exists(load_model_dir):
                 if args.use_graph_llama:
@@ -498,7 +499,7 @@ if __name__ == "__main__":
                 model.load_state_dict(state_dict, strict=False)
                 lm = MultitaskModel(model, tokenizer, model_type, use_cpu_offload=False,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
-                        optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step)
+                        optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
                 
                 if args.use_3bit or args.use_2bit:
                     trainer.validate_loop.trainer_fn = TrainerFn.FITTING
