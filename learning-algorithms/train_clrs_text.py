@@ -64,6 +64,28 @@ def layer_index_from_name(name, default=0):
     return default
 
 
+def add_gaussian_noise_to_weights(model, std=0.01):
+    """
+    Add Gaussian noise to all trainable parameters of the model.
+    
+    Args:
+        model: The model to perturb
+        std: Standard deviation of the Gaussian noise
+    """
+    total_params = 0
+    perturbed_params = 0
+    with torch.no_grad():
+        for name, param in model.named_parameters():
+            total_params += 1
+            if param.requires_grad:
+                noise = torch.randn_like(param) * std
+                param.add_(noise)
+                perturbed_params += 1
+                if perturbed_params <= 5:  # Print first 5 for debugging
+                    print(f"Added Gaussian noise (std={std}) to {name}, shape: {param.shape}")
+    print(f"Added Gaussian noise (std={std}) to {perturbed_params}/{total_params} trainable parameters")
+
+
 def initialize_model(args):
     model_key = args.model_key.replace("/", "-").replace("..", "")
     if "gpt" in args.model_key or "Llama" in model_key \
@@ -287,6 +309,9 @@ if __name__ == "__main__":
     parser.add_argument("--eval_last_step", action="store_true") # only evaluate the last step of the output
     parser.add_argument("--eval_step_num", type=int, default=0) # number of intermediate steps to evaluate (0 means only final, N means first N steps + final)
 
+    parser.add_argument("--add_weight_perturb", action="store_true") # add Gaussian noise to model weights
+    parser.add_argument("--perturb_std", type=float, default=0.01) # standard deviation of Gaussian noise for weight perturbation
+
     parser.add_argument("--use_graph_llama", action="store_true")
     parser.add_argument("--only_train_graph", action="store_true") # pretraining gnn 
     parser.add_argument("--test_classifier_before_cross_attn", action="store_true") # pretraining gnn
@@ -399,12 +424,23 @@ if __name__ == "__main__":
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
                 print(f"Loaded model from {load_model_dir}")
+                # Add Gaussian noise to model weights if requested
+                if args.add_weight_perturb:
+                    print(f"Adding Gaussian noise (std={args.perturb_std}) to model weights...")
+                    add_gaussian_noise_to_weights(lm.model, std=args.perturb_std)
             elif ("pt" in load_model_dir) and os.path.exists(load_model_dir):
                 if args.use_graph_llama:
                     print(model.model.load_state_dict(torch.load(load_model_dir), strict=False))
                 else:
                     print(model.load_state_dict(torch.load(load_model_dir), strict=False))
                 print(f"Loaded model from {load_model_dir}")
+                # Add Gaussian noise to model weights if requested
+                if args.add_weight_perturb:
+                    print(f"Adding Gaussian noise (std={args.perturb_std}) to model weights...")
+                    if args.use_graph_llama:
+                        add_gaussian_noise_to_weights(model.model, std=args.perturb_std)
+                    else:
+                        add_gaussian_noise_to_weights(model, std=args.perturb_std)
 
         if args.load_branching_config:
             # load weights from different trained adapters
@@ -497,6 +533,10 @@ if __name__ == "__main__":
                 args.use_3bit or args.use_2bit:                         
                 model, tokenizer, hf_key, model_type, append_eos = initialize_model(args)
                 model.load_state_dict(state_dict, strict=False)
+                # Add Gaussian noise to model weights if requested
+                if args.add_weight_perturb:
+                    print(f"Adding Gaussian noise (std={args.perturb_std}) to model weights...")
+                    add_gaussian_noise_to_weights(model, std=args.perturb_std)
                 lm = MultitaskModel(model, tokenizer, model_type, use_cpu_offload=False,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
