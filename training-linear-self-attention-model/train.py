@@ -61,11 +61,13 @@ class LinearAttentionLayerSimplified(nn.Module):
     One-layer linear attention model without softmax normalization.
     Implements: Attn(Q, K, V) = Q(K^T V) where Q, K, V are linear projections.
     """
-    def __init__(self, d_model, n, input_dim, no_cot=False):
+    def __init__(self, d_model, n, input_dim, no_cot=False, use_noise_injection=False, noise_sigma=1e-3):
         super().__init__()
         self.d_model = d_model
         self.n = n # normalization factor
         self.input_dim = input_dim
+        self.use_noise_injection = use_noise_injection
+        self.noise_sigma = noise_sigma
         
         # Linear projections for merging Q and K
         self.W_kq = nn.Linear(d_model, d_model, bias=False)
@@ -125,8 +127,24 @@ class LinearAttentionLayerSimplified(nn.Module):
         """
         batch_size, seq_len, d_model = x.shape
         
-        # Compute W^{KQ}(X): (batch_size, seq_len, d_model)
-        W_kq_x = self.W_kq(x)  # (batch_size, seq_len, d_model)
+        # Inject noise into weights if enabled (only during training)
+        if self.use_noise_injection and self.training:
+            # Generate noise without gradients
+            with torch.no_grad():
+                noise_kq = torch.randn_like(self.W_kq.weight) * self.noise_sigma * (self.W_kq.weight != 0)
+                noise_pv = torch.randn_like(self.W_pv.weight) * self.noise_sigma * (self.W_pv.weight != 0)
+                # set 24 block noise to zero
+                noise_kq[self.input_dim:self.input_dim+1, 2*self.input_dim+1:2*self.input_dim+2] = 0.0
+            
+            # Compute with noisy weights (noise doesn't require grad)
+            W_kq_noisy = self.W_kq.weight + noise_kq
+            W_pv_noisy = self.W_pv.weight + noise_pv
+            
+            # Use functional API to compute with noisy weights
+            W_kq_x = torch.nn.functional.linear(x, W_kq_noisy)  # (batch_size, seq_len, d_model)
+        else:
+            # Compute W^{KQ}(X): (batch_size, seq_len, d_model)
+            W_kq_x = self.W_kq(x)  # (batch_size, seq_len, d_model)
         
         # Compute attention score matrix: X^T @ W^{KQ}(X)
         # (batch_size, d_model, seq_len) @ (batch_size, seq_len, d_model) -> (batch_size, d_model, d_model)
@@ -141,7 +159,10 @@ class LinearAttentionLayerSimplified(nn.Module):
         masked_scores = attention_scores * causal_mask  # (batch_size, seq_len, seq_len)
         
         # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d_model)
-        PV = self.W_pv(x)  # (batch_size, seq_len, d_model)
+        if self.use_noise_injection and self.training:
+            PV = torch.nn.functional.linear(x, W_pv_noisy)  # (batch_size, seq_len, d_model)
+        else:
+            PV = self.W_pv(x)  # (batch_size, seq_len, d_model)
         attention_output = torch.matmul(masked_scores, PV)  # (batch_size, seq_len, d_model)
         
         # Add residual connection
@@ -155,18 +176,21 @@ class WeightPredictionModel(nn.Module):
     Model for predicting linear function weights from in-context examples.
     Causal language modeling style: predict next position from all preceding positions.
     """
-    def __init__(self, d_model, n_examples, no_cot=False):
+    def __init__(self, d_model, n_examples, no_cot=False, use_noise_injection=False, noise_sigma=1e-3):
         super().__init__()
         self.d_model = d_model
         self.n_examples = n_examples
         self.no_cot = no_cot
+        self.use_noise_injection = use_noise_injection
+        self.noise_sigma = noise_sigma
         
         # Calculate input_dim from d_model
         # d_model = 2*input_dim + 2
         input_dim = (d_model - 2) // 2
                 
         # Linear attention layer
-        self.attention = LinearAttentionLayerSimplified(d_model, n_examples, input_dim, no_cot)
+        self.attention = LinearAttentionLayerSimplified(d_model, n_examples, input_dim, no_cot, 
+                                                        use_noise_injection, noise_sigma)
         
         
     def forward(self, Z):
@@ -365,7 +389,7 @@ def evaluate(model, dataloader, device):
     Evaluate the model on a dataset by generating T+1 steps and comparing final prediction to w_star.
     Returns the mean squared error between predicted and true weights.
     """
-    model.eval()
+    model.eval(); model.training = False; model.attention.training = False
     total_loss = 0.0
     total_samples = 0
     
@@ -401,7 +425,7 @@ def evaluate(model, dataloader, device):
             total_loss += loss.item() * batch_size
             total_samples += batch_size
     
-    model.train()
+    model.train(); model.training = True; model.attention.training = True
     return total_loss / total_samples if total_samples > 0 else float('nan')
 
 
@@ -465,6 +489,13 @@ def generate_and_filter_cot(model, no_cot_dataset, device, error_threshold, batc
                 # Extract valid samples and errors in batch
                 valid_Z = Z_generated[valid_indices].cpu()  # (n_valid, seq_len, d_model)
                 valid_errors = errors[valid_indices].cpu()  # (n_valid,)
+                
+                # replace the last column as the true w_star
+                valid_Z[:, -1, input_dim+1:2*input_dim+1] = w_star_true[valid_indices].cpu()
+                # make positions as zeros in a similar format as the dataset
+                valid_Z[:, :n_examples, input_dim+1:2*input_dim+2] = 0.0  # zero out w_cot and indicator in input examples
+                valid_Z[:, n_examples:n_examples+T+1, :input_dim+1] = 0.0  # zero out x and y in CoT positions
+                valid_Z[:, n_examples:n_examples+T+1, 2*input_dim+1:] = 1.0  # set indicator to 1 in CoT positions
                 
                 # Append to filtered samples
                 for i in range(len(valid_indices)):
@@ -605,7 +636,9 @@ def train(args):
     model = WeightPredictionModel(
         d_model=d_model,
         n_examples=args.n_examples,
-        no_cot=args.no_cot
+        no_cot=args.no_cot,
+        use_noise_injection=args.use_noise_injection,
+        noise_sigma=args.train_noise_sigma
     ).to(device)
     
     print(f"Model parameters: {sum(p.numel() for p in model.parameters())}")
@@ -646,8 +679,8 @@ def train(args):
                 device, 
                 args.cot_error_threshold,
                 batch_size=args.batch_size,
-                inject_noise=args.cot_inject_noise,
-                noise_sigma=args.cot_noise_sigma
+                inject_noise=args.cot_generate_inject_noise,
+                noise_sigma=args.cot_generate_noise_sigma
             )
             # shuffle
             filtered_samples = sorted(filtered_samples, key=lambda x: x[1])
@@ -658,7 +691,7 @@ def train(args):
                 train_loader = DataLoader(
                     train_dataset,
                     batch_size=args.batch_size,
-                    shuffle=True,
+                    shuffle=False,
                     num_workers=args.num_workers
                 )
                 print(f"Updated training set: {len(cot_dataset)} original + {len(filtered_samples)} generated = {len(train_dataset)} total")
@@ -735,6 +768,14 @@ def train(args):
             if args.regen_interval > 0 and steps % args.regen_interval == 0:
                 break
         
+        # # At end of epoch, if no regeneration during epoch, continue as normal
+        # train_loader = DataLoader(
+        #     cot_dataset,
+        #     batch_size=args.batch_size,
+        #     shuffle=True,
+        #     num_workers=args.num_workers
+        # )
+        
         if steps >= max_steps:
             break
                     
@@ -770,6 +811,12 @@ def main():
     parser.add_argument('--no_cot', action='store_true', 
                         help='Disable chain-of-thought generation')
     
+    # Noise injection parameters
+    parser.add_argument('--use_noise_injection', action='store_true',
+                        help='Inject Gaussian noise into model weights during forward pass for training robustness')
+    parser.add_argument('--train_noise_sigma', type=float, default=1e-3,
+                        help='Standard deviation of weight noise injection during training')
+    
     # CoT generation and filtering parameters
     parser.add_argument('--cot_ratio', type=float, default=1.0,
                         help='Ratio of training data with ground-truth CoT (0.0-1.0)')
@@ -777,9 +824,9 @@ def main():
                         help='Steps between CoT regeneration (0 to disable)')
     parser.add_argument('--cot_error_threshold', type=float, default=1.0,
                         help='Maximum MSE error threshold to accept generated CoT')
-    parser.add_argument('--cot_inject_noise', action='store_true',
+    parser.add_argument('--cot_generate_inject_noise', action='store_true',
                         help='Inject noise into model weights during CoT generation for robustness')
-    parser.add_argument('--cot_noise_sigma', type=float, default=1e-3,
+    parser.add_argument('--cot_generate_noise_sigma', type=float, default=1e-3,
                         help='Standard deviation of weight noise during CoT generation')
     
     # Training parameters
