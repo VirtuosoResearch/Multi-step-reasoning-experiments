@@ -23,13 +23,14 @@ python train.py \
   --weight_decay 0.0 \
   --grad_clip 1.0 \
   --num_workers 4 \
-  --save_dir "checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T${T}" \
+  --save_dir "checkpoints/linear_attention_model_input10_examples20_lr0.001_bs1000_T${T}_use_noise" \
   --device 0 \
   --eval_interval 50 \
   --sigma 0.002 \
   --use_wandb \
   --wandb_project linear-self-attention-weight-prediction \
-  --wandb_run_name "input10_examples20_T${T}_seed${seed}_training_tasks1e1" \
-  --seed $seed
+  --wandb_run_name "input10_examples20_T${T}_seed${seed}_training_tasks1e1_use_noise" \
+  --seed $seed\
+  --use_noise_injection --train_noise_sigma 0.001
 done
 done
