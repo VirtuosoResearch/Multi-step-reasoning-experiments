@@ -2,6 +2,7 @@
 Training script for one-layer linear attention model on weight prediction task.
 Following the experimental setup from the paper for linear function learning.
 """
+import math
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -61,13 +62,15 @@ class LinearAttentionLayerSimplified(nn.Module):
     One-layer linear attention model without softmax normalization.
     Implements: Attn(Q, K, V) = Q(K^T V) where Q, K, V are linear projections.
     """
-    def __init__(self, d_model, n, input_dim, no_cot=False, use_noise_injection=False, noise_sigma=1e-3):
+    def __init__(self, d_model, n, input_dim, no_cot=False, use_noise_injection=False, noise_sigma=1e-3, 
+                 use_softmax=False):
         super().__init__()
         self.d_model = d_model
         self.n = n # normalization factor
         self.input_dim = input_dim
         self.use_noise_injection = use_noise_injection
         self.noise_sigma = noise_sigma
+        self.use_softmax = use_softmax
         
         # Linear projections for merging Q and K
         self.W_kq = nn.Linear(d_model, d_model, bias=False)
@@ -79,7 +82,8 @@ class LinearAttentionLayerSimplified(nn.Module):
         # Block structure: [x (input_dim), y (1), w (input_dim), indicator (1)]
         # Blocks: (0: x), (1: y), (2: w), (3: indicator)
         
-        # Initialize all weights with small random values to break symmetry
+    
+        # Initialize all we ights with small random values to break symmetry
         # Use smaller std for non-important blocks
         nn.init.zeros_(self.W_kq.weight)
         nn.init.zeros_(self.W_pv.weight)
@@ -109,7 +113,7 @@ class LinearAttentionLayerSimplified(nn.Module):
             block_31_pv.copy_(torch.diag(diagonal_values))
         
         self.no_cot = no_cot
-        if not self.no_cot:
+        if not self.no_cot and (not self.use_softmax):
             # Register hook to zero out gradients for block_24_kq
             def zero_block_24_grad(grad):
                 grad_copy = grad.clone()
@@ -117,7 +121,7 @@ class LinearAttentionLayerSimplified(nn.Module):
                 return grad_copy
             
             self.W_kq.weight.register_hook(zero_block_24_grad)
-            
+        
     def forward(self, x):
         """
         Args:
@@ -150,13 +154,20 @@ class LinearAttentionLayerSimplified(nn.Module):
         # (batch_size, d_model, seq_len) @ (batch_size, seq_len, d_model) -> (batch_size, d_model, d_model)
         x_T = x.transpose(-2, -1)  # (batch_size, d_model, seq_len)
         
-        # But wait - we need the score matrix to be (seq_len, seq_len) for masking
-        # The correct formulation: W^{KQ}(X) @ X^T gives us (seq_len, seq_len) scores
-        attention_scores = torch.matmul(W_kq_x, x_T) / self.n  # (batch_size, seq_len, seq_len)
-        
-        # Apply causal mask: only attend to past positions
-        causal_mask = torch.tril(torch.ones(seq_len, seq_len, device=x.device))  # (seq_len, seq_len)
-        masked_scores = attention_scores * causal_mask  # (batch_size, seq_len, seq_len)
+        if not self.use_softmax:
+            # The correct formulation: W^{KQ}(X) @ X^T gives us (seq_len, seq_len) scores
+            attention_scores = torch.matmul(W_kq_x, x_T) / self.n  # (batch_size, seq_len, seq_len)
+            # Apply causal mask: only attend to past positions
+            causal_mask = torch.tril(torch.ones(seq_len, seq_len, device=x.device))  # (seq_len, seq_len)
+            masked_scores = attention_scores * causal_mask  # (batch_size, seq_len, seq_len)
+        else:
+            # Compute attention scores as W^{KQ}(X) @ X^T
+            attention_scores = torch.matmul(W_kq_x, x_T) # / self.n  # (batch_size, seq_len, seq_len)
+            # Apply causal mask
+            causal_mask = torch.tril(torch.ones(seq_len, seq_len, device=x.device))  # (seq_len, seq_len)
+            masked_scores = attention_scores.masked_fill(causal_mask == 0, -1e8)  # (batch_size, seq_len, seq_len)
+            # Apply softmax
+            masked_scores = torch.nn.functional.softmax(masked_scores, dim=-1)  # (batch_size, seq_len, seq_len)
         
         # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d_model)
         if self.use_noise_injection and self.training:
@@ -176,13 +187,15 @@ class WeightPredictionModel(nn.Module):
     Model for predicting linear function weights from in-context examples.
     Causal language modeling style: predict next position from all preceding positions.
     """
-    def __init__(self, d_model, n_examples, no_cot=False, use_noise_injection=False, noise_sigma=1e-3):
+    def __init__(self, d_model, n_examples, no_cot=False, use_noise_injection=False, noise_sigma=1e-3, 
+                 use_softmax=True):
         super().__init__()
         self.d_model = d_model
         self.n_examples = n_examples
         self.no_cot = no_cot
         self.use_noise_injection = use_noise_injection
         self.noise_sigma = noise_sigma
+        self.use_softmax = use_softmax
         
         # Calculate input_dim from d_model
         # d_model = 2*input_dim + 2
@@ -190,7 +203,8 @@ class WeightPredictionModel(nn.Module):
                 
         # Linear attention layer
         self.attention = LinearAttentionLayerSimplified(d_model, n_examples, input_dim, no_cot, 
-                                                        use_noise_injection, noise_sigma)
+                                                        use_noise_injection, noise_sigma, 
+                                                        use_softmax)
         
         
     def forward(self, Z):
@@ -444,7 +458,7 @@ def generate_and_filter_cot(model, no_cot_dataset, device, error_threshold, batc
     Returns:
         filtered_samples: List of (Z_with_cot, error) tuples that passed the threshold
     """
-    model.eval()
+    model.eval(); model.training = False; model.attention.training = False
     filtered_samples = []
     
     if inject_noise:
@@ -504,7 +518,7 @@ def generate_and_filter_cot(model, no_cot_dataset, device, error_threshold, batc
     if inject_noise:
         # restore original weights
         model.load_state_dict(state_dict_original)
-    model.train()
+    model.train(); model.training = True; model.attention.training = True
     print(f"Generated CoT for {len(no_cot_dataset)} samples, {len(filtered_samples)} passed threshold {error_threshold}")
     return filtered_samples
 
@@ -638,7 +652,8 @@ def train(args):
         n_examples=args.n_examples,
         no_cot=args.no_cot,
         use_noise_injection=args.use_noise_injection,
-        noise_sigma=args.train_noise_sigma
+        noise_sigma=args.train_noise_sigma, 
+        use_softmax=args.use_softmax
     ).to(device)
     
     print(f"Model parameters: {sum(p.numel() for p in model.parameters())}")
@@ -699,6 +714,7 @@ def train(args):
                 print("No samples passed the error threshold, keeping original dataset")
         
         for Z in train_loader:
+            model.train()
             Z = Z.to(device)  # (batch_size, d_model, seq_len)
             
             # Compute loss over all positions (CLM style), masking out input examples
@@ -810,6 +826,8 @@ def main():
                         help='Number of gradient descent steps in CoT')
     parser.add_argument('--no_cot', action='store_true', 
                         help='Disable chain-of-thought generation')
+    parser.add_argument('--use_softmax', action='store_true',
+                        help='Use softmax in attention mechanism')
     
     # Noise injection parameters
     parser.add_argument('--use_noise_injection', action='store_true',
