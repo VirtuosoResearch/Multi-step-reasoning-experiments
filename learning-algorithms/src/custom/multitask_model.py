@@ -38,6 +38,162 @@ TODO:
 - Modify compute gradients
 '''
 
+def _find_sep_positions(answer_ids_1d: torch.Tensor, sep_token_id: int):
+    # answer_ids_1d: [T_ans], no pad
+    # return positions where token == sep_token_id
+    return (answer_ids_1d == sep_token_id).nonzero(as_tuple=False).view(-1)
+
+@torch.no_grad()
+def compute_step_losses_from_concatenated(
+    model,
+    tokenizer,
+    input_ids: torch.Tensor,          # [B, T] full sequence (input + labels already concatenated in input_ids)
+    labels: torch.Tensor,              # [B, T] with -100 for input tokens, and answer tokens as ids
+    attention_mask: torch.Tensor,      # [B, T] attention mask
+    sep_strs: List[str] = [",", "|"],  # List of separator strings
+    pad_token_id: int = None,
+):
+    """
+    Compute step losses by using input_ids (which contains input + gold_answers concatenated),
+    forward through model, mask input part, and split by separators.
+    
+    Args:
+        model: The model to use for forward pass
+        tokenizer: Tokenizer for encoding separator strings
+        input_ids: [B, T] full sequence (input + gold_answers concatenated)
+        labels: [B, T] with -100 for input tokens, and answer tokens as ids
+        attention_mask: [B, T] attention mask
+        sep_strs: List of separator strings to split steps (e.g., [",", "|"])
+        pad_token_id: Pad token id (if None, use tokenizer.pad_token_id)
+    
+    Returns:
+        step_loss_list: List[List[float]] length B, each inner list per step avg loss
+    """
+    if pad_token_id is None:
+        pad_token_id = tokenizer.pad_token_id
+    
+    device = input_ids.device
+    batch_size = input_ids.size(0)
+    
+    step_loss_list = []
+    
+    # 1) Extract input and gold_answers for each batch
+    for b in range(batch_size):
+        # Get input part: positions where labels == -100
+        input_mask = labels[b] == -100
+        input_tokens = input_ids[b, input_mask]  # [T_in]
+        
+        # Get gold answer part: positions where labels != -100 and != pad
+        gold_mask = (labels[b] != -100) & (labels[b] != pad_token_id)
+        gold_tokens = labels[b, gold_mask]  # [T_gold]
+        
+        if gold_tokens.numel() == 0:
+            step_loss_list.append([])
+            continue
+        
+        # 2) Decode to string and split by separators at string level
+        input_str = tokenizer.decode(input_tokens, skip_special_tokens=True)
+        gold_str = tokenizer.decode(gold_tokens, skip_special_tokens=True)
+        
+        # Split gold_str by separators while preserving separator information
+        import re
+        # Create a regex pattern that matches any separator
+        sep_pattern = "|".join([re.escape(sep) for sep in sep_strs])
+        # Split but keep separators in the result
+        parts = re.split(f"({sep_pattern})", gold_str)
+        # print(f"???????????????????????????????????????\nparts: {parts}\n???????????????????????????????????????\n")
+        
+        # Reconstruct steps and separators
+        gold_steps_str = []
+        separators_after_steps = []  # Separator after each step (None for last step)
+        
+        current_step = ""
+        for i, part in enumerate(parts):
+            if part in sep_strs:
+                # This is a separator
+                if current_step.strip():
+                    gold_steps_str.append(current_step.strip())
+                    separators_after_steps.append(part)
+                    current_step = ""
+            else:
+                current_step += part
+        
+        # Add the last step if not empty
+        if current_step.strip():
+            gold_steps_str.append(current_step.strip())
+            separators_after_steps.append(None)  # No separator after last step
+        
+        # Filter out empty steps
+        if len(gold_steps_str) == 0:
+            step_loss_list.append([])
+            continue
+        
+        # 3) For each step, compute loss
+        per_step_losses = []
+        accumulated_output = ""  # Accumulated output from previous steps (including separators)
+        
+        for step_idx, current_step_str in enumerate(gold_steps_str):
+            # Construct input: original_input + accumulated_output
+            if accumulated_output:
+                step_input_str = input_str + accumulated_output
+            else:
+                step_input_str = input_str
+            
+            # Tokenize step input and output
+            step_input_ids = tokenizer(step_input_str, return_tensors="pt", padding=False, truncation=True)["input_ids"].to(device)[0]  # [T_step_in]
+            step_output_ids = tokenizer(current_step_str, return_tensors="pt", padding=False, truncation=True)["input_ids"].to(device)[0]  # [T_step_out]
+            
+            # Concatenate input and output
+            step_concat_ids = torch.cat([step_input_ids, step_output_ids], dim=0)  # [T_step_in + T_step_out]
+            step_concat_attention = torch.ones_like(step_concat_ids, dtype=torch.long)
+            
+            # Create labels: mask input part, keep output part
+            step_labels = step_concat_ids.clone()
+            step_labels[:step_input_ids.size(0)] = -100  # Mask input part
+            
+            # Forward through model
+            step_concat_ids = step_concat_ids.unsqueeze(0)  # [1, T]
+            step_concat_attention = step_concat_attention.unsqueeze(0)  # [1, T]
+            step_labels = step_labels.unsqueeze(0)  # [1, T]
+            
+            out = model(input_ids=step_concat_ids, attention_mask=step_concat_attention)
+            step_logits = out.logits  # [1, T, V]
+            
+            # Compute loss for this step
+            shift_logits = step_logits[:, :-1, :].contiguous()  # [1, T-1, V]
+            shift_labels = step_labels[:, 1:].contiguous()  # [1, T-1]
+            
+            # Only compute loss on output part (where shift_labels != -100)
+            valid_mask = shift_labels != -100
+            if valid_mask.sum().item() == 0:
+                per_step_losses.append(0.0)
+                accumulated_output += current_step_str
+                # Add separator after this step if it exists
+                if step_idx < len(separators_after_steps) and separators_after_steps[step_idx] is not None:
+                    accumulated_output += separators_after_steps[step_idx]
+                continue
+            
+            # Compute cross entropy loss
+            flat_logits = shift_logits.view(-1, shift_logits.size(-1))
+            flat_labels = shift_labels.view(-1)
+            step_losses = F.cross_entropy(flat_logits, flat_labels, reduction="none", ignore_index=-100)
+            step_losses = step_losses[valid_mask.view(-1)]
+            
+            if step_losses.numel() > 0:
+                per_step_losses.append(step_losses.mean().item())
+            else:
+                per_step_losses.append(0.0)
+            
+            # Update accumulated output for next step
+            accumulated_output += current_step_str
+            # Add separator after this step if it exists
+            if step_idx < len(separators_after_steps) and separators_after_steps[step_idx] is not None:
+                accumulated_output += separators_after_steps[step_idx]
+        
+        step_loss_list.append(per_step_losses)
+    
+    return step_loss_list
+
 class MultitaskModel(pl.LightningModule):
     validation_predictions: Dict
 
@@ -204,7 +360,6 @@ class MultitaskModel(pl.LightningModule):
 
             gold_answers = batch["labels"].clone()
             gold_answers[gold_answers == -100] = self.tokenizer.pad_token_id
-            # logging.info(f" #############\n decoded gold_answers: {self.tokenizer.decode(gold_answers[0],skip_special_tokens=True)}\n {self.tokenizer.decode(gold_answers[1],skip_special_tokens=True)} \n##############\n")
             output_len = (gold_answers != self.tokenizer.pad_token_id).sum(dim=1).max().item()
 
             ''' Compute the logits of the labels '''
@@ -215,6 +370,17 @@ class MultitaskModel(pl.LightningModule):
 
             labels = batch["labels"][:, 1:][is_label_mask]
             labels = labels.cpu().numpy()
+
+            # Compute step losses
+            step_losses = compute_step_losses_from_concatenated(
+                self.model,
+                self.tokenizer,
+                batch["input_ids"],
+                batch["labels"],
+                batch["attention_mask"],
+                sep_strs=[",", "|"],
+                pad_token_id=self.tokenizer.pad_token_id,
+            )
 
             generate_output = self.generate_output
             if hasattr(self.model, "only_train_graph") and self.model.only_train_graph:
@@ -270,22 +436,9 @@ class MultitaskModel(pl.LightningModule):
             "generates": output,
             "pred_ids": preds,
             "label_ids": labels,
+            "step_losses": step_losses,
         }
-        # Save logits and labels for step-by-step loss calculation if eval_clrs is enabled
-        if self.eval_clrs and not generate_output:
-            # Only save if we're not generating (when generating, we need to recompute logits differently)
-            # But for CLRS evaluation, we typically have logits from forward pass
-            logits_for_loss = forward_output["logits"][:, :-1].contiguous()
-            labels_for_loss = batch["labels"][:, 1:].contiguous()
-            output_dict["logits"] = logits_for_loss.cpu()
-            output_dict["labels_for_loss"] = labels_for_loss.cpu()
-        elif self.eval_clrs and generate_output:
-            # When generating, we still want to save logits from the initial forward pass
-            # This logits correspond to the gold_answers, not the generated outputs
-            logits_for_loss = forward_output["logits"][:, :-1].contiguous()
-            labels_for_loss = batch["labels"][:, 1:].contiguous()
-            output_dict["logits"] = logits_for_loss.cpu()
-            output_dict["labels_for_loss"] = labels_for_loss.cpu()
+        # logging.info(f"step_losses: {step_losses}")
         if hasattr(self.model, "only_train_graph") and self.model.only_train_graph:
             output_dict.update({"graph_accuracy": forward_output.graph_accuracy})
         if "only_answer" in batch:
@@ -472,11 +625,21 @@ class MultitaskModel(pl.LightningModule):
 
         task_counts = {task_name: 0 for task_name in self.task_names}
         label_counts = {task_name: 0 for task_name in self.task_names}
+        # Collect step losses: {task_name: {step_idx: (sum, count)}}
+        step_loss_dict = {task_name: defaultdict(lambda: [0.0, 0]) for task_name in self.task_names}
         for step, batch in enumerate(outputs):
             task_name = batch["task_name"]
             if len(batch["answers"]) == 0:
                 continue
             summary[f"{task_name}_loss"] += batch["loss"].item()*len(batch["answers"]) if torch.isnan(batch["loss"]) == False else 0
+            
+            # Collect step losses
+            if "step_losses" in batch and batch["step_losses"] is not None:
+                for sample_step_losses in batch["step_losses"]:
+                    # sample_step_losses is List[float], one loss per step
+                    for step_idx, step_loss in enumerate(sample_step_losses):
+                        step_loss_dict[task_name][step_idx][0] += step_loss
+                        step_loss_dict[task_name][step_idx][1] += 1
             # accuracy score is the token-level accuracy conditioned on the correct input (even for the intermediate steps)
             summary[f"{task_name}_accuracy_score"] += accuracy_score(batch["label_ids"], batch["pred_ids"])*len(batch["label_ids"])*100
             if generate_output:
@@ -614,189 +777,14 @@ class MultitaskModel(pl.LightningModule):
                         step_metrics = compute_accuracy(step_preds, step_golds, indices=None)
                         step_key = f"{task_name}_step_{step_idx}_accuracy"
                         step_count_key = f"{task_name}_step_{step_idx}_count"
-                        step_loss_key = f"{task_name}_step_{step_idx}_loss"
                         
                         if step_key not in summary:
                             summary[step_key] = 0
                         if step_count_key not in summary:
                             summary[step_count_key] = 0
-                        if step_loss_key not in summary:
-                            summary[step_loss_key] = 0
                         
                         summary[step_key] += step_metrics["accuracy"] * step_count
                         summary[step_count_key] += step_count
-                        
-                        # Compute loss for this step
-                        # Use the full gold answer sequence to locate each step and compute loss
-                        if "logits" in batch and "labels_for_loss" in batch and "answers" in batch:
-                            batch_logits = batch["logits"]  # [batch_size, seq_len, vocab_size] (shifted, logits[:, :-1])
-                            batch_labels = batch["labels_for_loss"]  # [batch_size, seq_len] (shifted, labels[:, 1:])
-                            original_answers = batch["answers"]  # [batch_size, seq_len] - original token ids
-                            
-                            step_loss_sum = 0.0
-                            step_loss_count = 0
-                            
-                            for batch_idx in range(min(len(step_preds), batch_logits.shape[0])):
-                                # Get the full gold answer string for this batch item
-                                if batch_idx >= len(gold_answers):
-                                    continue
-                                full_gold_answer = gold_answers[batch_idx]
-                                
-                                # Get gold step text
-                                if batch_idx >= len(step_golds):
-                                    continue
-                                gold_step_str = step_golds[batch_idx][0] if isinstance(step_golds[batch_idx], list) else step_golds[batch_idx]
-                                
-                                if not gold_step_str or gold_step_str.strip() == "":
-                                    continue
-                                
-                                # Find the step text position in the full answer string
-                                # This is more reliable than tokenization matching
-                                step_str_clean = gold_step_str.strip()
-                                full_answer_clean = full_gold_answer.strip()
-                                
-                                # Try to find step in the full answer
-                                step_pos_in_str = full_answer_clean.find(step_str_clean)
-                                if step_pos_in_str == -1:
-                                    # Try with stripped version or handle comma/space variations
-                                    # For CLRS format "step1, step2, ... | final", we need to handle commas
-                                    if step_idx != 'final':
-                                        # For intermediate steps, look for "step, " or ", step" patterns
-                                        step_with_comma = step_str_clean + ","
-                                        step_pos_in_str = full_answer_clean.find(step_with_comma)
-                                        if step_pos_in_str == -1:
-                                            comma_step = "," + step_str_clean
-                                            step_pos_in_str = full_answer_clean.find(comma_step)
-                                            if step_pos_in_str != -1:
-                                                step_pos_in_str += 1  # Adjust for the comma
-                                
-                                if step_pos_in_str == -1:
-                                    # Still not found, skip this sample
-                                    continue
-                                
-                                # Now we need to find the token position corresponding to this string position
-                                # Get the token ids for the full answer
-                                original_answer_seq = original_answers[batch_idx]  # [seq_len]
-                                
-                                # Decode the full sequence to get character-level positions
-                                # But a simpler approach: tokenize the substring before the step and count tokens
-                                prefix_str = full_answer_clean[:step_pos_in_str]
-                                
-                                # Tokenize prefix to find token position
-                                prefix_tokenized = self.tokenizer(prefix_str, add_special_tokens=False, return_tensors="pt")
-                                prefix_token_count = prefix_tokenized["input_ids"].shape[1] if prefix_tokenized["input_ids"].shape[1] > 0 else 0
-                                
-                                # Tokenize the step text to get its length in tokens
-                                step_tokenized = self.tokenizer(step_str_clean, add_special_tokens=False, return_tensors="pt")
-                                step_token_count = step_tokenized["input_ids"].shape[1] if step_tokenized["input_ids"].shape[1] > 0 else 0
-                                
-                                if step_token_count == 0:
-                                    continue
-                                
-                                # Find the actual position in the token sequence
-                                # We need to search in original_answer_seq, but account for potential tokenization differences
-                                # Use the tokenized step ids to search
-                                step_token_ids = step_tokenized["input_ids"][0]  # [step_token_count]
-                                
-                                if isinstance(original_answer_seq, torch.Tensor):
-                                    original_answer_seq_np = original_answer_seq.cpu().numpy()
-                                else:
-                                    original_answer_seq_np = np.array(original_answer_seq)
-                                
-                                if isinstance(step_token_ids, torch.Tensor):
-                                    step_token_ids_np = step_token_ids.cpu().numpy()
-                                else:
-                                    step_token_ids_np = np.array(step_token_ids)
-                                
-                                # Filter pad tokens
-                                pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id is not None else 0
-                                non_pad_mask = original_answer_seq_np != pad_token_id
-                                non_pad_positions = np.where(non_pad_mask)[0]
-                                
-                                # Start searching from approximately the prefix position
-                                search_start_idx = max(0, min(prefix_token_count, len(non_pad_positions) - step_token_count))
-                                
-                                # Search for step tokens in the sequence
-                                step_start_pos = None
-                                for search_idx in range(search_start_idx, len(non_pad_positions) - step_token_count + 1):
-                                    actual_pos = non_pad_positions[search_idx]
-                                    if actual_pos + step_token_count <= len(original_answer_seq_np):
-                                        candidate_tokens = original_answer_seq_np[actual_pos:actual_pos+step_token_count]
-                                        if np.array_equal(candidate_tokens, step_token_ids_np):
-                                            step_start_pos = actual_pos
-                                            break
-                                
-                                # If not found near prefix, search from beginning
-                                if step_start_pos is None:
-                                    for i in range(len(original_answer_seq_np) - step_token_count + 1):
-                                        if np.array_equal(original_answer_seq_np[i:i+step_token_count], step_token_ids_np):
-                                            step_start_pos = i
-                                            break
-                                
-                                # Compute loss using the found position
-                                # Note: logits and labels are shifted by 1
-                                # logits[i] predicts original_answer_seq[i+1]
-                                # So if step starts at pos, we need logits at pos-1
-                                if step_start_pos is not None and step_start_pos > 0 and step_start_pos + step_token_count <= len(original_answer_seq_np):
-                                    logits_start_pos = step_start_pos - 1
-                                    logits_end_pos = min(logits_start_pos + step_token_count, batch_logits.shape[1])
-                                    
-                                    if logits_start_pos >= 0 and logits_end_pos > logits_start_pos and logits_end_pos <= batch_logits.shape[1]:
-                                        # Get corresponding logits and labels
-                                        step_logits = batch_logits[batch_idx, logits_start_pos:logits_end_pos, :]  # [step_len, vocab_size]
-                                        step_labels = batch_labels[batch_idx, logits_start_pos:logits_end_pos]  # [step_len]
-                                        
-                                        # Adjust length
-                                        min_len = min(step_logits.shape[0], step_labels.shape[0])
-                                        if min_len > 0:
-                                            step_logits = step_logits[:min_len, :]
-                                            step_labels = step_labels[:min_len]
-                                            
-                                            # Filter out -100 labels
-                                            valid_mask = step_labels != -100
-                                            if valid_mask.any():
-                                                step_logits_flat = step_logits.view(-1, step_logits.shape[-1])
-                                                step_labels_flat = step_labels.view(-1)
-                                                
-                                                # Ensure tensors
-                                                if not isinstance(step_logits_flat, torch.Tensor):
-                                                    step_logits_flat = torch.from_numpy(step_logits_flat)
-                                                if not isinstance(step_labels_flat, torch.Tensor):
-                                                    step_labels_flat = torch.from_numpy(step_labels_flat)
-                                                
-                                                step_logits_flat = step_logits_flat.cpu().float()
-                                                step_labels_flat = step_labels_flat.cpu().long()
-                                                
-                                                # Compute cross entropy loss
-                                                try:
-                                                    step_loss = F.cross_entropy(step_logits_flat[valid_mask], step_labels_flat[valid_mask], reduction='mean')
-                                                    step_loss_val = step_loss.item() if torch.is_tensor(step_loss) else float(step_loss)
-                                                    if not (np.isnan(step_loss_val) or np.isinf(step_loss_val)):
-                                                        step_loss_sum += step_loss_val
-                                                        step_loss_count += 1
-                                                except Exception as e:
-                                                    if step == 0 and batch_idx < 2:
-                                                        print(f"Warning: Error computing step loss: {e}")
-                                                    continue
-                            
-                            if step_loss_count > 0:
-                                avg_step_loss = step_loss_sum / step_loss_count
-                                summary[step_loss_key] += avg_step_loss * step_loss_count
-                                step_loss_count_key = f"{task_name}_step_{step_idx}_loss_count"
-                                if step_loss_count_key not in summary:
-                                    summary[step_loss_count_key] = 0
-                                summary[step_loss_count_key] += step_loss_count
-                            elif step == 0 and len(step_preds) > 0:
-                                # Debug info
-                                print(f"DEBUG: step_loss_count=0 for step_idx={step_idx}, task={task_name}, samples={len(step_preds)}")
-                                if "logits" in batch:
-                                    print(f"  batch_logits.shape={batch_logits.shape}")
-                                if "labels_for_loss" in batch:
-                                    print(f"  batch_labels.shape={batch_labels.shape}")
-                                if len(step_golds) > 0:
-                                    print(f"  First step_text: {step_golds[0] if isinstance(step_golds[0], list) else step_golds[0]}")
-                                    if len(gold_answers) > 0:
-                                        print(f"  First full_answer (first 200 chars): {gold_answers[0][:200]}")
                     
                     # For backward compatibility, also compute final accuracy as before
                     # Use pred_final_list and gold_final_list to ensure consistency with step_final_accuracy
@@ -857,6 +845,14 @@ class MultitaskModel(pl.LightningModule):
             if task_counts[task_name] > 0:
                 summary[f"{task_name}_loss"] /= task_counts[task_name]
                 summary[f"{task_name}_accuracy_score"] = (summary[f"{task_name}_accuracy_score"]/label_counts[task_name]) if label_counts[task_name] > 0 else 0
+                
+                # Average step losses
+                if task_name in step_loss_dict:
+                    for step_idx in sorted(step_loss_dict[task_name].keys()):
+                        step_loss_sum, step_loss_count = step_loss_dict[task_name][step_idx]
+                        if step_loss_count > 0:
+                            step_loss_avg = step_loss_sum / step_loss_count
+                            summary[f"{task_name}_step_{step_idx}_loss"] = step_loss_avg
 
                 if generate_output:
                     summary[f"{task_name}_accuracy"] /= task_counts[task_name]
@@ -864,7 +860,7 @@ class MultitaskModel(pl.LightningModule):
                     if self.eval_math:
                         summary[f"{task_name}_reasoning_accuracy"] /= task_counts[task_name]
                     
-                    # Average step accuracies and losses for CLRS tasks
+                    # Average step accuracies for CLRS tasks
                     if self.eval_clrs:
                         step_keys = [k for k in summary.keys() if k.startswith(f"{task_name}_step_") and k.endswith("_accuracy")]
                         for step_key in step_keys:
@@ -875,23 +871,6 @@ class MultitaskModel(pl.LightningModule):
                             else:
                                 # Fallback to task_counts if count not found
                                 summary[step_key] /= task_counts[task_name]
-                        
-                        # Normalize step losses
-                        step_loss_keys = [k for k in summary.keys() if k.startswith(f"{task_name}_step_") and k.endswith("_loss") and not k.endswith("_loss_count")]
-                        for step_loss_key in step_loss_keys:
-                            # Get the corresponding count key
-                            step_loss_count_key = step_loss_key + "_count"
-                            if step_loss_count_key in summary and summary[step_loss_count_key] > 0:
-                                summary[step_loss_key] /= summary[step_loss_count_key]
-                            else:
-                                # Fallback: use step accuracy count if loss count not found
-                                step_idx = step_loss_key.replace(f"{task_name}_step_", "").replace("_loss", "")
-                                step_acc_count_key = f"{task_name}_step_{step_idx}_count"
-                                if step_acc_count_key in summary and summary[step_acc_count_key] > 0:
-                                    summary[step_loss_key] /= summary[step_acc_count_key]
-                                else:
-                                    # Final fallback to task_counts
-                                    summary[step_loss_key] /= task_counts[task_name]
 
         # average accuracy and f1 score
         summary.update({"accuracy_score": np.mean([summary[f"{task_name}_accuracy_score"] for task_name in self.task_names])})
