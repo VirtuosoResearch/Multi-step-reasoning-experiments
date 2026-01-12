@@ -68,6 +68,7 @@ def compute_step_losses_from_concatenated(
     
     Returns:
         step_loss_list: List[List[float]] length B, each inner list per step avg loss
+        final_loss_list: List[float] length B, final step loss for each sample
     """
     if pad_token_id is None:
         pad_token_id = tokenizer.pad_token_id
@@ -76,6 +77,7 @@ def compute_step_losses_from_concatenated(
     batch_size = input_ids.size(0)
     
     step_loss_list = []
+    final_loss_list = []
     
     # 1) Extract input and gold_answers for each batch
     for b in range(batch_size):
@@ -89,6 +91,7 @@ def compute_step_losses_from_concatenated(
         
         if gold_tokens.numel() == 0:
             step_loss_list.append([])
+            final_loss_list.append(None)
             continue
         
         # 2) Decode to string and split by separators at string level
@@ -126,6 +129,7 @@ def compute_step_losses_from_concatenated(
         # Filter out empty steps
         if len(gold_steps_str) == 0:
             step_loss_list.append([])
+            final_loss_list.append(None)
             continue
         
         # 3) For each step, compute loss
@@ -190,9 +194,16 @@ def compute_step_losses_from_concatenated(
             if step_idx < len(separators_after_steps) and separators_after_steps[step_idx] is not None:
                 accumulated_output += separators_after_steps[step_idx]
         
+        # Get final step loss (last step)
+        if len(per_step_losses) > 0:
+            final_loss = per_step_losses[-1]
+        else:
+            final_loss = None
+        
         step_loss_list.append(per_step_losses)
+        final_loss_list.append(final_loss)
     
-    return step_loss_list
+    return step_loss_list, final_loss_list
 
 class MultitaskModel(pl.LightningModule):
     validation_predictions: Dict
@@ -372,7 +383,7 @@ class MultitaskModel(pl.LightningModule):
             labels = labels.cpu().numpy()
 
             # Compute step losses
-            step_losses = compute_step_losses_from_concatenated(
+            step_losses, final_losses = compute_step_losses_from_concatenated(
                 self.model,
                 self.tokenizer,
                 batch["input_ids"],
@@ -437,6 +448,7 @@ class MultitaskModel(pl.LightningModule):
             "pred_ids": preds,
             "label_ids": labels,
             "step_losses": step_losses,
+            "final_losses": final_losses,
         }
         # logging.info(f"step_losses: {step_losses}")
         if hasattr(self.model, "only_train_graph") and self.model.only_train_graph:
@@ -627,6 +639,8 @@ class MultitaskModel(pl.LightningModule):
         label_counts = {task_name: 0 for task_name in self.task_names}
         # Collect step losses: {task_name: {step_idx: (sum, count)}}
         step_loss_dict = {task_name: defaultdict(lambda: [0.0, 0]) for task_name in self.task_names}
+        # Collect final losses: {task_name: (sum, count)}
+        final_loss_dict = {task_name: [0.0, 0] for task_name in self.task_names}
         for step, batch in enumerate(outputs):
             task_name = batch["task_name"]
             if len(batch["answers"]) == 0:
@@ -640,6 +654,13 @@ class MultitaskModel(pl.LightningModule):
                     for step_idx, step_loss in enumerate(sample_step_losses):
                         step_loss_dict[task_name][step_idx][0] += step_loss
                         step_loss_dict[task_name][step_idx][1] += 1
+            
+            # Collect final losses
+            if "final_losses" in batch and batch["final_losses"] is not None:
+                for final_loss in batch["final_losses"]:
+                    if final_loss is not None:
+                        final_loss_dict[task_name][0] += final_loss
+                        final_loss_dict[task_name][1] += 1
             # accuracy score is the token-level accuracy conditioned on the correct input (even for the intermediate steps)
             summary[f"{task_name}_accuracy_score"] += accuracy_score(batch["label_ids"], batch["pred_ids"])*len(batch["label_ids"])*100
             if generate_output:
@@ -853,6 +874,13 @@ class MultitaskModel(pl.LightningModule):
                         if step_loss_count > 0:
                             step_loss_avg = step_loss_sum / step_loss_count
                             summary[f"{task_name}_step_{step_idx}_loss"] = step_loss_avg
+                
+                # Average final loss
+                if task_name in final_loss_dict:
+                    final_loss_sum, final_loss_count = final_loss_dict[task_name]
+                    if final_loss_count > 0:
+                        final_loss_avg = final_loss_sum / final_loss_count
+                        summary[f"{task_name}_final_loss"] = final_loss_avg
 
                 if generate_output:
                     summary[f"{task_name}_accuracy"] /= task_counts[task_name]
