@@ -64,26 +64,56 @@ def layer_index_from_name(name, default=0):
     return default
 
 
-def add_gaussian_noise_to_weights(model, std=0.01):
+def add_gaussian_noise_to_weights(model, std=0.01, only_lora=False):
     """
-    Add Gaussian noise to all trainable parameters of the model.
+    Add Gaussian noise to trainable parameters of the model.
     
     Args:
         model: The model to perturb
         std: Standard deviation of the Gaussian noise
+        only_lora: If True, only add noise to LoRA parameters (parameters with "lora" in name)
     """
     total_params = 0
     perturbed_params = 0
+    total_elements = 0
+    perturbed_elements = 0
+    
     with torch.no_grad():
         for name, param in model.named_parameters():
             total_params += 1
             if param.requires_grad:
+                # If only_lora is True, only perturb LoRA parameters
+                if only_lora and "lora" not in name.lower():
+                    total_elements += param.numel()
+                    continue
+                
+                # Calculate noise magnitude for verification
+                param_norm_before = param.norm().item()
                 noise = torch.randn_like(param) * std
                 param.add_(noise)
+                param_norm_after = param.norm().item()
+                noise_magnitude = (param_norm_after - param_norm_before) / param_norm_before if param_norm_before > 0 else 0
+                
                 perturbed_params += 1
+                total_elements += param.numel()
+                perturbed_elements += param.numel()
+                
                 if perturbed_params <= 5:  # Print first 5 for debugging
-                    print(f"Added Gaussian noise (std={std}) to {name}, shape: {param.shape}")
-    print(f"Added Gaussian noise (std={std}) to {perturbed_params}/{total_params} trainable parameters")
+                    print(f"Added Gaussian noise (std={std}) to {name}, shape: {param.shape}, "
+                          f"norm_change: {noise_magnitude:.6f}, elements: {param.numel()}")
+            else:
+                total_elements += param.numel()
+    
+    if only_lora:
+        print(f"Added Gaussian noise (std={std}) to {perturbed_params} LoRA parameters "
+              f"({perturbed_elements}/{total_elements} elements, {100*perturbed_elements/total_elements:.2f}%)")
+    else:
+        print(f"Added Gaussian noise (std={std}) to {perturbed_params}/{total_params} trainable parameters "
+              f"({perturbed_elements}/{total_elements} elements, {100*perturbed_elements/total_elements:.2f}%)")
+    
+    # Verify that noise was actually added by checking if any parameters changed
+    if perturbed_params == 0:
+        print("WARNING: No trainable parameters found! Noise was not added to any parameters.")
 
 
 def initialize_model(args):
@@ -407,9 +437,9 @@ if __name__ == "__main__":
                     few_shot_k=args.few_shot_k,
                     only_answer_output=args.only_answer_output)
         data_module.setup(stage="fit")
-        for name, param in model.named_parameters():
-            if param.requires_grad:
-                print(name, param.shape)
+        # for name, param in model.named_parameters():
+        #     if param.requires_grad:
+        #         print(name, param.shape)
 
         extended_task_names = [f"{task_name}" for task_name in args.task_names]
         lm = MultitaskModel(model, tokenizer, model_type, use_cpu_offload=False,
@@ -427,7 +457,8 @@ if __name__ == "__main__":
                 # Add Gaussian noise to model weights if requested
                 if args.add_weight_perturb:
                     print(f"Adding Gaussian noise (std={args.perturb_std}) to model weights...")
-                    add_gaussian_noise_to_weights(lm.model, std=args.perturb_std)
+                    only_lora = args.train_lora
+                    add_gaussian_noise_to_weights(lm.model, std=args.perturb_std, only_lora=only_lora)
             elif ("pt" in load_model_dir) and os.path.exists(load_model_dir):
                 if args.use_graph_llama:
                     print(model.model.load_state_dict(torch.load(load_model_dir), strict=False))
@@ -437,10 +468,40 @@ if __name__ == "__main__":
                 # Add Gaussian noise to model weights if requested
                 if args.add_weight_perturb:
                     print(f"Adding Gaussian noise (std={args.perturb_std}) to model weights...")
+                    # Check trainable parameters before adding noise
+                    target_model = model.model if args.use_graph_llama else model
+                    trainable_before = sum(p.numel() for name, p in target_model.named_parameters() if p.requires_grad)
+                    print(f"Trainable parameters before noise: {trainable_before}")
+                    
+                    # Store parameter values before adding noise for verification
+                    target_model = model.model if args.use_graph_llama else model
+                    param_values_before = {}
+                    for name, param in target_model.named_parameters():
+                        if param.requires_grad:
+                            param_values_before[name] = param.clone()
+                    
+                    # For LoRA models, only add noise to LoRA parameters, not base_layer parameters
+                    only_lora = args.train_lora
                     if args.use_graph_llama:
-                        add_gaussian_noise_to_weights(model.model, std=args.perturb_std)
+                        add_gaussian_noise_to_weights(model.model, std=args.perturb_std, only_lora=only_lora)
                     else:
-                        add_gaussian_noise_to_weights(model, std=args.perturb_std)
+                        add_gaussian_noise_to_weights(model, std=args.perturb_std, only_lora=only_lora)
+                    
+                    # Verify that noise was actually added by comparing parameter values
+                    max_change = 0.0
+                    for name, param in target_model.named_parameters():
+                        if param.requires_grad and name in param_values_before:
+                            change = (param - param_values_before[name]).abs().max().item()
+                            max_change = max(max_change, change)
+                    print(f"Maximum parameter change after noise: {max_change:.8f} (expected ~{args.perturb_std * 3:.8f} for std={args.perturb_std})")
+                    
+                    if max_change < args.perturb_std * 0.1:
+                        print(f"WARNING: Parameter change is much smaller than expected! Noise may not have been added correctly.")
+                    
+                    # Verify that lm.model shares the same reference (they should, but ensure it)
+                    if hasattr(lm, 'model') and lm.model is not model:
+                        print("WARNING: lm.model and model are different objects! Updating lm.model...")
+                        lm.model = model
 
         if args.load_branching_config:
             # load weights from different trained adapters
@@ -536,7 +597,8 @@ if __name__ == "__main__":
                 # Add Gaussian noise to model weights if requested
                 if args.add_weight_perturb:
                     print(f"Adding Gaussian noise (std={args.perturb_std}) to model weights...")
-                    add_gaussian_noise_to_weights(model, std=args.perturb_std)
+                    only_lora = args.train_lora
+                    add_gaussian_noise_to_weights(model, std=args.perturb_std, only_lora=only_lora)
                 lm = MultitaskModel(model, tokenizer, model_type, use_cpu_offload=False,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
