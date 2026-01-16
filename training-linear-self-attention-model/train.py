@@ -113,7 +113,7 @@ class LinearAttentionLayerSimplified(nn.Module):
             block_31_pv.copy_(torch.diag(diagonal_values))
         
         self.no_cot = no_cot
-        if not self.no_cot and (not self.use_softmax):
+        if not self.no_cot:
             # Register hook to zero out gradients for block_24_kq
             def zero_block_24_grad(grad):
                 grad_copy = grad.clone()
@@ -168,6 +168,8 @@ class LinearAttentionLayerSimplified(nn.Module):
             masked_scores = attention_scores.masked_fill(causal_mask == 0, -1e8)  # (batch_size, seq_len, seq_len)
             # Apply softmax
             masked_scores = torch.nn.functional.softmax(masked_scores, dim=-1)  # (batch_size, seq_len, seq_len)
+            normalization = torch.arange(1, seq_len + 1, device=x.device).unsqueeze(0).unsqueeze(-1)  # (1, seq_len, 1)
+            masked_scores = masked_scores * normalization / self.n  # Normalize by number of valid positions
         
         # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d_model)
         if self.use_noise_injection and self.training:
