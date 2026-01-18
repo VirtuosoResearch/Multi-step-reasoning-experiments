@@ -14,49 +14,6 @@ import wandb
 import os
 
 
-class LinearAttentionLayer(nn.Module):
-    """
-    One-layer linear attention model without softmax normalization.
-    Implements: Attn(Q, K, V) = Q(K^T V) where Q, K, V are linear projections.
-    """
-    def __init__(self, d_model, d_key, d_value):
-        super().__init__()
-        self.d_model = d_model
-        self.d_key = d_key
-        self.d_value = d_value
-        
-        # Linear projections for Q, K, V
-        self.W_q = nn.Linear(d_model, d_key, bias=False)
-        self.W_k = nn.Linear(d_model, d_key, bias=False)
-        self.W_v = nn.Linear(d_model, d_value, bias=False)
-        
-        # Output projection
-        self.W_o = nn.Linear(d_value, d_model, bias=False)
-        
-    def forward(self, x):
-        """
-        Args:
-            x: (batch_size, seq_len, d_model)
-        Returns:
-            output: (batch_size, seq_len, d_model)
-        """
-        # Compute Q, K, V
-        Q = self.W_q(x)  # (batch_size, seq_len, d_key)
-        K = self.W_k(x)  # (batch_size, seq_len, d_key)
-        V = self.W_v(x)  # (batch_size, seq_len, d_value)
-        
-        # Linear attention: Q @ (K^T @ V)
-        # K^T @ V: (batch_size, d_key, d_value)
-        KV = torch.matmul(K.transpose(-2, -1), V)
-        
-        # Q @ (K^T @ V): (batch_size, seq_len, d_value)
-        attention_output = torch.matmul(Q, KV)
-        
-        # Output projection
-        output = self.W_o(attention_output)
-        
-        return output
-    
 class LinearAttentionLayerSimplified(nn.Module):
     """
     One-layer linear attention model without softmax normalization.
@@ -223,6 +180,7 @@ class NonlinearAttentionLayerSimplified(nn.Module):
         nn.init.zeros_(self.W_v_1.weight)
         nn.init.zeros_(self.W_v_2.weight)
         nn.init.zeros_(self.W_v_3.weight)
+        nn.init.zeros_(self.W_P.weight)
         
         # W^{KQ}: emphasize (1,3) block - from indicator to y
         # This maps: indicator (col) -> y (row)
@@ -232,22 +190,22 @@ class NonlinearAttentionLayerSimplified(nn.Module):
         # nn.init.normal_(block_13_kq, mean=0.0, std=1.0 / d_model)
         # Initialize as diagonal matrix with random values from N(0, 1/d_model)
         with torch.no_grad():
-            diagonal_values = torch.randn(input_dim) * (1.0 / d_model)
-            block_13_kq_1.copy_(torch.diag(diagonal_values))
+            diagonal_values = torch.ones(input_dim) 
+            block_13_kq_1.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
         block_24_kq_1 = self.W_kq_1.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
         nn.init.constant_(block_24_kq_1, 0)
         
         block_13_kq_2 = self.W_kq_2.weight[:input_dim, input_dim+1:2*input_dim+1]
         with torch.no_grad():
-            diagonal_values = torch.randn(input_dim) * (1.0 / d_model)
-            block_13_kq_2.copy_(torch.diag(diagonal_values))
+            diagonal_values = torch.ones(input_dim) 
+            block_13_kq_2.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
         block_24_kq_2 = self.W_kq_2.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
         nn.init.constant_(block_24_kq_2, 1)
         
         block_13_kq_3 = self.W_kq_3.weight[:input_dim, input_dim+1:2*input_dim+1]
         with torch.no_grad():
-            diagonal_values = torch.randn(input_dim) * (1.0 / d_model)
-            block_13_kq_3.copy_(torch.diag(diagonal_values))
+            diagonal_values = torch.ones(input_dim) 
+            block_13_kq_3.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
         block_24_kq_3 = self.W_kq_3.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
         nn.init.constant_(block_24_kq_3, -1)
         
@@ -259,26 +217,29 @@ class NonlinearAttentionLayerSimplified(nn.Module):
         # nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
         # Initialize as diagonal matrix with random values from N(0, 1/d_model)
         with torch.no_grad():
-            diagonal_values = torch.randn(input_dim) * (1.0 / d_model)
-            block_1_v_1.copy_(torch.diag(diagonal_values))
+            diagonal_values = torch.ones(input_dim)
+            block_1_v_1.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
             
         block_1_v_2 = self.W_v_2.weight[:, :input_dim]
         with torch.no_grad():
-            diagonal_values = torch.randn(input_dim) * (1.0 / d_model)
-            block_1_v_2.copy_(torch.diag(diagonal_values))
+            diagonal_values = torch.ones(input_dim) 
+            block_1_v_2.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
             
         block_1_v_3 = self.W_v_3.weight[:, :input_dim]
         with torch.no_grad():
-            diagonal_values = torch.randn(input_dim) * (1.0 / d_model)
-            block_1_v_3.copy_(torch.diag(diagonal_values))
+            diagonal_values = torch.ones(input_dim) 
+            block_1_v_3.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
             
         block_3_p = self.W_P.weight[input_dim+1:2*input_dim+1, :]
         with torch.no_grad():
-            diagonal_values_1 = torch.randn(input_dim) * (1.0 / d_model)
-            diagonal_values_2 = torch.randn(input_dim) * (1.0 / d_model)
-            diagonal_values_3 = torch.randn(input_dim) * (1.0 / d_model)
+            lr = 0.001; n = 200
+            diagonal_values_1 = -2*lr*n*torch.ones(input_dim) 
+            diagonal_values_2 = 0.5*lr*n*torch.ones(input_dim) 
+            diagonal_values_3 = -0.5*lr*n*torch.ones(input_dim)
             block_3_p.copy_(torch.concat(
-                [torch.diag(diagonal_values_1), torch.diag(diagonal_values_2), torch.diag(diagonal_values_3)], dim=1
+                [torch.diag(diagonal_values_1) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8), 
+                 torch.diag(diagonal_values_2) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8), 
+                 torch.diag(diagonal_values_3) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8)], dim=1
                 ))
         
         self.no_cot = no_cot
@@ -313,7 +274,7 @@ class NonlinearAttentionLayerSimplified(nn.Module):
             # Compute head 1
             W_kq_x_1 = self.W_kq_1(x)  # (batch_size, seq_len, d_model)
             # The correct formulation: W^{KQ}(X) @ X^T gives us (seq_len, seq_len) scores
-            attention_scores_1 = torch.pow(torch.matmul(W_kq_x_1, x_T) / self.n, 3)  # (batch_size, seq_len, seq_len)
+            attention_scores_1 = torch.pow(torch.matmul(W_kq_x_1, x_T)/math.pow(self.n, 2/3), 3)  # (batch_size, seq_len, seq_len)
             # Apply causal mask: only attend to past positions
             masked_scores = attention_scores_1 * causal_mask  # (batch_size, seq_len, seq_len)
             # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d_model)
@@ -322,7 +283,7 @@ class NonlinearAttentionLayerSimplified(nn.Module):
             
             # Compute head 2
             W_kq_x_2 = self.W_kq_2(x)  # (batch_size, seq_len, d_model)
-            attention_scores_2 = torch.pow(torch.matmul(W_kq_x_2, x_T) / self.n, 2)  # (batch_size, seq_len, seq_len)
+            attention_scores_2 = torch.pow(torch.matmul(W_kq_x_2, x_T)/self.n, 2)  # (batch_size, seq_len, seq_len)
             # Apply causal mask: only attend to past positions
             masked_scores = attention_scores_2 * causal_mask  # (batch_size, seq_len, seq_len)
             # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d_model)
@@ -331,7 +292,7 @@ class NonlinearAttentionLayerSimplified(nn.Module):
             
             # Compute head 3
             W_kq_x_3 = self.W_kq_3(x)  # (batch_size, seq_len, d_model)
-            attention_scores_3 = torch.pow(torch.matmul(W_kq_x_3, x_T) / self.n, 1)  # (batch_size, seq_len, seq_len)
+            attention_scores_3 = torch.pow(torch.matmul(W_kq_x_3, x_T)/self.n, 2)  # (batch_size, seq_len, seq_len)
             # Apply causal mask: only attend to past positions
             masked_scores = attention_scores_3 * causal_mask  # (batch_size, seq_len, seq_len)
             # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d)
@@ -426,7 +387,7 @@ class WeightPredictionModel(nn.Module):
                 # Mask out first n_examples positions (input examples)
                 # Only compute loss on CoT and final answer positions
                 label_masks = torch.zeros(batch_size, seq_len - 1, device=Z.device)
-                label_masks[:, n_examples:] = 1.0  # Enable loss after n_examples positions
+                label_masks[:, n_examples:-1] = 1.0  # Enable loss after n_examples positions
             
             if label_masks is not None:
                 # Apply label masks and compute mean per batch example
@@ -589,6 +550,11 @@ def evaluate_noise_stability(model, dataloader, device, sigma, runs=10):
     for i in range(runs):
         # add Gaussian noise to model weights
         for name, param in model.named_parameters():
+            # if "_2" in name:
+                # if "kq" in name:
+                #     noise = torch.randn_like(param[:10, 11:21]) * sigma 
+                #     param[:10, 11:21].data.add_(noise)
+                # else:
             noise = torch.randn_like(param) * sigma * (param.data != 0)
             param.data.add_(noise)
         
@@ -884,6 +850,17 @@ def train(args):
     steps = 0
     
     max_steps = args.epochs * len(train_loader)
+    
+    # Initial evaluation before training
+    val_loss = evaluate(model, test_loader, device)
+    
+    # Evaluate noise stability
+    perturbed_mean_loss, perturbed_std_loss = evaluate_noise_stability(model, test_loader, device, sigma=args.sigma, runs=5)
+    perturbed_mean_loss = perturbed_mean_loss - val_loss
+    
+    print(f"Steps 0 Test Loss: {val_loss:.6f}")
+    print(f"Perturbed Loss: {perturbed_mean_loss:.6f} ± {perturbed_std_loss:.6f}")
+    
     for epoch in range(args.epochs):
         model.train()
         
