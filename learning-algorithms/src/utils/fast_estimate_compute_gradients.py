@@ -372,6 +372,14 @@ if __name__ == "__main__":
     
     load_model_dir = args.load_model_dir
     load_model_dir = os.path.join("external_lightning_logs", load_model_dir)
+    if os.path.isdir(load_model_dir):
+        candidates = [
+            fname for fname in os.listdir(load_model_dir)
+            if fname.startswith("epoch_epoch=") and fname.endswith(".pt")
+        ]
+        if len(candidates) > 0:
+            candidates = sorted(candidates)
+            load_model_dir = os.path.join(load_model_dir, candidates[0])
     if load_model_dir is not None:
         if ("ckpt" in load_model_dir) and os.path.exists(load_model_dir):
             lm = MultitaskModel.load_from_checkpoint(load_model_dir, model=model, tokenizer=tokenizer, model_type=model_type,

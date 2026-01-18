@@ -348,6 +348,7 @@ class MultitaskModel(pl.LightningModule):
         """
         Returns outputs in dictionary format, since it's the only way that seems to work with `all_gather`
         """        
+        logging.info(f"==========================================This is the validation step for task {batch['task_name']}==========================================")
         task_name = batch["task_name"]; batch = batch["data"]
         kwargs = {
             "input_ids": batch["input_ids"],

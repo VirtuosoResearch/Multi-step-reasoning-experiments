@@ -365,7 +365,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_name", type=str, default=None)
     parser.add_argument("--runs", type=int, default=3)
 
-    parser.add_argument("--load_model_dir", type=str, default="test")
+    parser.add_argument("--load_model_dir", type=str, default=None)
     parser.add_argument("--load_branching_config", type=str)
     parser.add_argument("--task_branching_config_dir", type=str)
     parser.add_argument("--write_results", action="store_true")
@@ -448,8 +448,20 @@ if __name__ == "__main__":
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
         
         load_model_dir = args.load_model_dir
-        load_model_dir = os.path.join("external_lightning_logs", load_model_dir)
+
         if load_model_dir is not None:
+            load_model_dir = os.path.join("external_lightning_logs", load_model_dir)
+            if os.path.isdir(load_model_dir):
+                candidates = [
+                    fname for fname in os.listdir(load_model_dir)
+                    if fname.startswith("epoch_epoch=") and fname.endswith(".pt")
+                ]
+                if len(candidates) > 0:
+                    candidates = sorted(candidates)
+                    load_model_dir = os.path.join(load_model_dir, candidates[0])
+            print("*"*50)
+            print(f"Loaded model from {load_model_dir}")
+            print("*"*50)
             if ("ckpt" in load_model_dir) and os.path.exists(load_model_dir):
                 lm = MultitaskModel.load_from_checkpoint(load_model_dir, model=model, tokenizer=tokenizer, model_type=model_type,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
