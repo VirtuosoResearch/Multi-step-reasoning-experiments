@@ -14,49 +14,6 @@ import wandb
 import os
 
 
-class LinearAttentionLayer(nn.Module):
-    """
-    One-layer linear attention model without softmax normalization.
-    Implements: Attn(Q, K, V) = Q(K^T V) where Q, K, V are linear projections.
-    """
-    def __init__(self, d_model, d_key, d_value):
-        super().__init__()
-        self.d_model = d_model
-        self.d_key = d_key
-        self.d_value = d_value
-        
-        # Linear projections for Q, K, V
-        self.W_q = nn.Linear(d_model, d_key, bias=False)
-        self.W_k = nn.Linear(d_model, d_key, bias=False)
-        self.W_v = nn.Linear(d_model, d_value, bias=False)
-        
-        # Output projection
-        self.W_o = nn.Linear(d_value, d_model, bias=False)
-        
-    def forward(self, x):
-        """
-        Args:
-            x: (batch_size, seq_len, d_model)
-        Returns:
-            output: (batch_size, seq_len, d_model)
-        """
-        # Compute Q, K, V
-        Q = self.W_q(x)  # (batch_size, seq_len, d_key)
-        K = self.W_k(x)  # (batch_size, seq_len, d_key)
-        V = self.W_v(x)  # (batch_size, seq_len, d_value)
-        
-        # Linear attention: Q @ (K^T @ V)
-        # K^T @ V: (batch_size, d_key, d_value)
-        KV = torch.matmul(K.transpose(-2, -1), V)
-        
-        # Q @ (K^T @ V): (batch_size, seq_len, d_value)
-        attention_output = torch.matmul(Q, KV)
-        
-        # Output projection
-        output = self.W_o(attention_output)
-        
-        return output
-    
 class LinearAttentionLayerSimplified(nn.Module):
     """
     One-layer linear attention model without softmax normalization.
@@ -182,6 +139,174 @@ class LinearAttentionLayerSimplified(nn.Module):
         output = attention_output + x
         
         return output
+    
+class NonlinearAttentionLayerSimplified(nn.Module):
+    """
+    One-layer non-linear three-head attention model without softmax normalization.
+    Implements: Attn(Q, K, V) = Q(K^T V) where Q, K, V are linear projections.
+    """
+    def __init__(self, d_model, n, input_dim, no_cot=False, use_noise_injection=False, noise_sigma=1e-3):
+        super().__init__()
+        self.d_model = d_model
+        self.n = n # normalization factor
+        self.input_dim = input_dim
+        self.use_noise_injection = use_noise_injection
+        self.noise_sigma = noise_sigma
+        
+        d = int((d_model - 2)/2)
+        self.d = int((d_model - 2)/2)
+        # initialize three heads 
+        # Linear projections for merging Q and K
+        self.W_kq_1 = nn.Linear(d_model, d_model, bias=False)
+        self.W_kq_2 = nn.Linear(d_model, d_model, bias=False)
+        self.W_kq_3 = nn.Linear(d_model, d_model, bias=False)
+        # Linear projection for merging V and projecting to output
+        self.W_v_1 = nn.Linear(d_model, d, bias=False)
+        self.W_v_2 = nn.Linear(d_model, d, bias=False)
+        self.W_v_3 = nn.Linear(d_model, d, bias=False)
+        # Output projection
+        self.W_P = nn.Linear(3*d, d_model, bias=False)
+        
+        # Block initialization according to the paper
+        # d_model = 2*input_dim + 2
+        # Block structure: [x (input_dim), y (1), w (input_dim), indicator (1)]
+        # Blocks: (0: x), (1: y), (2: w), (3: indicator)
+    
+        # Initialize all we ights with small random values to break symmetry
+        # Use smaller std for non-important blocks
+        nn.init.zeros_(self.W_kq_1.weight)
+        nn.init.zeros_(self.W_kq_2.weight)
+        nn.init.zeros_(self.W_kq_3.weight)
+        nn.init.zeros_(self.W_v_1.weight)
+        nn.init.zeros_(self.W_v_2.weight)
+        nn.init.zeros_(self.W_v_3.weight)
+        nn.init.zeros_(self.W_P.weight)
+        
+        # W^{KQ}: emphasize (1,3) block - from indicator to y
+        # This maps: indicator (col) -> y (row)
+        # Row indices for y: input_dim to input_dim+1
+        # Col indices for indicator: 2*input_dim+1 to 2*input_dim+2
+        block_13_kq_1 = self.W_kq_1.weight[:input_dim, input_dim+1:2*input_dim+1]
+        # nn.init.normal_(block_13_kq, mean=0.0, std=1.0 / d_model)
+        # Initialize as diagonal matrix with random values from N(0, 1/d_model)
+        with torch.no_grad():
+            diagonal_values = torch.ones(input_dim) 
+            block_13_kq_1.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
+        block_24_kq_1 = self.W_kq_1.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
+        nn.init.constant_(block_24_kq_1, 0)
+        
+        block_13_kq_2 = self.W_kq_2.weight[:input_dim, input_dim+1:2*input_dim+1]
+        with torch.no_grad():
+            diagonal_values = torch.ones(input_dim) 
+            block_13_kq_2.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
+        block_24_kq_2 = self.W_kq_2.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
+        nn.init.constant_(block_24_kq_2, 1)
+        
+        block_13_kq_3 = self.W_kq_3.weight[:input_dim, input_dim+1:2*input_dim+1]
+        with torch.no_grad():
+            diagonal_values = torch.ones(input_dim) 
+            block_13_kq_3.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
+        block_24_kq_3 = self.W_kq_3.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
+        nn.init.constant_(block_24_kq_3, -1)
+        
+        # W^{PV}: emphasize (3,1) block - from y to indicator
+        # This maps: y (col) -> indicator (row)
+        # Row indices for indicator: 2*input_dim+1 to 2*input_dim+2
+        # Col indices for y: input_dim to input_dim+1
+        block_1_v_1 = self.W_v_1.weight[:, :input_dim]
+        # nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
+        # Initialize as diagonal matrix with random values from N(0, 1/d_model)
+        with torch.no_grad():
+            diagonal_values = torch.ones(input_dim)
+            block_1_v_1.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
+            
+        block_1_v_2 = self.W_v_2.weight[:, :input_dim]
+        with torch.no_grad():
+            diagonal_values = torch.ones(input_dim) 
+            block_1_v_2.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
+            
+        block_1_v_3 = self.W_v_3.weight[:, :input_dim]
+        with torch.no_grad():
+            diagonal_values = torch.ones(input_dim) 
+            block_1_v_3.copy_(torch.diag(diagonal_values) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8))
+            
+        block_3_p = self.W_P.weight[input_dim+1:2*input_dim+1, :]
+        with torch.no_grad():
+            lr = 0.001; n = 200
+            diagonal_values_1 = -2*lr*n*torch.ones(input_dim) 
+            diagonal_values_2 = 0.5*lr*n*torch.ones(input_dim) 
+            diagonal_values_3 = -0.5*lr*n*torch.ones(input_dim)
+            block_3_p.copy_(torch.concat(
+                [torch.diag(diagonal_values_1) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8), 
+                 torch.diag(diagonal_values_2) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8), 
+                 torch.diag(diagonal_values_3) + torch.randn(input_dim, input_dim) * (1.0 / d_model**0.8)], dim=1
+                ))
+        
+        self.no_cot = no_cot
+        if not self.no_cot:
+            # Register hook to zero out gradients for block_24_kq
+            def zero_block_24_grad(grad):
+                grad_copy = grad.clone()
+                grad_copy[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2] = 0
+                return grad_copy
+            
+            self.W_kq_1.weight.register_hook(zero_block_24_grad)
+            self.W_kq_2.weight.register_hook(zero_block_24_grad)
+            self.W_kq_3.weight.register_hook(zero_block_24_grad)
+        
+    def forward(self, x):
+        """
+        Args:
+            x: (batch_size, seq_len, d_model)
+        Returns:
+            output: (batch_size, seq_len, d_model)
+        """
+        batch_size, seq_len, d_model = x.shape
+        
+        # Inject noise into weights if enabled (only during training)
+        if self.use_noise_injection and self.training:
+            # Generate noise without gradients
+            pass
+        else:
+            x_T = x.transpose(-2, -1)  # (batch_size, d_model, seq_len)
+            causal_mask = torch.tril(torch.ones(seq_len, seq_len, device=x.device))  # (seq_len, seq_len)
+            
+            # Compute head 1
+            W_kq_x_1 = self.W_kq_1(x)  # (batch_size, seq_len, d_model)
+            # The correct formulation: W^{KQ}(X) @ X^T gives us (seq_len, seq_len) scores
+            attention_scores_1 = torch.pow(torch.matmul(W_kq_x_1, x_T)/math.pow(self.n, 2/3), 3)  # (batch_size, seq_len, seq_len)
+            # Apply causal mask: only attend to past positions
+            masked_scores = attention_scores_1 * causal_mask  # (batch_size, seq_len, seq_len)
+            # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d_model)
+            V_1 = self.W_v_1(x)  # (batch_size, seq_len, d)
+            V_1 = torch.matmul(masked_scores, V_1) 
+            
+            # Compute head 2
+            W_kq_x_2 = self.W_kq_2(x)  # (batch_size, seq_len, d_model)
+            attention_scores_2 = torch.pow(torch.matmul(W_kq_x_2, x_T)/self.n, 2)  # (batch_size, seq_len, seq_len)
+            # Apply causal mask: only attend to past positions
+            masked_scores = attention_scores_2 * causal_mask  # (batch_size, seq_len, seq_len)
+            # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d_model)
+            V_2 = self.W_v_2(x)  # (batch_size, seq_len, d)
+            V_2 = torch.matmul(masked_scores, V_2) 
+            
+            # Compute head 3
+            W_kq_x_3 = self.W_kq_3(x)  # (batch_size, seq_len, d_model)
+            attention_scores_3 = torch.pow(torch.matmul(W_kq_x_3, x_T)/self.n, 2)  # (batch_size, seq_len, seq_len)
+            # Apply causal mask: only attend to past positions
+            masked_scores = attention_scores_3 * causal_mask  # (batch_size, seq_len, seq_len)
+            # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d)
+            V_3 = self.W_v_3(x)  # (batch_size, seq_len, d)
+            V_3 = torch.matmul(masked_scores, V_3)
+            
+            # Concatenate heads
+            V_concat = torch.cat([V_1, V_2, V_3], dim=-1)  # (batch_size, seq_len, 3*d)
+            attention_output = self.W_P(V_concat)  # (batch_size, seq_len, d_model)
+        
+        # Add residual connection
+        output = attention_output + x
+        
+        return output
 
 
 class WeightPredictionModel(nn.Module):
@@ -190,7 +315,7 @@ class WeightPredictionModel(nn.Module):
     Causal language modeling style: predict next position from all preceding positions.
     """
     def __init__(self, d_model, n_examples, no_cot=False, use_noise_injection=False, noise_sigma=1e-3, 
-                 use_softmax=True):
+                 use_softmax=True, use_nonlinear_attention=False):
         super().__init__()
         self.d_model = d_model
         self.n_examples = n_examples
@@ -204,9 +329,13 @@ class WeightPredictionModel(nn.Module):
         input_dim = (d_model - 2) // 2
                 
         # Linear attention layer
-        self.attention = LinearAttentionLayerSimplified(d_model, n_examples, input_dim, no_cot, 
-                                                        use_noise_injection, noise_sigma, 
-                                                        use_softmax)
+        if use_nonlinear_attention:
+            self.attention = NonlinearAttentionLayerSimplified(d_model, n_examples, input_dim, no_cot, 
+                                                              use_noise_injection, noise_sigma)
+        else:
+            self.attention = LinearAttentionLayerSimplified(d_model, n_examples, input_dim, no_cot, 
+                                                            use_noise_injection, noise_sigma, 
+                                                            use_softmax)
         
         
     def forward(self, Z):
@@ -258,7 +387,7 @@ class WeightPredictionModel(nn.Module):
                 # Mask out first n_examples positions (input examples)
                 # Only compute loss on CoT and final answer positions
                 label_masks = torch.zeros(batch_size, seq_len - 1, device=Z.device)
-                label_masks[:, n_examples:] = 1.0  # Enable loss after n_examples positions
+                label_masks[:, n_examples:-1] = 1.0  # Enable loss after n_examples positions
             
             if label_masks is not None:
                 # Apply label masks and compute mean per batch example
@@ -319,7 +448,7 @@ class LinearFunctionDataset(Dataset):
     Generates random linear functions w* and examples (x, y) where y = w* · x.
     """
     def __init__(self, n_tasks, n_examples, input_dim, noise_std=0.0, 
-                lr=0.4, T=20, split='train', no_cot=False):
+                lr=0.4, T=20, split='train', no_cot=False, use_quadratic=False):
         self.n_tasks = n_tasks
         self.task_seeds = np.arange(n_tasks) if split == 'train' else (np.arange(10000000, 10000000 + n_tasks) if split == 'test' else np.arange(20000000, 20000000 + n_tasks))
         self.n_examples = n_examples
@@ -328,6 +457,7 @@ class LinearFunctionDataset(Dataset):
         self.lr = lr
         self.T = T
         self.no_cot = no_cot
+        self.use_quadratic = use_quadratic
         
     def __len__(self):
         return self.n_tasks
@@ -336,30 +466,61 @@ class LinearFunctionDataset(Dataset):
         # Sample random weight vector w* from standard Gaussian
         rng = torch.Generator()
         rng.manual_seed(int(self.task_seeds[idx]))
-        w_star = torch.randn(self.input_dim, generator=rng)
-        
-        # Sample n_examples random input vectors from standard Gaussian
-        x = torch.randn(self.n_examples, self.input_dim, generator=rng) # (n_examples, input_dim)
-        
-        # Compute y = w* · x + noise
-        y = torch.matmul(x, w_star).unsqueeze(-1)  # (n_examples, 1)
-        
-        if self.noise_std > 0:
-            y = y + torch.randn_like(y) * self.noise_std
+        w_t = torch.tensor(float('nan'))
+        while w_t.isnan().any():
+            w_star = torch.randn(self.input_dim, generator=rng)
             
-        # Generate the gradient descent on x, y for T steps as the chain-of-thought
-        w_0 = torch.zeros_like(w_star)
-        w_t = w_0.clone()
-        
-        if self.no_cot:
-            cot = torch.zeros((self.T + 1, self.input_dim))  # (T+1, input_dim)
-        else:
-            cot = [w_0.unsqueeze(0)]  # list of (1, input_dim)
-            for t in range(self.T):
-                grad = x.T @ (torch.matmul(x, w_t.unsqueeze(-1)) - y).squeeze(-1) / self.n_examples
-                w_t = w_t - self.lr * grad
-                cot.append(w_t.unsqueeze(0))
-            cot = torch.cat(cot, dim=0)  # (T+1, input_dim)
+            # Sample n_examples random input vectors from standard Gaussian
+            x = torch.randn(self.n_examples, self.input_dim, generator=rng) # (n_examples, input_dim)
+            
+            # Compute y = w* · x + noise
+            if self.use_quadratic:
+                y = torch.matmul(x, w_star).unsqueeze(-1)**2  # (n_examples, 1)
+            else:
+                y = torch.matmul(x, w_star).unsqueeze(-1)  # (n_examples, 1)
+            
+            if self.noise_std > 0:
+                y = y + torch.randn_like(y) * self.noise_std
+                
+            # Generate the gradient descent on x, y for T steps as the chain-of-thought
+            if self.use_quadratic:
+                y_flat = y.squeeze(-1)
+                M = (x.T * y_flat) @ x / self.n_examples
+                evals, evecs = torch.linalg.eigh(M)
+                v1 = evecs[:, -1]
+                w_norm = torch.sqrt(torch.clamp(y.mean(), min=1e-12))
+                w_0 = (w_norm * v1).clone()
+            else:
+                w_0 = torch.zeros_like(w_star)
+            w_t = w_0.clone()
+            
+            if self.no_cot:
+                cot = torch.zeros((self.T + 1, self.input_dim))  # (T+1, input_dim)
+            else:
+                cot = [w_0.unsqueeze(0)]  # list of (1, input_dim)
+                for t in range(self.T):
+                    if self.use_quadratic:
+                        # Gradient for quadratic loss: ∇[(w·x)² - y]² = 2[(w·x)² - y] · 2(w·x) · x
+                        w_dot_x = torch.matmul(x, w_t.unsqueeze(-1))  # (n_examples, 1)
+                        residual = w_dot_x ** 2 - y  # (n_examples, 1)
+                        grad = x.T @ (residual * 2 * w_dot_x).squeeze(-1) / self.n_examples  # (input_dim,)
+                    else:
+                        # Gradient for linear loss: ∇[(w·x - y)²]
+                        grad = x.T @ (torch.matmul(x, w_t.unsqueeze(-1)) - y).squeeze(-1) / self.n_examples
+                    w_t = w_t - self.lr * grad
+                    cot.append(w_t.unsqueeze(0))
+                cot = torch.cat(cot, dim=0)  # (T+1, input_dim)
+            
+            if self.use_quadratic:
+                # convert sign of w_star
+                if torch.norm(w_t - w_star) > torch.norm(w_t + w_star):
+                    w_star = -w_star
+            
+            # final_error = min(torch.norm(w_t - w_star), torch.norm(w_t + w_star)).item()
+            # if final_error > 0.1:
+            #     print(f"Warning: GD didn't converge. Final error: {final_error:.4f}")
+        if w_t.isnan().any():
+            print(f"Warning: NaN detected in final weight after GD")
         
         # format the input sequences
         # Z structure: [x, y, w_cot, w_star] with indicator rows
@@ -389,6 +550,11 @@ def evaluate_noise_stability(model, dataloader, device, sigma, runs=10):
     for i in range(runs):
         # add Gaussian noise to model weights
         for name, param in model.named_parameters():
+            # if "_2" in name:
+                # if "kq" in name:
+                #     noise = torch.randn_like(param[:10, 11:21]) * sigma 
+                #     param[:10, 11:21].data.add_(noise)
+                # else:
             noise = torch.randn_like(param) * sigma * (param.data != 0)
             param.data.add_(noise)
         
@@ -587,7 +753,8 @@ def train(args):
             lr=args.gd_lr,
             T=args.T,
             split='train',
-            no_cot=False
+            no_cot=False,
+            use_quadratic=args.use_quadratic_functions
         )
         
         # Dataset without CoT
@@ -599,7 +766,8 @@ def train(args):
             lr=args.gd_lr,
             T=args.T,
             split='train_no_cot',
-            no_cot=True
+            no_cot=True,
+            use_quadratic=args.use_quadratic_functions
         )
         # Offset the seeds for no_cot_dataset to avoid overlap
         no_cot_dataset.task_seeds = np.arange(n_cot_tasks, n_cot_tasks + n_no_cot_tasks)
@@ -616,7 +784,8 @@ def train(args):
             lr=args.gd_lr,
             T=args.T,
             split='train',
-            no_cot=args.no_cot
+            no_cot=args.no_cot,
+            use_quadratic=args.use_quadratic_functions
         )
         no_cot_dataset = None
     
@@ -628,7 +797,8 @@ def train(args):
         lr=args.gd_lr,
         T=args.T,
         split='test',
-        no_cot=args.no_cot
+        no_cot=args.no_cot,
+        use_quadratic=args.use_quadratic_functions
     )
     
     # Create dataloaders
@@ -655,7 +825,8 @@ def train(args):
         no_cot=args.no_cot,
         use_noise_injection=args.use_noise_injection,
         noise_sigma=args.train_noise_sigma, 
-        use_softmax=args.use_softmax
+        use_softmax=args.use_softmax,
+        use_nonlinear_attention=args.use_quadratic_functions
     ).to(device)
     
     print(f"Model parameters: {sum(p.numel() for p in model.parameters())}")
@@ -679,6 +850,17 @@ def train(args):
     steps = 0
     
     max_steps = args.epochs * len(train_loader)
+    
+    # Initial evaluation before training
+    val_loss = evaluate(model, test_loader, device)
+    
+    # Evaluate noise stability
+    perturbed_mean_loss, perturbed_std_loss = evaluate_noise_stability(model, test_loader, device, sigma=args.sigma, runs=5)
+    perturbed_mean_loss = perturbed_mean_loss - val_loss
+    
+    print(f"Steps 0 Test Loss: {val_loss:.6f}")
+    print(f"Perturbed Loss: {perturbed_mean_loss:.6f} ± {perturbed_std_loss:.6f}")
+    
     for epoch in range(args.epochs):
         model.train()
         
@@ -830,6 +1012,8 @@ def main():
                         help='Disable chain-of-thought generation')
     parser.add_argument('--use_softmax', action='store_true',
                         help='Use softmax in attention mechanism')
+    parser.add_argument('--use_quadratic_functions', action='store_true',
+                        help='Use nonlinear attention mechanism instead of linear attention')
     
     # Noise injection parameters
     parser.add_argument('--use_noise_injection', action='store_true',
