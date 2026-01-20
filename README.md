@@ -30,6 +30,11 @@ python train_math.py
 
 Several convenience shell scripts are available under `scripts/` for common training setups and grouped experiments.
 
+Test noise stability:
+```bash
+bash scripts/noise_stability/test_dfs.sh
+```
+
 ## Repository layout
 
 - `train.py`, `train_clrs_text.py`, `train_math.py` — top-level Python entrypoints that wire datasets, models, and training loops.
