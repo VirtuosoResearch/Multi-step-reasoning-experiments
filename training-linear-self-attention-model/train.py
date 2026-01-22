@@ -359,7 +359,7 @@ class NonlinearAttentionLayerv2(nn.Module):
         # nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
         # Initialize as diagonal matrix with random values from N(0, 1/d_model)
         with torch.no_grad():
-            diagonal_values = -0.1*torch.ones(input_dim) + torch.randn(input_dim) * (0.2 / d_model) # -0.1*torch.ones(input_dim) 
+            diagonal_values = -0.1*torch.ones(input_dim) + torch.randn(input_dim) * (0.5 / d_model) # -0.1*torch.ones(input_dim) 
             block_31_pv.copy_(torch.diag(diagonal_values))
             
         self.no_cot = no_cot
