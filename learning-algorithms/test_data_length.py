@@ -4,7 +4,7 @@ from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-1.5B", trust_remote_code=True)
 data_module =TextCLRSDataModule(
-    task_names=["dfs"],
+    task_names=["bellman_ford"],
     tokenizer=tokenizer,
     batch_size=8,
     inference_batch_size=8,
@@ -15,11 +15,12 @@ data_module =TextCLRSDataModule(
     downsample_ratio=1,
     minimum_samples=10000,
     minimum_samples_validation=10000,
-    train_lengths=[23],
-    test_lengths=[23],
+    train_lengths=[5],
+    test_lengths=[5],
     use_few_shot=False, 
     few_shot_k=0,
-    only_answer_output=False)
+    only_answer_output=False,
+    reduce_steps_ratio=1.0)
 data_module.setup(stage="fit")
 
 # %%
@@ -36,4 +37,11 @@ for i in range(len(data_module.multitask_train_dataset.datasets[0])):
     #     print(new_output_length)
     max_input_length = max(max_input_length, len(tokenizer(sample['input'])['input_ids']))
     max_output_length =  max(max_output_length, len(tokenizer(sample['output'])['input_ids']))
+for i in range(len(data_module.multitask_valid_dataset.datasets[0])):
+    sample = data_module.multitask_valid_dataset.datasets[0][i]
+    new_input_length = len(tokenizer(sample['input'])['input_ids'])
+    new_output_length = len(tokenizer(sample['output'])['input_ids'])
+    max_input_length = max(max_input_length, len(tokenizer(sample['input'])['input_ids']))
+    max_output_length =  max(max_output_length, len(tokenizer(sample['output'])['input_ids']))
+
 print(max_input_length, max_output_length)

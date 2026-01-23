@@ -338,6 +338,7 @@ if __name__ == "__main__":
     parser.add_argument("--only_answer_output", action="store_true") # only load the last step
     parser.add_argument("--eval_last_step", action="store_true") # only evaluate the last step of the output
     parser.add_argument("--eval_step_num", type=int, default=0) # number of intermediate steps to evaluate (0 means only final, N means first N steps + final)
+    parser.add_argument("--reduce_steps_ratio", type=float, default=1.0) # ratio to reduce the number of intermediate steps
 
     parser.add_argument("--add_weight_perturb", action="store_true") # add Gaussian noise to model weights
     parser.add_argument("--perturb_std", type=float, default=0.01) # standard deviation of Gaussian noise for weight perturbation
@@ -437,7 +438,8 @@ if __name__ == "__main__":
                     test_lengths=args.test_lengths,
                     use_few_shot=(args.few_shot_k > 0), 
                     few_shot_k=args.few_shot_k,
-                    only_answer_output=args.only_answer_output)
+                    only_answer_output=args.only_answer_output,
+                    reduce_steps_ratio=args.reduce_steps_ratio)
         data_module.setup(stage="fit")
         # for name, param in model.named_parameters():
         #     if param.requires_grad:
