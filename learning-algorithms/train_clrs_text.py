@@ -610,11 +610,6 @@ if __name__ == "__main__":
                 args.use_3bit or args.use_2bit:                         
                 model, tokenizer, hf_key, model_type, append_eos = initialize_model(args)
                 model.load_state_dict(state_dict, strict=False)
-                # Add Gaussian noise to model weights if requested
-                if args.add_weight_perturb:
-                    print(f"Adding Gaussian noise (std={args.perturb_std}) to model weights...")
-                    only_lora = args.train_lora
-                    add_gaussian_noise_to_weights(model, std=args.perturb_std, only_lora=only_lora)
                 lm = MultitaskModel(model, tokenizer, model_type, use_cpu_offload=False,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)

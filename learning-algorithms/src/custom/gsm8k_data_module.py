@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 import pandas as pd
+import re
 from torch.utils.data import DataLoader, SequentialSampler, IterableDataset
 from transformers import DataCollatorForLanguageModeling
 from transformers.data.data_collator import *
@@ -11,23 +12,78 @@ import torch
 import numpy as np
 
 
+STEP_PATTERN = re.compile(r"<<(.*?)>>")
+
+
+def extract_gsm8k_steps(answer: str):
+    if not answer:
+        return []
+    steps = STEP_PATTERN.findall(answer)
+    cleaned = []
+    for step in steps:
+        step = step.strip()
+        if step:
+            cleaned.append(step)
+    return cleaned
+
+
+def extract_gsm8k_final(answer: str) -> str:
+    if not answer:
+        return ""
+    if "####" in answer:
+        final = answer.split("####")[-1].strip()
+    else:
+        final = answer.strip()
+    return final.replace(",", "")
+
+
+def format_steps_and_final(steps, final_answer: str) -> str:
+    steps_text = ", ".join([f"[{step}]" for step in steps])
+    if steps_text:
+        return f"{steps_text} | {final_answer}"
+    return f"| {final_answer}"
+
+
 class convert_format:
 
     problem_prompt = (
         "Below is an instruction that describes a task. "
         "Write a response that appropriately completes the request.\n\n"
-        "### Instruction:\n{instruction}\n\n### Response: Let's think step by step."
+        "### Instruction:\n{ex1_q}\n\n"
+        "### Response:\n{ex1_a}\n\n"
+        "### Instruction:\n{ex2_q}\n\n"
+        "### Response:\n{ex2_a}\n\n"
+        "### Instruction:\n{ex3_q}\n\n"
+        "### Response:\n{ex3_a}\n\n"
+        "### Instruction:\n{instruction}\n\n"
+        "### Response: Let's think step by step."
     )
     def __init__(self, only_answer_output=False):
         self.only_answer_output = only_answer_output
 
     def __call__(self, examples):
-        examples["input"] = [self.problem_prompt.format(instruction=item) for item in examples['question']]
-        examples["only_answer"] = [answer.split('#### ')[1].replace(',', '') if '#### ' in answer else answer for answer in examples["answer"]]
+        examples["input"] = [
+            self.problem_prompt.format(
+                ex1_q="Tom has 3 bags with 4 apples each. He gives 2 apples away. How many apples are left?",
+                ex1_a="[3*4=12], [12-2=10] | 10",
+                ex2_q="A bus has 5 rows with 2 seats each. 3 seats are empty. How many seats are filled?",
+                ex2_a="[5*2=10], [10-3=7] | 7",
+                ex3_q="Sara buys 2 pencils for $1 each and 1 eraser for $2. How much does she spend?",
+                ex3_a="[2*1=2], [2+2=4] | 4",
+                instruction=item,
+            )
+            for item in examples["question"]
+        ]
+        only_answer = [extract_gsm8k_final(answer) for answer in examples["answer"]]
+        examples["only_answer"] = only_answer
         if self.only_answer_output:
-            examples["output"] = [f"The answer is: {answer}" for answer in examples["only_answer"]]
+            examples["output"] = [f"The answer is: {answer}" for answer in only_answer]
         else:
-            examples["output"] = [item + " The answer is: {}".format(examples["only_answer"][i]) for i, item in enumerate(examples["answer"])]
+            steps_list = [extract_gsm8k_steps(answer) for answer in examples["answer"]]
+            examples["output"] = [
+                format_steps_and_final(steps_list[i], only_answer[i])
+                for i in range(len(only_answer))
+            ]
         return examples
 
 
