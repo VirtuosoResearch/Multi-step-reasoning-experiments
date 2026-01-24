@@ -12,11 +12,17 @@ import numpy as np
 import os
 from sklearn.metrics import accuracy_score, f1_score
 from src.utils.compute_metrics import compute_accuracy
-from pynvml import *
+try:
+    from pynvml import *  # noqa: F401,F403
+except Exception:
+    pass
 from src.utils.math_utils import eval_results_math, eval_results_gsm8k
 
 def print_gpu_utilization():
     try:
+        if "nvmlInit" not in globals():
+            print("NVML not available; skipping GPU utilization.")
+            return
         nvmlInit()
         device_count = nvmlDeviceGetCount()
         if device_count == 0:
@@ -348,7 +354,7 @@ class MultitaskModel(pl.LightningModule):
         """
         Returns outputs in dictionary format, since it's the only way that seems to work with `all_gather`
         """        
-        logging.info(f"==========================================This is the validation step for task {batch['task_name']}==========================================")
+        # logging.info(f"==========================================This is the validation step for task {batch['task_name']}==========================================")
         task_name = batch["task_name"]; batch = batch["data"]
         kwargs = {
             "input_ids": batch["input_ids"],
@@ -638,30 +644,32 @@ class MultitaskModel(pl.LightningModule):
 
         task_counts = {task_name: 0 for task_name in self.task_names}
         label_counts = {task_name: 0 for task_name in self.task_names}
+        compute_step_metrics = self.eval_step_num > 0
         # Collect step losses: {task_name: {step_idx: (sum, count)}}
-        step_loss_dict = {task_name: defaultdict(lambda: [0.0, 0]) for task_name in self.task_names}
+        step_loss_dict = {task_name: defaultdict(lambda: [0.0, 0]) for task_name in self.task_names} if compute_step_metrics else {}
         # Collect final losses: {task_name: (sum, count)}
-        final_loss_dict = {task_name: [0.0, 0] for task_name in self.task_names}
+        final_loss_dict = {task_name: [0.0, 0] for task_name in self.task_names} if compute_step_metrics else {}
         for step, batch in enumerate(outputs):
             task_name = batch["task_name"]
             if len(batch["answers"]) == 0:
                 continue
             summary[f"{task_name}_loss"] += batch["loss"].item()*len(batch["answers"]) if torch.isnan(batch["loss"]) == False else 0
             
-            # Collect step losses
-            if "step_losses" in batch and batch["step_losses"] is not None:
-                for sample_step_losses in batch["step_losses"]:
-                    # sample_step_losses is List[float], one loss per step
-                    for step_idx, step_loss in enumerate(sample_step_losses):
-                        step_loss_dict[task_name][step_idx][0] += step_loss
-                        step_loss_dict[task_name][step_idx][1] += 1
-            
-            # Collect final losses
-            if "final_losses" in batch and batch["final_losses"] is not None:
-                for final_loss in batch["final_losses"]:
-                    if final_loss is not None:
-                        final_loss_dict[task_name][0] += final_loss
-                        final_loss_dict[task_name][1] += 1
+            if compute_step_metrics:
+                # Collect step losses
+                if "step_losses" in batch and batch["step_losses"] is not None:
+                    for sample_step_losses in batch["step_losses"]:
+                        # sample_step_losses is List[float], one loss per step
+                        for step_idx, step_loss in enumerate(sample_step_losses):
+                            step_loss_dict[task_name][step_idx][0] += step_loss
+                            step_loss_dict[task_name][step_idx][1] += 1
+
+                # Collect final losses
+                if "final_losses" in batch and batch["final_losses"] is not None:
+                    for final_loss in batch["final_losses"]:
+                        if final_loss is not None:
+                            final_loss_dict[task_name][0] += final_loss
+                            final_loss_dict[task_name][1] += 1
             # accuracy score is the token-level accuracy conditioned on the correct input (even for the intermediate steps)
             summary[f"{task_name}_accuracy_score"] += accuracy_score(batch["label_ids"], batch["pred_ids"])*len(batch["label_ids"])*100
             if generate_output:
@@ -754,59 +762,53 @@ class MultitaskModel(pl.LightningModule):
 
                         # logging.info(f"DEBUG: pred_steps: {pred_steps}, gold_steps: {gold_steps}, pred_final: {pred_final}, gold_final: {gold_final}")
 
-                    # Compute step-by-step accuracy
-                    max_steps = max(len(ps) for ps in pred_steps_list + gold_steps_list) if pred_steps_list or gold_steps_list else 0
-
-                    # Compute accuracy for intermediate steps and final step
-                    # If eval_step_num is 0, only compute final step
-                    # If eval_step_num is N, compute first N steps + final step
                     if self.eval_step_num > 0:
+                        # Compute step-by-step accuracy
+                        max_steps = max(len(ps) for ps in pred_steps_list + gold_steps_list) if pred_steps_list or gold_steps_list else 0
                         steps_to_compute = list(range(min(self.eval_step_num, max_steps))) + ['final']
-                    else:
-                        steps_to_compute = ['final']
-                    
-                    for step_idx in steps_to_compute:
-                        if step_idx == 'final':
-                            # Compute final step accuracy
-                            step_preds = pred_final_list
-                            step_golds = [[g] for g in gold_final_list]
-                            step_count = len(step_preds)
-                        else:
-                            # Compute accuracy for step step_idx
-                            step_preds = []
-                            step_golds = []
-                            for ps, gs in zip(pred_steps_list, gold_steps_list):
-                                if step_idx < len(ps) and step_idx < len(gs):
-                                    step_preds.append(ps[step_idx])
-                                    step_golds.append([gs[step_idx]])
-                                elif step_idx < len(gs):
-                                    # Prediction missing this step
-                                    step_preds.append("")
-                                    step_golds.append([gs[step_idx]])
-                                elif step_idx < len(ps):
-                                    # Gold missing this step
-                                    step_preds.append(ps[step_idx])
-                                    step_golds.append([""])
-                                else:
-                                    # Both missing, skip
+
+                        for step_idx in steps_to_compute:
+                            if step_idx == 'final':
+                                # Compute final step accuracy
+                                step_preds = pred_final_list
+                                step_golds = [[g] for g in gold_final_list]
+                                step_count = len(step_preds)
+                            else:
+                                # Compute accuracy for step step_idx
+                                step_preds = []
+                                step_golds = []
+                                for ps, gs in zip(pred_steps_list, gold_steps_list):
+                                    if step_idx < len(ps) and step_idx < len(gs):
+                                        step_preds.append(ps[step_idx])
+                                        step_golds.append([gs[step_idx]])
+                                    elif step_idx < len(gs):
+                                        # Prediction missing this step
+                                        step_preds.append("")
+                                        step_golds.append([gs[step_idx]])
+                                    elif step_idx < len(ps):
+                                        # Gold missing this step
+                                        step_preds.append(ps[step_idx])
+                                        step_golds.append([""])
+                                    else:
+                                        # Both missing, skip
+                                        continue
+
+                                step_count = len(step_preds)
+                                if step_count == 0:
                                     continue
-                            
-                            step_count = len(step_preds)
-                            if step_count == 0:
-                                continue
-                        
-                        # Compute accuracy for this step
-                        step_metrics = compute_accuracy(step_preds, step_golds, indices=None)
-                        step_key = f"{task_name}_step_{step_idx}_accuracy"
-                        step_count_key = f"{task_name}_step_{step_idx}_count"
-                        
-                        if step_key not in summary:
-                            summary[step_key] = 0
-                        if step_count_key not in summary:
-                            summary[step_count_key] = 0
-                        
-                        summary[step_key] += step_metrics["accuracy"] * step_count
-                        summary[step_count_key] += step_count
+
+                            # Compute accuracy for this step
+                            step_metrics = compute_accuracy(step_preds, step_golds, indices=None)
+                            step_key = f"{task_name}_step_{step_idx}_accuracy"
+                            step_count_key = f"{task_name}_step_{step_idx}_count"
+
+                            if step_key not in summary:
+                                summary[step_key] = 0
+                            if step_count_key not in summary:
+                                summary[step_count_key] = 0
+
+                            summary[step_key] += step_metrics["accuracy"] * step_count
+                            summary[step_count_key] += step_count
                     
                     # For backward compatibility, also compute final accuracy as before
                     # Use pred_final_list and gold_final_list to ensure consistency with step_final_accuracy
@@ -868,20 +870,21 @@ class MultitaskModel(pl.LightningModule):
                 summary[f"{task_name}_loss"] /= task_counts[task_name]
                 summary[f"{task_name}_accuracy_score"] = (summary[f"{task_name}_accuracy_score"]/label_counts[task_name]) if label_counts[task_name] > 0 else 0
                 
-                # Average step losses
-                if task_name in step_loss_dict:
-                    for step_idx in sorted(step_loss_dict[task_name].keys()):
-                        step_loss_sum, step_loss_count = step_loss_dict[task_name][step_idx]
-                        if step_loss_count > 0:
-                            step_loss_avg = step_loss_sum / step_loss_count
-                            summary[f"{task_name}_step_{step_idx}_loss"] = step_loss_avg
-                
-                # Average final loss
-                if task_name in final_loss_dict:
-                    final_loss_sum, final_loss_count = final_loss_dict[task_name]
-                    if final_loss_count > 0:
-                        final_loss_avg = final_loss_sum / final_loss_count
-                        summary[f"{task_name}_final_loss"] = final_loss_avg
+                if compute_step_metrics:
+                    # Average step losses
+                    if task_name in step_loss_dict:
+                        for step_idx in sorted(step_loss_dict[task_name].keys()):
+                            step_loss_sum, step_loss_count = step_loss_dict[task_name][step_idx]
+                            if step_loss_count > 0:
+                                step_loss_avg = step_loss_sum / step_loss_count
+                                summary[f"{task_name}_step_{step_idx}_loss"] = step_loss_avg
+
+                    # Average final loss
+                    if task_name in final_loss_dict:
+                        final_loss_sum, final_loss_count = final_loss_dict[task_name]
+                        if final_loss_count > 0:
+                            final_loss_avg = final_loss_sum / final_loss_count
+                            summary[f"{task_name}_final_loss"] = final_loss_avg
 
                 if generate_output:
                     summary[f"{task_name}_accuracy"] /= task_counts[task_name]
@@ -890,7 +893,7 @@ class MultitaskModel(pl.LightningModule):
                         summary[f"{task_name}_reasoning_accuracy"] /= task_counts[task_name]
                     
                     # Average step accuracies for CLRS tasks
-                    if self.eval_clrs:
+                    if self.eval_clrs and self.eval_step_num > 0:
                         step_keys = [k for k in summary.keys() if k.startswith(f"{task_name}_step_") and k.endswith("_accuracy")]
                         for step_key in step_keys:
                             # Get the corresponding count key

@@ -307,6 +307,126 @@ class NonlinearAttentionLayerSimplified(nn.Module):
         output = attention_output + x
         
         return output
+    
+class NonlinearAttentionLayerv2(nn.Module):
+    """
+    One-layer non-linear three-head attention model without softmax normalization.
+    Implements: Attn(Q, K, V) = Q(K^T V) where Q, K, V are linear projections.
+    """
+    def __init__(self, d_model, n, input_dim, no_cot=False, use_noise_injection=False, noise_sigma=1e-3):
+        super().__init__()
+        self.d_model = d_model
+        self.n = n # normalization factor
+        self.input_dim = input_dim
+        self.use_noise_injection = use_noise_injection
+        self.noise_sigma = noise_sigma
+        
+        d = int((d_model - 2)/2)
+        self.d = int((d_model - 2)/2)
+        # initialize three heads 
+        # Linear projections for merging Q and K
+        self.W_kq = nn.Linear(d_model, d_model, bias=False)
+        self.W_pv = nn.Linear(d_model, d_model, bias=False)
+        
+        # Block initialization according to the paper
+        # d_model = 2*input_dim + 2
+        # Block structure: [x (input_dim), y (1), w (input_dim), indicator (1)]
+        # Blocks: (0: x), (1: y), (2: w), (3: indicator)
+    
+        # Initialize all weights with small random values to break symmetry
+        # Use smaller std for non-important blocks
+        nn.init.zeros_(self.W_kq.weight)
+        nn.init.zeros_(self.W_pv.weight)
+        
+        # W^{KQ}: emphasize (1,3) block - from indicator to y
+        # This maps: indicator (col) -> y (row)
+        # Row indices for y: input_dim to input_dim+1
+        # Col indices for indicator: 2*input_dim+1 to 2*input_dim+2
+        block_13_kq = self.W_kq.weight[:input_dim, input_dim+1:2*input_dim+1]
+        # nn.init.normal_(block_13_kq, mean=0.0, std=1.0 / d_model)
+        # Initialize as diagonal matrix with random values from N(0, 1/d_model)
+        with torch.no_grad():
+            diagonal_values = torch.ones(input_dim) + torch.randn(input_dim) * (5 / d_model) #  torch.ones(input_dim) 
+            block_13_kq.copy_(torch.diag(diagonal_values))
+        self.block_24_kq = self.W_kq.weight[input_dim:input_dim+1, 2*input_dim+1:2*input_dim+2]
+        nn.init.constant_(self.block_24_kq, 0.0)
+        
+        # W^{PV}: emphasize (3,1) block - from y to indicator
+        # This maps: y (col) -> indicator (row)
+        # Row indices for indicator: 2*input_dim+1 to 2*input_dim+2
+        # Col indices for y: input_dim to input_dim+1
+        block_31_pv = self.W_pv.weight[input_dim+1:2*input_dim+1, 0:input_dim]
+        # nn.init.normal_(block_31_pv, mean=0.0, std=1.0 / d_model)
+        # Initialize as diagonal matrix with random values from N(0, 1/d_model)
+        with torch.no_grad():
+            diagonal_values = -0.1*torch.ones(input_dim) + torch.randn(input_dim) * (0.5 / d_model) # -0.1*torch.ones(input_dim) 
+            block_31_pv.copy_(torch.diag(diagonal_values))
+            
+        self.no_cot = no_cot
+        if not self.no_cot:
+            # Register hook to zero out gradients for block_24_kq
+            def zero_block_24_grad(grad):
+                grad_copy = grad.clone()
+                grad_copy[:input_dim+1, 2*input_dim+1:2*input_dim+2] = 0
+                return grad_copy
+            
+            self.W_kq.weight.register_hook(zero_block_24_grad)
+        
+    def forward(self, x):
+        """
+        Args:
+            x: (batch_size, seq_len, d_model)
+        Returns:
+            output: (batch_size, seq_len, d_model)
+        """
+        batch_size, seq_len, d_model = x.shape
+        
+        # Inject noise into weights if enabled (only during training)
+        if self.use_noise_injection and self.training:
+            # Generate noise without gradients
+            pass
+        else:
+            x_T = x.transpose(-2, -1)  # (batch_size, d_model, seq_len)
+            causal_mask = torch.tril(torch.ones(seq_len, seq_len, device=x.device))  # (seq_len, seq_len)
+            
+            # Compute head 1
+            self.W_kq.weight[10:11, 21:22].data.fill_(0.0)
+            W_kq_x_1 = self.W_kq(x)  # (batch_size, seq_len, d_model)
+            # The correct formulation: W^{KQ}(X) @ X^T gives us (seq_len, seq_len) scores
+            attention_scores_1 = torch.pow(torch.matmul(W_kq_x_1, x_T)/self.n, 3)  # (batch_size, seq_len, seq_len)
+            # Apply causal mask: only attend to past positions
+            masked_scores = attention_scores_1 * causal_mask  # (batch_size, seq_len, seq_len)
+            # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d_model)
+            PV_1 = 4*self.n*self.W_pv(x)  # (batch_size, seq_len, d)
+            PV_1 = torch.matmul(masked_scores, PV_1) 
+            
+            # Compute head 2
+            self.W_kq.weight[10:11, 21:22].data.fill_(1.0)
+            W_kq_x_2 = self.W_kq(x)  # (batch_size, seq_len, d_model)
+            attention_scores_2 = torch.pow(torch.matmul(W_kq_x_2, x_T)/self.n, 2)  # (batch_size, seq_len, seq_len)
+            # Apply causal mask: only attend to past positions
+            masked_scores = attention_scores_2 * causal_mask  # (batch_size, seq_len, seq_len)
+            # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d_model)
+            PV_2 = -self.W_pv(x)  # (batch_size, seq_len, d)
+            PV_2 = torch.matmul(masked_scores, PV_2) 
+            
+            # Compute head 3
+            self.W_kq.weight[10:11, 21:22].data.fill_(-1.0)
+            W_kq_x_3 = self.W_kq(x)  # (batch_size, seq_len, d_model)
+            attention_scores_3 = torch.pow(torch.matmul(W_kq_x_3, x_T)/self.n, 2)  # (batch_size, seq_len, seq_len)
+            # Apply causal mask: only attend to past positions
+            masked_scores = attention_scores_3 * causal_mask  # (batch_size, seq_len, seq_len)
+            # Apply attention to values: (batch_size, seq_len, seq_len) @ (batch_size, seq_len, d)
+            PV_3 = self.W_pv(x)  # (batch_size, seq_len, d)
+            PV_3 = torch.matmul(masked_scores, PV_3)
+            
+            # Concatenate heads
+            attention_output = PV_1 + PV_2 + PV_3  # (batch_size, seq_len, d_model)
+        
+        # Add residual connection
+        output = attention_output + x
+        
+        return output
 
 
 class WeightPredictionModel(nn.Module):
@@ -315,7 +435,7 @@ class WeightPredictionModel(nn.Module):
     Causal language modeling style: predict next position from all preceding positions.
     """
     def __init__(self, d_model, n_examples, no_cot=False, use_noise_injection=False, noise_sigma=1e-3, 
-                 use_softmax=True, use_nonlinear_attention=False):
+                 use_softmax=True, use_nonlinear_attention=False, weight_sharing=True):
         super().__init__()
         self.d_model = d_model
         self.n_examples = n_examples
@@ -329,7 +449,10 @@ class WeightPredictionModel(nn.Module):
         input_dim = (d_model - 2) // 2
                 
         # Linear attention layer
-        if use_nonlinear_attention:
+        if use_nonlinear_attention and weight_sharing:
+            self.attention = NonlinearAttentionLayerv2(d_model, n_examples, input_dim, no_cot, 
+                                                              use_noise_injection, noise_sigma)
+        elif use_nonlinear_attention and not weight_sharing:
             self.attention = NonlinearAttentionLayerSimplified(d_model, n_examples, input_dim, no_cot, 
                                                               use_noise_injection, noise_sigma)
         else:
@@ -549,14 +672,24 @@ def evaluate_noise_stability(model, dataloader, device, sigma, runs=10):
     perturbed_loss = []
     for i in range(runs):
         # add Gaussian noise to model weights
-        for name, param in model.named_parameters():
-            # if "_2" in name:
-                # if "kq" in name:
-                #     noise = torch.randn_like(param[:10, 11:21]) * sigma 
-                #     param[:10, 11:21].data.add_(noise)
-                # else:
-            noise = torch.randn_like(param) * sigma * (param.data != 0)
-            param.data.add_(noise)
+        if isinstance(model.attention, NonlinearAttentionLayerSimplified) or isinstance(model.attention, NonlinearAttentionLayerv2):
+            for name, param in model.named_parameters():
+                if "_kq" in name:
+                    noise = torch.randn_like(param[:10, 11:21]) * sigma 
+                    param[:10, 11:21].data.add_(noise)
+                elif "_v" in name:
+                    noise = torch.randn_like(param[:, :10]) * sigma 
+                    param[:, :10].data.add_(noise)
+                elif "W_P" in name:
+                    noise = torch.randn_like(param[11:21, :]) * sigma 
+                    param[11:21, :].data.add_(noise)
+                elif "_pv" in name:
+                    noise = torch.randn_like(param[11:21, :10]) * sigma 
+                    param[11:21, :10].data.add_(noise)
+        else:
+            for name, param in model.named_parameters():
+                noise = torch.randn_like(param) * sigma * (param.data != 0)
+                param.data.add_(noise)
         
         # evaluate on the dataset
         loss = evaluate(model, dataloader, device)

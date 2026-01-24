@@ -43,7 +43,7 @@ p1 = ax2.plot(x[:21], smooth(T_10_test_loss.mean(axis=1), 3)[:21], lw = 3, color
 p2 = ax2.plot(x[:21], smooth(T_20_test_loss.mean(axis=1), 3)[:21], lw = 3, color="lightsteelblue", linestyle="solid", label=r"$T=20$")
 p3 = ax2.plot(x[:21], smooth(T_30_test_loss.mean(axis=1), 3)[:21], lw = 3, color="lightgreen", linestyle="solid", label=r"$T=30$")
 p4 = ax2.plot(x[:21], smooth(T_40_test_loss.mean(axis=1), 3)[:21], lw = 3, color="forestgreen", linestyle="solid", label=r"$T=40$")
-ax2.set_title(r'$L(W)$', fontsize = 32)
+ax2.set_title(r'$\mathrm{Test~loss}$', fontsize = 32)
 ax2.set_xlabel(r'$\mathrm{Training~iterations}$', fontsize = 32) 
 plt.xticks(np.arange(0, 21, 5), [r"$0$", r"$250$", r"$500$", r"$750$", r"$1000$"]) # "", r"$1500$", "", r"$2000$"
 ax2.set_xlim((-1, 21))
@@ -116,7 +116,7 @@ p4 = ax2.plot(x[:21], smooth(T_40_noise_stability.mean(axis=1), 5)[:21], lw = 3,
 ax2.fill_between(x[:21], smooth(T_40_noise_stability.mean(axis=1) - T_40_noise_stability.std(axis=1), 5)[:21],
                      smooth(T_40_noise_stability.mean(axis=1) + T_40_noise_stability.std(axis=1), 5)[:21],
                      color="forestgreen", alpha=0.2)
-ax2.set_title(r'${E}_U(L_{W+U}) - L_W$', fontsize = 32)
+ax2.set_title(r'$\mathrm{Noise~stability}$', fontsize = 32)
 ax2.set_xlabel(r'$\mathrm{Training~iterations}$', fontsize = 32) 
 plt.xticks(np.arange(0, 21, 5), [r"$0$", r"$250$", r"$500$", r"$750$", r"$1000$"]) # "", r"$1500$", "", r"$2000$"
 ax2.set_xlim((-1, 21))

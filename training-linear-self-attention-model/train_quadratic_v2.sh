@@ -11,7 +11,7 @@
 T=${1:-200}
 device=${2:-0}
 
-for seed in 2
+for seed in 0 1 2
 do
 python train.py \
   --input_dim 10 \
@@ -39,33 +39,33 @@ python train.py \
   --wandb_run_name "input10_examples200_T${T}_seed${seed}_training_tasks1e6_quad"
 done
 
-# for seed in 0 1 2
-# do
-# python train.py \
-#   --input_dim 10 \
-#   --n_examples 200 \
-#   --n_train_tasks 1000000 \
-#   --n_test_tasks 1000 \
-#   --noise_std 0.0 \
-#   --gd_lr 0.001 \
-#   --T 200 \
-#   --batch_size 1000 \
-#   --epochs 1 \
-#   --lr 0.001 \
-#   --lr_min 1e-5 \
-#   --weight_decay 0.0 \
-#   --grad_clip 1.0 \
-#   --num_workers 4 \
-#   --save_dir "checkpoints/nonlinear_attention_model_input10_examples200_lr0.001_bs1000_T200_quad_v2" \
-#   --device $device \
-#   --eval_interval 10 \
-#   --sigma 0.02 \
-#   --seed $seed \
-#   --use_quadratic_functions \
-#   --use_wandb \
-#   --wandb_project linear-self-attention-weight-prediction \
-#   --wandb_run_name "input10_examples200_T200_seed${seed}_training_tasks1e6_quad"
-# done
+for seed in 0 1 2
+do
+python train.py \
+  --input_dim 10 \
+  --n_examples 200 \
+  --n_train_tasks 1000000 \
+  --n_test_tasks 1000 \
+  --noise_std 0.0 \
+  --gd_lr 0.001 \
+  --T 400 \
+  --batch_size 1000 \
+  --epochs 1 \
+  --lr 0.001 \
+  --lr_min 1e-5 \
+  --weight_decay 0.0 \
+  --grad_clip 1.0 \
+  --num_workers 4 \
+  --save_dir "checkpoints/nonlinear_attention_model_input10_examples200_lr0.001_bs1000_T400_quad_v2" \
+  --device $device \
+  --eval_interval 10 \
+  --sigma 0.02 \
+  --seed $seed \
+  --use_quadratic_functions \
+  --use_wandb \
+  --wandb_project linear-self-attention-weight-prediction \
+  --wandb_run_name "input10_examples200_T400_seed${seed}_training_tasks1e6_quad"
+done
 
 
 # python train.py \

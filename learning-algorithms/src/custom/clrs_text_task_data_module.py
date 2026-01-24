@@ -91,10 +91,11 @@ class add_length:
 
 class convert_format:
 
-    def __init__(self, only_answer_output = False, sample_steps=20):
+    def __init__(self, only_answer_output = False, sample_steps=20, reduce_steps_ratio=1.0):
         self.only_answer_output = only_answer_output
         self.sample_steps = sample_steps
-
+        self.reduce_steps_ratio = reduce_steps_ratio
+        
     def __call__(self, examples):
         examples["input"] = examples["question"][:]
         examples["only_answer"] = [answer.split("|")[-1].strip() for answer in examples["answer"]]
@@ -104,7 +105,11 @@ class convert_format:
             only_answers = [answer.split("|")[-1].strip() for answer in examples["answer"]]
             intermediate_steps = [answer.split("|")[0].strip().split(",") for answer in examples["answer"]]
             for i, item in enumerate(intermediate_steps):
+                # print("Original number of steps: ", len(item))
                 choices = np.random.choice(len(item), min(len(item), self.sample_steps), replace=False) # if there are too many intermediate steps, randomly sample some of them
+                if self.reduce_steps_ratio < 1.0:
+                    choices = np.random.choice(choices, max(1, int(len(choices)*self.reduce_steps_ratio)), replace=False)  # reduce the number of steps by the given ratio
+                # print("Reduced number of steps: ", len(choices))
                 choices = sorted(choices)
                 intermediate_steps[i] = ", ".join([item[j] for j in choices])
             examples["output"] = [intermediate_steps[i] + " | " + only_answers[i] for i in range(len(only_answers))]
@@ -158,7 +163,8 @@ class TextCLRSDataModule(pl.LightningDataModule):
         downsample_seed=0,
         use_few_shot=False,
         few_shot_k=5,
-        only_answer_output=False
+        only_answer_output=False,
+        reduce_steps_ratio=1.0,
     ):
         super().__init__()
 
@@ -185,6 +191,7 @@ class TextCLRSDataModule(pl.LightningDataModule):
         self.use_few_shot = use_few_shot
         self.few_shot_k = few_shot_k
         self.only_answer_output = only_answer_output
+        self.reduce_steps_ratio = reduce_steps_ratio
 
     def setup(self, stage=None):
         self.task_to_train_datasets = {}
@@ -204,7 +211,7 @@ class TextCLRSDataModule(pl.LightningDataModule):
             column_names = train_dataset.column_names
             # convert the input and output format
             sample_steps = 10 if task_name in ["mst_kruskal", "floyd_warshall"] else 20
-            train_dataset = train_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps), batched=True, load_from_cache_file=False) # remove_columns=column_names
+            train_dataset = train_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False) # remove_columns=column_names
             # split dataset
             tmp_datasets = train_dataset.train_test_split(test_size=self.eval_split, seed=42)
             train_dataset = tmp_datasets['train']
@@ -220,7 +227,7 @@ class TextCLRSDataModule(pl.LightningDataModule):
             if self.use_few_shot:
                 predict_dataset = predict_dataset.map(convert_few_shot_format(train_dataset, only_answer_output=self.only_answer_output, k=self.few_shot_k), batched=True, load_from_cache_file=False)
             else:
-                predict_dataset = predict_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps), batched=True, load_from_cache_file=False)
+                predict_dataset = predict_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False)
 
             # Downsample the dataset if needed
             if self.downsample_rate < 1.0:
