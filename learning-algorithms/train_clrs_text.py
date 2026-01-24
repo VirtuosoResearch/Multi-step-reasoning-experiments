@@ -338,6 +338,7 @@ if __name__ == "__main__":
     parser.add_argument("--only_answer_output", action="store_true") # only load the last step
     parser.add_argument("--eval_last_step", action="store_true") # only evaluate the last step of the output
     parser.add_argument("--eval_step_num", type=int, default=0) # number of intermediate steps to evaluate (0 means only final, N means first N steps + final)
+    parser.add_argument("--reduce_steps_ratio", type=float, default=1.0) # ratio to reduce the number of intermediate steps
 
     parser.add_argument("--add_weight_perturb", action="store_true") # add Gaussian noise to model weights
     parser.add_argument("--perturb_std", type=float, default=0.01) # standard deviation of Gaussian noise for weight perturbation
@@ -385,6 +386,7 @@ if __name__ == "__main__":
     save_name = model_key + \
                 (f"_{args.save_name}" if args.save_name else "") + \
                 (f"_{args.minimum_samples}") + \
+                (f"_len_{args.train_lengths}") + \
                 (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
                 (f"_use_only_answer_output" if args.only_answer_output else "")
     file_dir = os.path.join("./results/", save_name)
@@ -436,7 +438,8 @@ if __name__ == "__main__":
                     test_lengths=args.test_lengths,
                     use_few_shot=(args.few_shot_k > 0), 
                     few_shot_k=args.few_shot_k,
-                    only_answer_output=args.only_answer_output)
+                    only_answer_output=args.only_answer_output,
+                    reduce_steps_ratio=args.reduce_steps_ratio)
         data_module.setup(stage="fit")
         # for name, param in model.named_parameters():
         #     if param.requires_grad:
@@ -537,6 +540,7 @@ if __name__ == "__main__":
                                         f"{model_key}_" + \
                                         ("_".join(extended_task_names) if len("_".join(extended_task_names)) <= 100 else "{}_tasks".format(len(extended_task_names))) + \
                                         (f"_{args.minimum_samples}") + \
+                                        (f"_len_{args.train_lengths}") + \
                                         (f"_use_only_answer_output" if args.only_answer_output else "") + \
                                         (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
                                         (f"_{args.save_name}" if args.save_name else "") + \
@@ -546,12 +550,14 @@ if __name__ == "__main__":
         # if args.save_name and os.path.exists(default_root_dir):
         #     os.system(f"rm -rf {default_root_dir}")
         
+        monitor_metric = "accuracy" if args.generate_output else "train_loss"
+        monitor_mode = "max" if args.generate_output else "min"
         checkpoint_callback = ModelCheckpoint(
-            monitor="accuracy",
+            monitor=monitor_metric,
             dirpath=default_root_dir,
             filename="epoch_{epoch}",
             save_top_k=(-1 if args.save_every_epoch else 1),
-            mode="max",
+            mode=monitor_mode,
         )
 
         trainer = pl.Trainer(accelerator="gpu", devices=args.devices, strategy=args.strategy,
@@ -608,11 +614,6 @@ if __name__ == "__main__":
                 args.use_3bit or args.use_2bit:                         
                 model, tokenizer, hf_key, model_type, append_eos = initialize_model(args)
                 model.load_state_dict(state_dict, strict=False)
-                # Add Gaussian noise to model weights if requested
-                if args.add_weight_perturb:
-                    print(f"Adding Gaussian noise (std={args.perturb_std}) to model weights...")
-                    only_lora = args.train_lora
-                    add_gaussian_noise_to_weights(model, std=args.perturb_std, only_lora=only_lora)
                 lm = MultitaskModel(model, tokenizer, model_type, use_cpu_offload=False,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
