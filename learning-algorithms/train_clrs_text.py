@@ -398,9 +398,10 @@ if __name__ == "__main__":
     metrics = {}
     for run in range(args.runs):
         if args.use_wandb:
+            wandb_suffix = "_reweight" if args.use_reweight else ""
             wandb.init(
                 project="clrs_text",
-                name=f"{save_name}_run_{run}",
+                name=f"{save_name}_run_{run}{wandb_suffix}",
                 config=vars(args),
                 reinit=True,
             )
