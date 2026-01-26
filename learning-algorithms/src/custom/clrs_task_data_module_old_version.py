@@ -127,6 +127,9 @@ class CasualLMInstructionCollator:
         if "weights" in converted_batch[0]:
             model_inputs["weights"] = torch.Tensor([instance["weights"] for instance in converted_batch])
 
+        if "sample_idx" in converted_batch[0]:
+            model_inputs["sample_idx"] = torch.tensor([instance["sample_idx"] for instance in converted_batch], dtype=torch.long)
+
         if "residuals" in converted_batch[0]:
             model_inputs["residuals"] = torch.Tensor([instance["residuals"] for instance in converted_batch])
         

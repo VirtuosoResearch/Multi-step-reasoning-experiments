@@ -327,6 +327,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_every_epoch", action="store_true")
     parser.add_argument("--optimizer", type=str, default="adamw")
     parser.add_argument("--use_reweight", action="store_true")
+    parser.add_argument("--reweight_eta", type=float, default=0.1)
 
     parser.add_argument("--eval_split", type=float, default=0.2)
     parser.add_argument("--downsample_ratio", type=float, default=1.0)
@@ -460,6 +461,8 @@ if __name__ == "__main__":
         lm = trainer_cls(model, tokenizer, model_type, use_cpu_offload=False,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb, 
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
+        if args.use_reweight:
+            lm.reweight_eta = args.reweight_eta
         
         load_model_dir = args.load_model_dir
 
@@ -480,6 +483,8 @@ if __name__ == "__main__":
                 lm = trainer_cls.load_from_checkpoint(load_model_dir, model=model, tokenizer=tokenizer, model_type=model_type,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
+                if args.use_reweight:
+                    lm.reweight_eta = args.reweight_eta
                 print(f"Loaded model from {load_model_dir}")
                 # Add Gaussian noise to model weights if requested
                 if args.add_weight_perturb:
