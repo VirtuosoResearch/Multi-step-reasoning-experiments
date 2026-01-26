@@ -232,6 +232,10 @@ class TextCLRSDataModule(pl.LightningDataModule):
             else:
                 predict_dataset = predict_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False)
 
+            print("Original train_dataset size: ", len(train_dataset))
+            print("Original eval_dataset size: ", len(eval_dataset))
+            print("Original predict_dataset size: ", len(predict_dataset))
+
             # Downsample the dataset if needed
             if self.downsample_rate < 1.0:
                 rng = np.random.default_rng(self.downsample_seed)
@@ -250,6 +254,14 @@ class TextCLRSDataModule(pl.LightningDataModule):
                 permutations = rng.permutation(len(predict_dataset))
                 min_sample = max(int(self.minimum_sample_validation), int(self.downsample_rate*len(predict_dataset)))
                 predict_dataset = predict_dataset.select(permutations[:min_sample])
+            
+            # Add sample_idx to each sample BEFORE storing in task_to_train_datasets
+            # This ensures each original data point gets a unique index (0, 1, 2, ..., N-1) per task
+            if "sample_idx" not in train_dataset.column_names:
+                def _add_sample_idx(example, idx):
+                    example["sample_idx"] = int(idx)
+                    return example
+                train_dataset = train_dataset.map(_add_sample_idx, with_indices=True)
             
             extended_task_name = task_name
             print("Task: {} train dataset size: {} validation dataset size: {} test dataset size: {}".format(extended_task_name, len(train_dataset), len(eval_dataset), len(predict_dataset)))

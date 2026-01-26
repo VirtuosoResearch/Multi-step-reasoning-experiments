@@ -22,21 +22,26 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
     # Initialization utilities
     # -------------------------
     def _initialize_sample_indices_and_weights(self) -> None:
+        """
+        Initialize sample weights. The sample_idx should already be added in the datamodule.setup()
+        method, so we just need to verify and initialize weights.
+        """
         datamodule = getattr(self.trainer, "datamodule", None)
         if datamodule is None or not hasattr(datamodule, "task_to_train_datasets"):
             return
 
         task_to_weights = {}
         for task_name, train_dataset in datamodule.task_to_train_datasets.items():
+            # Verify that sample_idx exists (should have been added in datamodule.setup())
             if "sample_idx" not in train_dataset.column_names:
-                def _add_sample_idx(example, idx):
-                    example["sample_idx"] = int(idx)
-                    return example
-
-                train_dataset = train_dataset.map(_add_sample_idx, with_indices=True)
-
-            datamodule.task_to_train_datasets[task_name] = train_dataset
-            task_to_weights[task_name] = [1.0] * len(train_dataset)
+                raise ValueError(
+                    f"sample_idx not found in dataset for task '{task_name}'. "
+                    "It should be added in the datamodule.setup() method after downsample."
+                )
+            
+            # Initialize weights for each original data point (one weight per data point)
+            num_samples = len(train_dataset)
+            task_to_weights[task_name] = [1.0] * num_samples
 
         self._set_class_weights(task_to_weights)
 
@@ -44,6 +49,11 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
     # Weight update procedure
     # -------------------------
     def _update_sample_weights(self) -> None:
+        """
+        Update sample weights at the end of each epoch.
+        This function iterates through all original training data points (not dataloader batches),
+        computes gradient norms for each, and updates the global weights list.
+        """
         datamodule = getattr(self.trainer, "datamodule", None)
         if datamodule is None or not hasattr(datamodule, "task_to_train_datasets"):
             return
@@ -61,19 +71,15 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
                 collator = datamodule.task_to_collators[task_name]
                 batch_size = int(getattr(datamodule, "batch_size", 1))
 
-                norms_by_idx = torch.zeros(len(train_dataset), dtype=torch.float32)
+                # Initialize norms for all original data points in this task
+                num_samples = len(train_dataset)
+                norms_by_idx = torch.zeros(num_samples, dtype=torch.float32)
 
-                for start_idx in range(0, len(train_dataset), batch_size):
-                    end_idx = min(start_idx + batch_size, len(train_dataset))
+                for start_idx in range(0, num_samples, batch_size):
+                    end_idx = min(start_idx + batch_size, num_samples)
                     samples = [train_dataset[i] for i in range(start_idx, end_idx)]
 
                     batch = collator(samples)
-
-                    if "sample_idx" not in batch:
-                        raise KeyError(
-                            "Batch is missing `sample_idx`. "
-                            "Your collator must preserve `sample_idx` from samples."
-                        )
 
                     idxs = batch["sample_idx"]
                     if not isinstance(idxs, torch.Tensor):
@@ -88,11 +94,10 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
                     ).detach().cpu().float()
 
                     norms_by_idx[idxs_cpu] = grad_norms
-
                     self.model.zero_grad(set_to_none=True)
 
                 task_to_norms_by_idx[task_name] = norms_by_idx
-
+        # Update weights based on gradient norms
         task_to_raw = {}
         for task_name, norms_by_idx in task_to_norms_by_idx.items():
             prev = prev_weights_by_task.get(task_name, None)
@@ -102,13 +107,13 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
                 prev_tensor = torch.tensor(prev, dtype=norms_by_idx.dtype)
 
             scaled = torch.clamp(norms_by_idx * float(self.reweight_eta), max=float(self.weight_clip_exp))
-            raw = prev_tensor * torch.exp(scaled)
+            # raw = prev_tensor * torch.exp(scaled)
+            raw = torch.exp(scaled)
             task_to_raw[task_name] = raw
 
         all_raw = torch.cat(list(task_to_raw.values())) if task_to_raw else torch.zeros(0)
         norm_sum = all_raw.sum()
         total_len = all_raw.numel()
-
         task_to_weights = {}
         for task_name, raw in task_to_raw.items():
             if total_len == 0 or float(norm_sum) == 0.0:
@@ -117,7 +122,15 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
                 w = raw / (norm_sum + 1e-12) * total_len
             task_to_weights[task_name] = w.tolist()
 
+        # print("================================================")
+        # print("task_to_weights: ", task_to_weights)
+        # print("================================================")
+        # Update the global weights list
         self._set_class_weights(task_to_weights)
+        
+        # Print summary of updated weights
+        total_samples = sum(len(weights) for weights in task_to_weights.values())
+        print(f"[GradientReweight] Updated weights for {total_samples} total data points across all tasks")
 
         if was_training:
             self.model.train()
@@ -126,15 +139,21 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
     # Storage helpers
     # -------------------------
     def _set_class_weights(self, task_to_weights):
+        """
+        Store the global weights list. Each task has a list of weights, one per original data point.
+        The sample_idx in each batch corresponds to the index in this weights list (0 to N-1 per task).
+        """
         self.sample_weight_by_task = {}
         self.sample_index_by_task = {}
         self.sample_weight_list = []
-        offset = 0
         for task_name, weights in task_to_weights.items():
+            # Store weights for this task (one weight per original data point)
             self.sample_weight_by_task[task_name] = weights
-            self.sample_index_by_task[task_name] = list(range(offset, offset + len(weights)))
+            # Store the sample_idx range for this task (0 to N-1, not global offset)
+            # This matches the sample_idx in the dataset which starts from 0 for each task
+            self.sample_index_by_task[task_name] = list(range(len(weights)))
+            # Maintain a global weights list across all tasks (for potential future use)
             self.sample_weight_list.extend(weights)
-            offset += len(weights)
 
     # -------------------------
     # Loss and grad utilities
@@ -213,10 +232,13 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
             idxs = torch.tensor(idxs, dtype=torch.long)
         idxs = idxs.to(self.device)
 
+        # Get weights from the global weights list for this task
+        # The sample_idx in the batch corresponds to the index in the weights list
         weights_table = self.sample_weight_by_task.get(task_name, None)
         if weights_table is None:
             weights = torch.ones((idxs.shape[0],), device=self.device, dtype=torch.float32)
         else:
+            # Use the sample_idx to index into the weights list for this task
             weights_full = torch.tensor(weights_table, device=self.device, dtype=torch.float32)
             weights = weights_full[idxs]
 

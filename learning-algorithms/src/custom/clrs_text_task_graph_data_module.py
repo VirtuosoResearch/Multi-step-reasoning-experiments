@@ -322,6 +322,14 @@ class TextGraphCLRSDataModule(pl.LightningDataModule):
                 min_sample = max(int(self.minimum_sample_validation), int(self.downsample_rate*len(predict_dataset)))
                 predict_dataset = predict_dataset.select(permutations[:min_sample])
             
+            # Add sample_idx to each sample BEFORE storing in task_to_train_datasets
+            # This ensures each original data point gets a unique index (0, 1, 2, ..., N-1) per task
+            if "sample_idx" not in train_dataset.column_names:
+                def _add_sample_idx(example, idx):
+                    example["sample_idx"] = int(idx)
+                    return example
+                train_dataset = train_dataset.map(_add_sample_idx, with_indices=True)
+            
             extended_task_name = task_name
             print("Task: {} train dataset size: {} validation dataset size: {} test dataset size: {}".format(extended_task_name, len(train_dataset), len(eval_dataset), len(predict_dataset)))
             self.task_to_train_datasets[extended_task_name] = train_dataset
