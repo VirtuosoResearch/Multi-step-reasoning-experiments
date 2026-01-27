@@ -920,6 +920,9 @@ class MultitaskModel(pl.LightningModule):
                     self.log(key, value, prog_bar=True, logger=True)
                 else:
                     self.log(key, value, prog_bar=False, logger=True)
+        if self.use_wandb and "accuracy" in summary:
+            import wandb
+            wandb.log({"accuracy": summary["accuracy"]})
         self.validation_step_outputs.clear()
         return summary
 

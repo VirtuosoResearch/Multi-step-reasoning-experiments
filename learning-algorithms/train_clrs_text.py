@@ -7,6 +7,7 @@ from src.custom.clrs_text_task_data_module import TextCLRSDataModule
 from src.custom.clrs_text_task_graph_data_module import TextGraphCLRSDataModule
 
 from src.custom.multitask_model import MultitaskModel
+from src.custom.gradient_reweight_multitask_model import GradientNormReweightMultitaskModel
 from src.model.GraphLlama import GraphLlamaForCausalLM
 from src.model.gnn_models.config import load_cfg
 from src.model.projectors import create_intrinsic_model
@@ -325,6 +326,8 @@ if __name__ == "__main__":
     parser.add_argument("--max_output_length", type=int, default=64)
     parser.add_argument("--save_every_epoch", action="store_true")
     parser.add_argument("--optimizer", type=str, default="adamw")
+    parser.add_argument("--use_reweight", action="store_true")
+    parser.add_argument("--reweight_eta", type=float, default=0.1)
 
     parser.add_argument("--eval_split", type=float, default=0.2)
     parser.add_argument("--downsample_ratio", type=float, default=1.0)
@@ -395,6 +398,14 @@ if __name__ == "__main__":
 
     metrics = {}
     for run in range(args.runs):
+        if args.use_wandb:
+            wandb_suffix = "_reweight" if args.use_reweight else ""
+            wandb.init(
+                project="clrs_text",
+                name=f"{save_name}_run_{run}{wandb_suffix}",
+                config=vars(args),
+                reinit=True,
+            )
         model, tokenizer, hf_key, model_type, append_eos = initialize_model(args)
 
         batch_size = args.batch_size
@@ -446,9 +457,12 @@ if __name__ == "__main__":
         #         print(name, param.shape)
 
         extended_task_names = [f"{task_name}" for task_name in args.task_names]
-        lm = MultitaskModel(model, tokenizer, model_type, use_cpu_offload=False,
+        trainer_cls = GradientNormReweightMultitaskModel if args.use_reweight else MultitaskModel
+        lm = trainer_cls(model, tokenizer, model_type, use_cpu_offload=False,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb, 
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
+        if args.use_reweight:
+            lm.reweight_eta = args.reweight_eta
         
         load_model_dir = args.load_model_dir
 
@@ -466,9 +480,11 @@ if __name__ == "__main__":
             print(f"Loaded model from {load_model_dir}")
             print("*"*50)
             if ("ckpt" in load_model_dir) and os.path.exists(load_model_dir):
-                lm = MultitaskModel.load_from_checkpoint(load_model_dir, model=model, tokenizer=tokenizer, model_type=model_type,
+                lm = trainer_cls.load_from_checkpoint(load_model_dir, model=model, tokenizer=tokenizer, model_type=model_type,
                         lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
                         optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
+                if args.use_reweight:
+                    lm.reweight_eta = args.reweight_eta
                 print(f"Loaded model from {load_model_dir}")
                 # Add Gaussian noise to model weights if requested
                 if args.add_weight_perturb:
@@ -654,19 +670,22 @@ if __name__ == "__main__":
         if args.use_graph_llama or args.train_lora or args.train_adapter:
             os.system(f"rm {checkpoint_callback.best_model_path}")
     
-    for key in metrics:
-        logging.info("{}: {:.4f} +/- {:.4f}".format(key, np.mean(metrics[key]), np.std(metrics[key])))
+        for key in metrics:
+            print("{}: {:.4f} +/- {:.4f}".format(key, np.mean(metrics[key]), np.std(metrics[key])))
     
     # save indexes 
-    if args.write_results:
-        for task_name in extended_task_names:
-            result_datapoint = {
-                "Task name": task_name,
-                "Trained with": " ".join(extended_task_names),
-            }
-            for key, val in metrics.items():
-                if task_name in key:
-                    tmp_key = key.replace(f"{task_name}_", "")
-                    result_datapoint[tmp_key] = np.mean(val)
-            file_name = os.path.join(file_dir, "results.csv")
-            add_result_to_csv(result_datapoint, file_name)
+        if args.write_results:
+            for task_name in extended_task_names:
+                result_datapoint = {
+                    "Task name": task_name,
+                    "Trained with": " ".join(extended_task_names),
+                }
+                for key, val in metrics.items():
+                    if task_name in key:
+                        tmp_key = key.replace(f"{task_name}_", "")
+                        result_datapoint[tmp_key] = np.mean(val)
+                file_name = os.path.join(file_dir, "results.csv")
+                add_result_to_csv(result_datapoint, file_name)
+
+        if args.use_wandb:
+            wandb.finish()
