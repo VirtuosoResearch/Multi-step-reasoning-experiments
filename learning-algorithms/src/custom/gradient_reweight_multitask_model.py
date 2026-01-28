@@ -107,8 +107,8 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
                 prev_tensor = torch.tensor(prev, dtype=norms_by_idx.dtype)
 
             scaled = torch.clamp(norms_by_idx * float(self.reweight_eta), max=float(self.weight_clip_exp))
-            # raw = prev_tensor * torch.exp(scaled)
-            raw = torch.exp(scaled)
+            # raw = prev_tensor * torch.exp(-scaled)
+            raw = torch.exp(-scaled)
             task_to_raw[task_name] = raw
 
         all_raw = torch.cat(list(task_to_raw.values())) if task_to_raw else torch.zeros(0)
@@ -122,9 +122,9 @@ class GradientNormReweightMultitaskModel(MultitaskModel):
                 w = raw / (norm_sum + 1e-12) * total_len
             task_to_weights[task_name] = w.tolist()
 
-        # print("================================================")
-        # print("task_to_weights: ", task_to_weights)
-        # print("================================================")
+        print("================================================")
+        print("task_to_weights: ", task_to_weights)
+        print("================================================")
         # Update the global weights list
         self._set_class_weights(task_to_weights)
         

@@ -86,10 +86,26 @@ def get_length(question):
     question = question[start_index:end_index]
     return len(question.split(','))
 
+def get_length_lego(question):
+    """Get length for lego dataset from variables field"""
+    # Extract variables line: "variables: t u d p s e a n x y i f"
+    variables_start = question.find('variables:')
+    if variables_start == -1:
+        return 0
+    variables_line = question[variables_start:].split('\n')[0]
+    variables = variables_line.replace('variables:', '').strip().split()
+    return len(variables)
+
 class add_length:
 
+    def __init__(self, is_lego=False):
+        self.is_lego = is_lego
+
     def __call__(self, examples):
-        examples["length"] = [get_length(q) for q in examples['question']]
+        if self.is_lego:
+            examples["length"] = [get_length_lego(q) for q in examples['question']]
+        else:
+            examples["length"] = [get_length(q) for q in examples['question']]
         return examples
 
 class convert_format:
@@ -203,34 +219,74 @@ class TextCLRSDataModule(pl.LightningDataModule):
         self.task_to_collators = {}
         self.task_to_templates = {}
         for i, task_name in enumerate(self.task_names):
-
-            # Split the dataset into train and validation
-            train_dataset = load_dataset("tomg-group-umd/CLRS-Text-train")['train']
-            train_dataset = train_dataset.filter(lambda x: x['algo_name'] == task_name)
-            train_dataset = train_dataset.map(add_length(), batched=True)
-            train_dataset = train_dataset.filter(lambda x: x['length'] in self.train_lengths) if task_name != "bridges" else \
-                train_dataset.filter(lambda x: x['length'] in [5])
-            # fileter out the examples by the text encoder
-            column_names = train_dataset.column_names
-            # convert the input and output format
-            sample_steps = 10 if task_name in ["mst_kruskal", "floyd_warshall"] else 20
-            train_dataset = train_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False) # remove_columns=column_names
-            # split dataset
-            tmp_datasets = train_dataset.train_test_split(test_size=self.eval_split, seed=42)
-            train_dataset = tmp_datasets['train']
-            eval_dataset = tmp_datasets['test']
+            # Check if this is a local dataset task (lego or symmetry)
+            is_local_dataset = (task_name == "lego" or task_name.startswith("lego_") or 
+                              task_name == "symmetry" or task_name.startswith("symmetry_"))
             
-            predict_dataset = load_dataset("tomg-group-umd/CLRS-Text-test")['test_1']
-            predict_dataset = predict_dataset.filter(lambda x: x['algo_name'] == task_name)
-            predict_dataset = predict_dataset.filter(lambda x: x['length'] in self.test_lengths) if task_name != "bridges" else \
-                predict_dataset.filter(lambda x: x['length'] in [5])
-            # fileter out the examples by the text encoder
-            column_names = predict_dataset.column_names
-            # convert the input and output format
-            if self.use_few_shot:
-                predict_dataset = predict_dataset.map(convert_few_shot_format(train_dataset, only_answer_output=self.only_answer_output, k=self.few_shot_k), batched=True, load_from_cache_file=False)
+            if is_local_dataset:
+                # Determine dataset directory and file prefix
+                if task_name == "lego" or task_name.startswith("lego_"):
+                    dataset_dir = "./lego_dataset"
+                    file_prefix = "lego"
+                elif task_name == "symmetry" or task_name.startswith("symmetry_"):
+                    dataset_dir = "./symmetry_dataset"
+                    file_prefix = "symmetry"
+                else:
+                    raise ValueError(f"Unknown local dataset task: {task_name}")
+                
+                # Load dataset from local JSON files
+                # Note: local datasets have fixed length for all samples, so we skip length filtering
+                train_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_train.json")['train']
+                train_dataset = train_dataset.map(add_length(is_lego=True), batched=True)
+                # Skip length filtering for local datasets since all samples have the same length
+                # convert the input and output format
+                sample_steps = 10 if task_name in ["mst_kruskal", "floyd_warshall"] else 20
+                train_dataset = train_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False)
+                
+                # Load validation dataset
+                eval_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_val.json")['train']
+                eval_dataset = eval_dataset.map(add_length(is_lego=True), batched=True)
+                # Skip length filtering for local datasets since all samples have the same length
+                eval_dataset = eval_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False)
+                
+                # Load test dataset
+                predict_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_test.json")['train']
+                predict_dataset = predict_dataset.map(add_length(is_lego=True), batched=True)
+                # Skip length filtering for local datasets since all samples have the same length
+                # convert the input and output format
+                if self.use_few_shot:
+                    predict_dataset = predict_dataset.map(convert_few_shot_format(train_dataset, only_answer_output=self.only_answer_output, k=self.few_shot_k), batched=True, load_from_cache_file=False)
+                else:
+                    predict_dataset = predict_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False)
             else:
-                predict_dataset = predict_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False)
+                # Original CLRS dataset loading
+                # Split the dataset into train and validation
+                train_dataset = load_dataset("tomg-group-umd/CLRS-Text-train")['train']
+                train_dataset = train_dataset.filter(lambda x: x['algo_name'] == task_name)
+                train_dataset = train_dataset.map(add_length(is_lego=False), batched=True)
+                train_dataset = train_dataset.filter(lambda x: x['length'] in self.train_lengths) if task_name != "bridges" else \
+                    train_dataset.filter(lambda x: x['length'] in [5])
+                # fileter out the examples by the text encoder
+                column_names = train_dataset.column_names
+                # convert the input and output format
+                sample_steps = 10 if task_name in ["mst_kruskal", "floyd_warshall"] else 20
+                train_dataset = train_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False) # remove_columns=column_names
+                # split dataset
+                tmp_datasets = train_dataset.train_test_split(test_size=self.eval_split, seed=42)
+                train_dataset = tmp_datasets['train']
+                eval_dataset = tmp_datasets['test']
+                
+                predict_dataset = load_dataset("tomg-group-umd/CLRS-Text-test")['test_1']
+                predict_dataset = predict_dataset.filter(lambda x: x['algo_name'] == task_name)
+                predict_dataset = predict_dataset.filter(lambda x: x['length'] in self.test_lengths) if task_name != "bridges" else \
+                    predict_dataset.filter(lambda x: x['length'] in [5])
+                # fileter out the examples by the text encoder
+                column_names = predict_dataset.column_names
+                # convert the input and output format
+                if self.use_few_shot:
+                    predict_dataset = predict_dataset.map(convert_few_shot_format(train_dataset, only_answer_output=self.only_answer_output, k=self.few_shot_k), batched=True, load_from_cache_file=False)
+                else:
+                    predict_dataset = predict_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False)
 
             print("Original train_dataset size: ", len(train_dataset))
             print("Original eval_dataset size: ", len(eval_dataset))
