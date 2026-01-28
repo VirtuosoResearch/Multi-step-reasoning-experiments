@@ -1,0 +1,16 @@
+sample=500
+
+python train_clrs_text.py --task_names lego --model_key Qwen/Qwen2.5-1.5B --devices 0 --batch_size 4 --inference_batch_size 4 --max_length 85 --max_output_length 150 --train_lengths 5 --test_lengths 5 --generate_output --runs 2 --lr 2e-5 --save_name lego --epochs 10 --precision bf16-true --train_lora --lora_rank 16 --lora_alpha 128 --few_shot_k 0 --downsample_ratio 0.01 --minimum_samples $sample --minimum_samples_validation 73 --eval_last_step
+
+
+python train_clrs_text.py --task_names lego --model_key Qwen/Qwen2.5-1.5B --devices 0 --batch_size 4 --inference_batch_size 4 --max_length 85 --max_output_length 150 --train_lengths 5 --test_lengths 5 --generate_output --runs 2 --lr 2e-5 --save_name lego --epochs 10 --precision bf16-true --train_lora --lora_rank 16 --lora_alpha 128 --few_shot_k 0 --downsample_ratio 0.01 --minimum_samples $sample --minimum_samples_validation 73 --eval_last_step --use_reweight --reweight_eta 0.03
+
+python train_clrs_text.py --task_names lego --model_key Qwen/Qwen2.5-1.5B --devices 0 --batch_size 4 --inference_batch_size 4 --max_length 85 --max_output_length 150 --train_lengths 5 --test_lengths 5 --generate_output --runs 2 --lr 2e-5 --save_name lego --epochs 10 --precision bf16-true --train_lora --lora_rank 16 --lora_alpha 128 --few_shot_k 0 --downsample_ratio 0.01 --minimum_samples $sample --minimum_samples_validation 73 --eval_last_step --use_reweight --reweight_eta 0.04
+
+python train_clrs_text.py --task_names lego --model_key Qwen/Qwen2.5-1.5B --devices 0 --batch_size 4 --inference_batch_size 4 --max_length 85 --max_output_length 150 --train_lengths 5 --test_lengths 5 --generate_output --runs 2 --lr 2e-5 --save_name lego --epochs 10 --precision bf16-true --train_lora --lora_rank 16 --lora_alpha 128 --few_shot_k 0 --downsample_ratio 0.01 --minimum_samples $sample --minimum_samples_validation 73 --eval_last_step --use_reweight --reweight_eta 0.03
+
+python train_clrs_text.py --task_names lego --model_key Qwen/Qwen2.5-1.5B --devices 0 --batch_size 4 --inference_batch_size 4 --max_length 85 --max_output_length 150 --train_lengths 5 --test_lengths 5 --generate_output --runs 2 --lr 2e-5 --save_name lego --epochs 10 --precision bf16-true --train_lora --lora_rank 16 --lora_alpha 128 --few_shot_k 0 --downsample_ratio 0.01 --minimum_samples $sample --minimum_samples_validation 73 --eval_last_step --use_reweight --reweight_eta 0.05
+
+python train_clrs_text.py --task_names lego --model_key Qwen/Qwen2.5-1.5B --devices 0 --batch_size 4 --inference_batch_size 4 --max_length 85 --max_output_length 150 --train_lengths 5 --test_lengths 5 --generate_output --runs 2 --lr 2e-5 --save_name lego --epochs 10 --precision bf16-true --train_lora --lora_rank 16 --lora_alpha 128 --few_shot_k 0 --downsample_ratio 0.01 --minimum_samples $sample --minimum_samples_validation 73 --eval_last_step --use_reweight --reweight_eta 0.02
+
+python train_clrs_text.py --task_names lego --model_key Qwen/Qwen2.5-1.5B --devices 0 --batch_size 4 --inference_batch_size 4 --max_length 85 --max_output_length 150 --train_lengths 5 --test_lengths 5 --generate_output --runs 2 --lr 2e-5 --save_name lego --epochs 10 --precision bf16-true --train_lora --lora_rank 16 --lora_alpha 128 --few_shot_k 0 --downsample_ratio 0.01 --minimum_samples $sample --minimum_samples_validation 73 --eval_last_step --use_reweight --reweight_eta 0.1
