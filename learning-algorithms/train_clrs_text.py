@@ -8,6 +8,7 @@ from src.custom.clrs_text_task_graph_data_module import TextGraphCLRSDataModule
 
 from src.custom.multitask_model import MultitaskModel
 from src.custom.gradient_reweight_multitask_model import GradientNormReweightMultitaskModel
+from src.custom.noise_injection_multitask_model import NoiseInjectionMultitaskModel
 from src.model.GraphLlama import GraphLlamaForCausalLM
 from src.model.gnn_models.config import load_cfg
 from src.model.projectors import create_intrinsic_model
@@ -328,6 +329,9 @@ if __name__ == "__main__":
     parser.add_argument("--optimizer", type=str, default="adamw")
     parser.add_argument("--use_reweight", action="store_true")
     parser.add_argument("--reweight_eta", type=float, default=0.1)
+    
+    parser.add_argument("--use_noise_injection", action="store_true")  # enable noise injection during training
+    parser.add_argument("--noise_std", type=float, default=1e-3)  # standard deviation of Gaussian noise
 
     parser.add_argument("--eval_split", type=float, default=0.2)
     parser.add_argument("--downsample_ratio", type=float, default=1.0)
@@ -396,13 +400,23 @@ if __name__ == "__main__":
     if not os.path.exists(file_dir):
         os.mkdir(file_dir)
 
+    # Create wandb name without model_key prefix
+    wandb_name_base = \
+                (f"_{args.save_name}" if args.save_name else "") + \
+                (f"_{args.minimum_samples}") + \
+                (f"_len_{args.train_lengths}") + \
+                (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
+                (f"_use_only_answer_output" if args.only_answer_output else "")
+    # Remove leading underscore if present
+    wandb_name_base = wandb_name_base.lstrip("_")
+
     metrics = {}
     for run in range(args.runs):
         if args.use_wandb:
             wandb_suffix = "_reweight" if args.use_reweight else ""
             wandb.init(
                 project="clrs_text",
-                name=f"{save_name}_run_{run}{wandb_suffix}",
+                name=f"{wandb_name_base}_run_{run}{wandb_suffix}" if wandb_name_base else f"run_{run}{wandb_suffix}",
                 config=vars(args),
                 reinit=True,
             )
@@ -457,10 +471,43 @@ if __name__ == "__main__":
         #         print(name, param.shape)
 
         extended_task_names = [f"{task_name}" for task_name in args.task_names]
-        trainer_cls = GradientNormReweightMultitaskModel if args.use_reweight else MultitaskModel
-        lm = trainer_cls(model, tokenizer, model_type, use_cpu_offload=False,
-                        lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb, 
-                        optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
+        
+        # Select trainer class based on arguments
+        if args.use_reweight:
+            trainer_cls = GradientNormReweightMultitaskModel
+        elif args.use_noise_injection:
+            trainer_cls = NoiseInjectionMultitaskModel
+        else:
+            trainer_cls = MultitaskModel
+        
+        # Initialize trainer with common arguments
+        trainer_kwargs = {
+            "model": model,
+            "tokenizer": tokenizer,
+            "model_type": model_type,
+            "use_cpu_offload": False,
+            "lr": args.lr,
+            "weight_decay": args.weight_decay,
+            "max_length": args.max_length,
+            "max_output_length": args.max_output_length,
+            "use_wandb": args.use_wandb,
+            "optimizer": args.optimizer,
+            "generate_output": args.generate_output,
+            "task_names": extended_task_names,
+            "eval_clrs": args.eval_last_step,
+            "eval_step_num": args.eval_step_num,
+        }
+        
+        # Add noise injection arguments if using NoiseInjectionMultitaskModel
+        if args.use_noise_injection:
+            trainer_kwargs.update({
+                "use_noise_injection": True,
+                "noise_std": args.noise_std,
+            })
+        
+        lm = trainer_cls(**trainer_kwargs)
+        
+        # Set reweight_eta if using reweight
         if args.use_reweight:
             lm.reweight_eta = args.reweight_eta
         
@@ -480,9 +527,32 @@ if __name__ == "__main__":
             print(f"Loaded model from {load_model_dir}")
             print("*"*50)
             if ("ckpt" in load_model_dir) and os.path.exists(load_model_dir):
-                lm = trainer_cls.load_from_checkpoint(load_model_dir, model=model, tokenizer=tokenizer, model_type=model_type,
-                        lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
-                        optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
+                # Prepare checkpoint loading arguments
+                checkpoint_kwargs = {
+                    "model": model,
+                    "tokenizer": tokenizer,
+                    "model_type": model_type,
+                    "lr": args.lr,
+                    "weight_decay": args.weight_decay,
+                    "max_length": args.max_length,
+                    "max_output_length": args.max_output_length,
+                    "use_wandb": args.use_wandb,
+                    "optimizer": args.optimizer,
+                    "generate_output": args.generate_output,
+                    "task_names": extended_task_names,
+                    "eval_clrs": args.eval_last_step,
+                    "eval_step_num": args.eval_step_num,
+                }
+                
+                # Add noise injection arguments if using NoiseInjectionMultitaskModel
+                if args.use_noise_injection:
+                    checkpoint_kwargs.update({
+                        "use_noise_injection": True,
+                        "noise_std": args.noise_std,
+                    })
+                
+                lm = trainer_cls.load_from_checkpoint(load_model_dir, **checkpoint_kwargs)
+                
                 if args.use_reweight:
                     lm.reweight_eta = args.reweight_eta
                 print(f"Loaded model from {load_model_dir}")
