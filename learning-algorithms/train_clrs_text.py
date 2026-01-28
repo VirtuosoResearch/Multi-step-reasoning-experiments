@@ -629,6 +629,7 @@ if __name__ == "__main__":
                                         (f"_len_{args.train_lengths}") + \
                                         (f"_use_only_answer_output" if args.only_answer_output else "") + \
                                         (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
+                                        (f"_reweight_eta_{args.reweight_eta}" if args.use_reweight else "") + \
                                         (f"_{args.save_name}" if args.save_name else "") + \
                                         f"_run_{run}"
                                         )
