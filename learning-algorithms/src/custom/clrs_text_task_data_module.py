@@ -226,17 +226,19 @@ class TextCLRSDataModule(pl.LightningDataModule):
             if is_local_dataset:
                 # Determine dataset directory and file prefix
                 if task_name == "lego" or task_name.startswith("lego_"):
-                    dataset_dir = "./lego_dataset"
+                    dataset_dir = "lego_dataset"
                     file_prefix = "lego"
+                    file_suffix = "_progressive"  # lego uses _progressive suffix
                 elif task_name == "symmetry" or task_name.startswith("symmetry_"):
-                    dataset_dir = "./symmetry_dataset"
+                    dataset_dir = "symmetry_dataset"
                     file_prefix = "symmetry"
+                    file_suffix = ""  # symmetry doesn't use suffix
                 else:
                     raise ValueError(f"Unknown local dataset task: {task_name}")
                 
                 # Load dataset from local JSON files
                 # Note: local datasets have fixed length for all samples, so we skip length filtering
-                train_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_train.json")['train']
+                train_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_train{file_suffix}.json")['train']
                 train_dataset = train_dataset.map(add_length(is_lego=True), batched=True)
                 # Skip length filtering for local datasets since all samples have the same length
                 # convert the input and output format
@@ -244,13 +246,13 @@ class TextCLRSDataModule(pl.LightningDataModule):
                 train_dataset = train_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False)
                 
                 # Load validation dataset
-                eval_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_val.json")['train']
+                eval_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_val{file_suffix}.json")['train']
                 eval_dataset = eval_dataset.map(add_length(is_lego=True), batched=True)
                 # Skip length filtering for local datasets since all samples have the same length
                 eval_dataset = eval_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio), batched=True, load_from_cache_file=False)
                 
                 # Load test dataset
-                predict_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_test.json")['train']
+                predict_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_test{file_suffix}.json")['train']
                 predict_dataset = predict_dataset.map(add_length(is_lego=True), batched=True)
                 # Skip length filtering for local datasets since all samples have the same length
                 # convert the input and output format
