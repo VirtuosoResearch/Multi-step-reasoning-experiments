@@ -478,12 +478,12 @@ if __name__ == "__main__":
         extended_task_names = [f"{task_name}" for task_name in args.task_names]
         
         # Select trainer class based on arguments
-        if args.use_reweight:
+        if args.use_self_training:
+            trainer_cls = SelfTrainingMultitaskModel
+        elif args.use_reweight:
             trainer_cls = GradientNormReweightMultitaskModel
         elif args.use_noise_injection:
             trainer_cls = NoiseInjectionMultitaskModel
-        elif args.use_self_training:
-            trainer_cls = SelfTrainingMultitaskModel
         else:
             trainer_cls = MultitaskModel
         
@@ -518,6 +518,12 @@ if __name__ == "__main__":
                 "use_self_training": True,
                 "self_train_n_samples": args.self_train_n_samples,
                 "self_train_temperature": args.self_train_temperature,
+            })
+
+        # Add reweight flag only for SelfTrainingMultitaskModel (它的构造函数才有 use_reweight)
+        if args.use_reweight and trainer_cls is SelfTrainingMultitaskModel:
+            trainer_kwargs.update({
+                "use_reweight": True,
             })
         
         lm = trainer_cls(**trainer_kwargs)
@@ -571,6 +577,12 @@ if __name__ == "__main__":
                         "use_self_training": True,
                         "self_train_n_samples": args.self_train_n_samples,
                         "self_train_temperature": args.self_train_temperature,
+                    })
+
+                # Add reweight flag only for SelfTrainingMultitaskModel
+                if args.use_reweight and trainer_cls is SelfTrainingMultitaskModel:
+                    checkpoint_kwargs.update({
+                        "use_reweight": True,
                     })
                 
                 lm = trainer_cls.load_from_checkpoint(load_model_dir, **checkpoint_kwargs)
