@@ -4,7 +4,7 @@ from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-1.5B", trust_remote_code=True)
 data_module =TextCLRSDataModule(
-    task_names=["bellman_ford"],
+    task_names=["mst_kruskal"],
     tokenizer=tokenizer,
     batch_size=8,
     inference_batch_size=8,
@@ -15,12 +15,12 @@ data_module =TextCLRSDataModule(
     downsample_ratio=1,
     minimum_samples=10000,
     minimum_samples_validation=10000,
-    train_lengths=[5],
-    test_lengths=[5],
+    train_lengths=[10],
+    test_lengths=[10],
     use_few_shot=False, 
     few_shot_k=0,
-    only_answer_output=False,
-    reduce_steps_ratio=1.0)
+    only_answer_output=True,
+    reduce_steps_ratio=1)
 data_module.setup(stage="fit")
 
 # %%

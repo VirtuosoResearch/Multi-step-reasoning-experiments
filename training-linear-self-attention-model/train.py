@@ -1198,7 +1198,7 @@ def main():
     # Wandb parameters
     parser.add_argument('--use_wandb', action='store_true',
                         help='Use Weights & Biases for logging')
-    parser.add_argument('--wandb_project', type=str, default='linear-attention-weight-prediction',
+    parser.add_argument('--wandb_project', type=str, default='train-transformers-for-weight-prediction',
                         help='Wandb project name')
     parser.add_argument('--wandb_run_name', type=str, default=None,
                         help='Wandb run name')
