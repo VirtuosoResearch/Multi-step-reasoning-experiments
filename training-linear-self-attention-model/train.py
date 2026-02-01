@@ -864,6 +864,7 @@ def train(args):
     # Initialize wandb if enabled
     if args.use_wandb:
         wandb.init(
+            entity="VirtuosoResearch",
             project=args.wandb_project,
             name=args.wandb_run_name,
             config=vars(args)

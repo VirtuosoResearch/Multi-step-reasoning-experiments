@@ -81,6 +81,7 @@ class MultitaskModel_GraphQA(pl.LightningModule):
             if not os.path.exists(wandb_output_dir):
                 os.makedirs(wandb_output_dir)
             wandb.init(
+                entity="VirtuosoResearch",
                 dir=wandb_output_dir,
                 project="GraphQA",
                 entity="zszhang-northeastern-university",

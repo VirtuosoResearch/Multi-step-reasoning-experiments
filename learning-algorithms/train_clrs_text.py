@@ -420,6 +420,7 @@ if __name__ == "__main__":
         if args.use_wandb:
             wandb_suffix = "_reweight" if args.use_reweight else ("_self_train" if args.use_self_training else "")
             wandb.init(
+                entity="VirtuosoResearch",
                 project="clrs_text",
                 name=f"{wandb_name_base}_run_{run}{wandb_suffix}" if wandb_name_base else f"run_{run}{wandb_suffix}",
                 config=vars(args),

@@ -420,7 +420,7 @@ class SubLoRA():
         wandb_run_name = "id{}_lr{}_r{}".format(intrinsic_dim, learning_rate, attention_linear_lora_r)
         # logging
         if wandb_log and self.master_process:
-            wandb.init(project=wandb_project, name=wandb_run_name, config=self.yaml_config)
+            wandb.init(entity="VirtuosoResearch",project=wandb_project, name=wandb_run_name, config=self.yaml_config)
         # ? creating new output directory
         if create_new_output_dir:
             now = datetime.datetime.now()
