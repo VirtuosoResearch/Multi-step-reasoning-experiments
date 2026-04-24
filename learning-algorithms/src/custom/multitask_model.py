@@ -350,7 +350,7 @@ class MultitaskModel(pl.LightningModule):
             self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
             return loss
 
-    def validation_step(self, batch, batch_idx) -> Dict[str, torch.Tensor]:
+    def validation_step(self, batch, batch_idx, dataloader_idx=0) -> Dict[str, torch.Tensor]:
         """
         Returns outputs in dictionary format, since it's the only way that seems to work with `all_gather`
         """        
@@ -449,6 +449,7 @@ class MultitaskModel(pl.LightningModule):
 
         output_dict = {
             "task_name": task_name,
+            "split": "test" if dataloader_idx == 1 else "val",
             "loss": forward_output['loss'],
             "answers": gold_answers,
             "generates": output,
@@ -462,6 +463,8 @@ class MultitaskModel(pl.LightningModule):
             output_dict.update({"graph_accuracy": forward_output.graph_accuracy})
         if "only_answer" in batch:
             output_dict.update({"only_answer": batch["only_answer"]})
+        if "length" in batch:
+            output_dict.update({"lengths": batch["length"].detach().cpu().tolist()})
         self.validation_step_outputs.append(output_dict)
         return output_dict
     
@@ -605,13 +608,7 @@ class MultitaskModel(pl.LightningModule):
             output_dict.update({"weights": batch["weights"]})
         return output_dict
     
-    def on_validation_epoch_end(self) -> None:
-        """
-        Gather outputs from all GPUs and save validation predictions as a CompletionDataset and
-        log validation metrics.
-
-        Note, `all_gather` *concatenates* tensors from all GPUs along the first dimension.
-        """
+    def _compute_validation_summary(self, outputs):
         summary = {f"{task_name}_loss": 0 for task_name in self.task_names}
         summary.update({f"{task_name}_accuracy_score": 0 for task_name in self.task_names})
         summary.update({f"{task_name}_accuracy": 0 for task_name in self.task_names})
@@ -619,59 +616,46 @@ class MultitaskModel(pl.LightningModule):
         if self.eval_math:
             summary.update({f"{task_name}_reasoning_accuracy": 0 for task_name in self.task_names})
 
-        # average loss
-        outputs = self.validation_step_outputs
+        if len(outputs) == 0:
+            return summary
+
         losses = [output["loss"] for output in outputs]
         losses = torch.stack(losses)
         losses = losses[torch.isnan(losses) == False]
-        summary.update({"loss": losses.mean().item()})
+        summary.update({"loss": losses.mean().item() if len(losses) > 0 else 0.0})
 
         generate_output = self.generate_output
         if hasattr(self.model, "only_train_graph") and self.model.only_train_graph:
             generate_output = False
 
-            task_counts = {task_name: 0 for task_name in self.task_names}
-            for step, batch in enumerate(outputs):
-                task_name = batch["task_name"]
-                summary[f"{task_name}_loss"] += batch["loss"].item()*len(batch["answers"]) if torch.isnan(batch["loss"]) == False else 0
-                summary[f"{task_name}_accuracy"] += batch["graph_accuracy"]*len(batch["answers"])
-                task_counts[task_name] += len(batch["answers"])
-            
-            for task_name in self.task_names:
-                if task_counts[task_name] > 0:
-                    summary[f"{task_name}_loss"] /= task_counts[task_name]
-                    summary[f"{task_name}_accuracy"] /= task_counts[task_name]
-
         task_counts = {task_name: 0 for task_name in self.task_names}
         label_counts = {task_name: 0 for task_name in self.task_names}
         compute_step_metrics = self.eval_step_num > 0
-        # Collect step losses: {task_name: {step_idx: (sum, count)}}
         step_loss_dict = {task_name: defaultdict(lambda: [0.0, 0]) for task_name in self.task_names} if compute_step_metrics else {}
-        # Collect final losses: {task_name: (sum, count)}
         final_loss_dict = {task_name: [0.0, 0] for task_name in self.task_names} if compute_step_metrics else {}
+        length_metric_dict = {task_name: defaultdict(lambda: [0.0, 0.0, 0]) for task_name in self.task_names} if generate_output and self.eval_clrs else {}
+
         for step, batch in enumerate(outputs):
             task_name = batch["task_name"]
             if len(batch["answers"]) == 0:
                 continue
-            summary[f"{task_name}_loss"] += batch["loss"].item()*len(batch["answers"]) if torch.isnan(batch["loss"]) == False else 0
-            
+            summary[f"{task_name}_loss"] += batch["loss"].item() * len(batch["answers"]) if torch.isnan(batch["loss"]) == False else 0
+
             if compute_step_metrics:
-                # Collect step losses
                 if "step_losses" in batch and batch["step_losses"] is not None:
                     for sample_step_losses in batch["step_losses"]:
-                        # sample_step_losses is List[float], one loss per step
                         for step_idx, step_loss in enumerate(sample_step_losses):
                             step_loss_dict[task_name][step_idx][0] += step_loss
                             step_loss_dict[task_name][step_idx][1] += 1
 
-                # Collect final losses
                 if "final_losses" in batch and batch["final_losses"] is not None:
                     for final_loss in batch["final_losses"]:
                         if final_loss is not None:
                             final_loss_dict[task_name][0] += final_loss
                             final_loss_dict[task_name][1] += 1
-            # accuracy score is the token-level accuracy conditioned on the correct input (even for the intermediate steps)
-            summary[f"{task_name}_accuracy_score"] += accuracy_score(batch["label_ids"], batch["pred_ids"])*len(batch["label_ids"])*100
+
+            summary[f"{task_name}_accuracy_score"] += accuracy_score(batch["label_ids"], batch["pred_ids"]) * len(batch["label_ids"]) * 100
+
             if generate_output:
                 pred_answers = self.tokenizer.batch_decode(batch['generates'], skip_special_tokens=True)
                 gold_answers = self.tokenizer.batch_decode(batch['answers'], skip_special_tokens=True)
@@ -679,28 +663,23 @@ class MultitaskModel(pl.LightningModule):
                 if step == 0:
                     print("gold_answers", gold_answers[:4])
                     print("pred_answers", pred_answers[:4])
+
                 if self.evaluate_cot:
-                    # remove the steps and only keeps the answers
                     for i, answer in enumerate(pred_answers):
                         if "###" in answer:
-                            answer = answer[answer.index("###")+3:]
-                            pred_answers[i] = answer
-                        else:
-                            pred_answers[i] = answer
+                            answer = answer[answer.index("###") + 3:]
+                        pred_answers[i] = answer
                     for i, answer in enumerate(gold_answers):
                         if "###" in answer:
-                            answer = answer[answer.index("###")+3:]
-                            gold_answers[i] = answer
-                        else:
-                            gold_answers[i] = answer
+                            answer = answer[answer.index("###") + 3:]
+                        gold_answers[i] = answer
+
                 if self.eval_clrs:
-                    # Parse steps and compute step-by-step accuracy
                     pred_steps_list = []
                     gold_steps_list = []
                     pred_final_list = []
                     gold_final_list = []
-                    
-                    # Debug: check if | exists in the answers
+
                     if step == 0:
                         has_pipe_pred = sum(1 for a in pred_answers[:4] if "|" in a)
                         has_pipe_gold = sum(1 for a in gold_answers[:4] if "|" in a)
@@ -708,73 +687,53 @@ class MultitaskModel(pl.LightningModule):
                         print(f"DEBUG: First 4 gold_answers with |: {has_pipe_gold}/4")
                         if has_pipe_gold > 0:
                             print(f"DEBUG: Example gold with |: {gold_answers[0][:200] if len(gold_answers[0]) > 200 else gold_answers[0]}")
-                    
+
                     for i, (pred, gold) in enumerate(zip(pred_answers, gold_answers)):
-                        # Parse prediction
                         logging.info(f"DEBUG: pred: {pred}, gold: {gold}")
                         if "|" in pred:
                             pred_steps_str = pred[:pred.index("|")].strip()
-                            pred_final = pred[pred.index("|")+1:].strip()
+                            pred_final = pred[pred.index("|") + 1:].strip()
                         else:
-                            # If model didn't generate |, treat entire string as steps, last one is final
-                            # This is a fallback for when model output doesn't match expected format
                             pred_steps_str = pred.strip()
                             pred_final = ""
                             if step == 0 and i < 2:
                                 print(f"WARNING: pred_answers[{i}] has no | separator (first 100 chars): {pred[:100]}")
-                        
-                        # Parse gold - should always have | according to user
+
                         if "|" in gold:
                             gold_steps_str = gold[:gold.index("|")].strip()
-                            gold_final = gold[gold.index("|")+1:].strip()
+                            gold_final = gold[gold.index("|") + 1:].strip()
                         else:
-                            # This shouldn't happen if data format is correct
                             gold_steps_str = gold.strip()
                             gold_final = ""
                             if step == 0 and i < 2:
                                 print(f"ERROR: gold_answers[{i}] has no | separator (first 100 chars): {gold[:100]}")
-                        
-                        # Split steps by comma
-                        if pred_steps_str:
-                            pred_steps = [s.strip() for s in pred_steps_str.split(",") if s.strip()]
-                        else:
-                            pred_steps = []
-                        
-                        if gold_steps_str:
-                            gold_steps = [s.strip() for s in gold_steps_str.split(",") if s.strip()]
-                        else:
-                            gold_steps = []
-                        
-                        # If no final answer separated by |, use last step as final
-                        # We remove it from intermediate steps to avoid double counting
+
+                        pred_steps = [s.strip() for s in pred_steps_str.split(",") if s.strip()] if pred_steps_str else []
+                        gold_steps = [s.strip() for s in gold_steps_str.split(",") if s.strip()] if gold_steps_str else []
+
                         if not pred_final and pred_steps:
                             pred_final = pred_steps[-1]
-                            pred_steps = pred_steps[:-1]  # Remove last step from intermediate steps
-                        
+                            pred_steps = pred_steps[:-1]
+
                         if not gold_final and gold_steps:
                             gold_final = gold_steps[-1]
-                            gold_steps = gold_steps[:-1]  # Remove last step from intermediate steps
-                        
+                            gold_steps = gold_steps[:-1]
+
                         pred_steps_list.append(pred_steps)
                         gold_steps_list.append(gold_steps)
                         pred_final_list.append(pred_final)
                         gold_final_list.append(gold_final)
 
-                        # logging.info(f"DEBUG: pred_steps: {pred_steps}, gold_steps: {gold_steps}, pred_final: {pred_final}, gold_final: {gold_final}")
-
                     if self.eval_step_num > 0:
-                        # Compute step-by-step accuracy
                         max_steps = max(len(ps) for ps in pred_steps_list + gold_steps_list) if pred_steps_list or gold_steps_list else 0
                         steps_to_compute = list(range(min(self.eval_step_num, max_steps))) + ['final']
 
                         for step_idx in steps_to_compute:
                             if step_idx == 'final':
-                                # Compute final step accuracy
                                 step_preds = pred_final_list
                                 step_golds = [[g] for g in gold_final_list]
                                 step_count = len(step_preds)
                             else:
-                                # Compute accuracy for step step_idx
                                 step_preds = []
                                 step_golds = []
                                 for ps, gs in zip(pred_steps_list, gold_steps_list):
@@ -782,22 +741,18 @@ class MultitaskModel(pl.LightningModule):
                                         step_preds.append(ps[step_idx])
                                         step_golds.append([gs[step_idx]])
                                     elif step_idx < len(gs):
-                                        # Prediction missing this step
                                         step_preds.append("")
                                         step_golds.append([gs[step_idx]])
                                     elif step_idx < len(ps):
-                                        # Gold missing this step
                                         step_preds.append(ps[step_idx])
                                         step_golds.append([""])
                                     else:
-                                        # Both missing, skip
                                         continue
 
                                 step_count = len(step_preds)
                                 if step_count == 0:
                                     continue
 
-                            # Compute accuracy for this step
                             step_metrics = compute_accuracy(step_preds, step_golds, indices=None)
                             step_key = f"{task_name}_step_{step_idx}_accuracy"
                             step_count_key = f"{task_name}_step_{step_idx}_count"
@@ -809,53 +764,51 @@ class MultitaskModel(pl.LightningModule):
 
                             summary[step_key] += step_metrics["accuracy"] * step_count
                             summary[step_count_key] += step_count
-                    
-                    # For backward compatibility, also compute final accuracy as before
-                    # Use pred_final_list and gold_final_list to ensure consistency with step_final_accuracy
-                    # This ensures dfs_accuracy and dfs_step_final_accuracy use the same data
+
                     pred_answers_for_accuracy = pred_final_list.copy()
                     gold_answers_for_accuracy = [[g] for g in gold_final_list]
-                    
-                    # Also update pred_answers and gold_answers for edit_distance calculation
+
                     for i, answer in enumerate(pred_answers):
                         if "|" in answer:
-                            answer = answer[answer.index("|")+1:]
-                            pred_answers[i] = answer
+                            pred_answers[i] = answer[answer.index("|") + 1:]
                         else:
-                            # Use the final answer we extracted
-                            if i < len(pred_final_list):
-                                pred_answers[i] = pred_final_list[i]
-                            else:
-                                pred_answers[i] = answer
+                            pred_answers[i] = pred_final_list[i] if i < len(pred_final_list) else answer
                     for i, answer in enumerate(gold_answers):
                         if "|" in answer:
-                            answer = answer[answer.index("|")+1:]
-                            gold_answers[i] = answer
+                            gold_answers[i] = answer[answer.index("|") + 1:]
                         else:
-                            # Use the final answer we extracted
-                            if i < len(gold_final_list):
-                                gold_answers[i] = gold_final_list[i]
-                            else:
-                                gold_answers[i] = answer
-                    
-                    # Compute accuracy using the same final answers as step_final_accuracy
+                            gold_answers[i] = gold_final_list[i] if i < len(gold_final_list) else answer
+
                     metrics = compute_accuracy(pred_answers_for_accuracy, gold_answers_for_accuracy, indices=batch.get("indexes", None))
-                    summary[f"{task_name}_accuracy"] += metrics["accuracy"]*len(batch["answers"])
-                    
-                    # Also compute edit_distance using the same final answers
-                    summary[f"{task_name}_edit_distance"] += metrics["edit_distance"]*len(batch["answers"])
+                    summary[f"{task_name}_accuracy"] += metrics["accuracy"] * len(batch["answers"])
+                    summary[f"{task_name}_edit_distance"] += metrics["edit_distance"] * len(batch["answers"])
+
+                    if "lengths" in batch and batch["lengths"] is not None:
+                        grouped_preds = defaultdict(list)
+                        grouped_golds = defaultdict(list)
+                        for length_val, pred_val, gold_val in zip(batch["lengths"], pred_answers_for_accuracy, gold_answers_for_accuracy):
+                            grouped_preds[int(length_val)].append(pred_val)
+                            grouped_golds[int(length_val)].append(gold_val)
+
+                        for length_val in grouped_preds:
+                            local_metrics = compute_accuracy(grouped_preds[length_val], grouped_golds[length_val], indices=None)
+                            local_count = len(grouped_preds[length_val])
+                            length_metric_dict[task_name][int(length_val)][0] += local_metrics["accuracy"] * local_count
+                            length_metric_dict[task_name][int(length_val)][1] += local_metrics["edit_distance"] * local_count
+                            length_metric_dict[task_name][int(length_val)][2] += local_count
                 else:
-                    # Original behavior for non-CLRS datasets
                     gold_answers = [[answer] for answer in gold_answers]
                     metrics = compute_accuracy(pred_answers, gold_answers, indices=batch.get("indexes", None))
-                    summary[f"{task_name}_accuracy"] += metrics["accuracy"]*len(batch["answers"])
-                    summary[f"{task_name}_edit_distance"] += metrics["edit_distance"]*len(batch["answers"])
-            
+                    summary[f"{task_name}_accuracy"] += metrics["accuracy"] * len(batch["answers"])
+                    summary[f"{task_name}_edit_distance"] += metrics["edit_distance"] * len(batch["answers"])
+
                 if self.eval_math:
                     only_answer = self.tokenizer.batch_decode(batch['only_answer'], skip_special_tokens=True)
                     if step == 0:
                         print("only_answer", only_answer[:4])
-                    correct = 0; count = 0; eval_func = eval_results_math if task_name == "math" else eval_results_gsm8k
+                    correct = 0
+                    count = 0
+                    eval_func = eval_results_math if task_name == "math" else eval_results_gsm8k
                     for pred, gold in zip(pred_answers, only_answer):
                         if eval_func(pred, gold[0]):
                             correct += 1
@@ -864,47 +817,47 @@ class MultitaskModel(pl.LightningModule):
 
             task_counts[task_name] += len(batch["answers"])
             label_counts[task_name] += batch["label_ids"].shape[0]
-        
+
         for task_name in self.task_names:
             if task_counts[task_name] > 0:
                 summary[f"{task_name}_loss"] /= task_counts[task_name]
-                summary[f"{task_name}_accuracy_score"] = (summary[f"{task_name}_accuracy_score"]/label_counts[task_name]) if label_counts[task_name] > 0 else 0
-                
+                summary[f"{task_name}_accuracy_score"] = (summary[f"{task_name}_accuracy_score"] / label_counts[task_name]) if label_counts[task_name] > 0 else 0
+
                 if compute_step_metrics:
-                    # Average step losses
                     if task_name in step_loss_dict:
                         for step_idx in sorted(step_loss_dict[task_name].keys()):
                             step_loss_sum, step_loss_count = step_loss_dict[task_name][step_idx]
                             if step_loss_count > 0:
-                                step_loss_avg = step_loss_sum / step_loss_count
-                                summary[f"{task_name}_step_{step_idx}_loss"] = step_loss_avg
+                                summary[f"{task_name}_step_{step_idx}_loss"] = step_loss_sum / step_loss_count
 
-                    # Average final loss
                     if task_name in final_loss_dict:
                         final_loss_sum, final_loss_count = final_loss_dict[task_name]
                         if final_loss_count > 0:
-                            final_loss_avg = final_loss_sum / final_loss_count
-                            summary[f"{task_name}_final_loss"] = final_loss_avg
+                            summary[f"{task_name}_final_loss"] = final_loss_sum / final_loss_count
 
                 if generate_output:
                     summary[f"{task_name}_accuracy"] /= task_counts[task_name]
                     summary[f"{task_name}_edit_distance"] /= task_counts[task_name]
                     if self.eval_math:
                         summary[f"{task_name}_reasoning_accuracy"] /= task_counts[task_name]
-                    
-                    # Average step accuracies for CLRS tasks
+
                     if self.eval_clrs and self.eval_step_num > 0:
                         step_keys = [k for k in summary.keys() if k.startswith(f"{task_name}_step_") and k.endswith("_accuracy")]
                         for step_key in step_keys:
-                            # Get the corresponding count key
                             step_count_key = step_key.replace("_accuracy", "_count")
                             if step_count_key in summary and summary[step_count_key] > 0:
                                 summary[step_key] /= summary[step_count_key]
                             else:
-                                # Fallback to task_counts if count not found
                                 summary[step_key] /= task_counts[task_name]
 
-        # average accuracy and f1 score
+                if generate_output and self.eval_clrs and task_name in length_metric_dict:
+                    for length_val in sorted(length_metric_dict[task_name].keys()):
+                        acc_sum, edit_sum, cnt = length_metric_dict[task_name][length_val]
+                        if cnt > 0:
+                            summary[f"{task_name}_len_{length_val}_accuracy"] = acc_sum / cnt
+                            summary[f"{task_name}_len_{length_val}_edit_distance"] = edit_sum / cnt
+                            summary[f"{task_name}_len_{length_val}_count"] = cnt
+
         summary.update({"accuracy_score": np.mean([summary[f"{task_name}_accuracy_score"] for task_name in self.task_names])})
         if generate_output:
             summary.update({"accuracy": np.mean([summary[f"{task_name}_accuracy"] for task_name in self.task_names])})
@@ -912,19 +865,46 @@ class MultitaskModel(pl.LightningModule):
             if self.eval_math:
                 summary.update({"reasoning_accuracy": np.mean([summary[f"{task_name}_reasoning_accuracy"] for task_name in self.task_names])})
 
-        # Log metrics
-        print(summary)
-        if summary:
-            for key, value in summary.items():
+        return summary
+
+    def on_validation_epoch_end(self) -> None:
+        outputs = self.validation_step_outputs
+        if len(outputs) == 0:
+            return {}
+
+        has_split = any("split" in output for output in outputs)
+        if has_split:
+            val_outputs = [output for output in outputs if output.get("split", "val") == "val"]
+            test_outputs = [output for output in outputs if output.get("split", "val") == "test"]
+        else:
+            val_outputs = outputs
+            test_outputs = []
+
+        val_summary = self._compute_validation_summary(val_outputs)
+        print(val_summary)
+        if val_summary:
+            for key, value in val_summary.items():
                 if "accuracy" in key:
                     self.log(key, value, prog_bar=True, logger=True)
                 else:
                     self.log(key, value, prog_bar=False, logger=True)
-        if self.use_wandb and "accuracy" in summary:
+
+        if self.use_wandb and "accuracy" in val_summary:
             import wandb
-            wandb.log({"accuracy": summary["accuracy"]})
+            wandb.log({"accuracy": val_summary["accuracy"]})
+
+        if len(test_outputs) > 0:
+            test_summary_raw = self._compute_validation_summary(test_outputs)
+            test_summary = {f"test_{key}": value for key, value in test_summary_raw.items()}
+            print(test_summary)
+            for key, value in test_summary.items():
+                if "accuracy" in key:
+                    self.log(key, value, prog_bar=False, logger=True)
+                else:
+                    self.log(key, value, prog_bar=False, logger=True)
+
         self.validation_step_outputs.clear()
-        return summary
+        return val_summary
 
     def forward(self, batch, batch_idx):
         task_name = batch["task_name"]; batch = batch["data"]

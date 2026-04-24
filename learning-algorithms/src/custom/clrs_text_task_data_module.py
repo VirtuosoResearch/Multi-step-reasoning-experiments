@@ -6,7 +6,7 @@ from transformers.data.data_collator import *
 from torch.utils.data import BatchSampler
 
 from src.utils.multitask_dataset import MultitaskDataset, MultitaskBatchSampler, MultitaskCollator
-from datasets import load_dataset
+from datasets import concatenate_datasets, load_dataset
 
 import torch
 import numpy as np
@@ -77,6 +77,9 @@ class CasualLMInstructionCollator:
 
         if "residuals" in converted_batch[0]:
             model_inputs["residuals"] = torch.Tensor([instance["residuals"] for instance in converted_batch])
+
+        if "length" in converted_batch[0]:
+            model_inputs["length"] = torch.tensor([int(instance["length"]) for instance in converted_batch], dtype=torch.long)
         
         return model_inputs
 
@@ -184,6 +187,7 @@ class TextCLRSDataModule(pl.LightningDataModule):
         few_shot_k=5,
         only_answer_output=False,
         reduce_steps_ratio=1.0,
+        eval_test_during_fit=False,
     ):
         super().__init__()
 
@@ -211,6 +215,7 @@ class TextCLRSDataModule(pl.LightningDataModule):
         self.few_shot_k = few_shot_k
         self.only_answer_output = only_answer_output
         self.reduce_steps_ratio = reduce_steps_ratio
+        self.eval_test_during_fit = eval_test_during_fit
 
     def setup(self, stage=None):
         self.task_to_train_datasets = {}
@@ -297,21 +302,62 @@ class TextCLRSDataModule(pl.LightningDataModule):
             # Downsample the dataset if needed
             if self.downsample_rate < 1.0:
                 rng = np.random.default_rng(self.downsample_seed)
-                permutations = rng.permutation(len(train_dataset))
-                min_sample = max(int(self.minimum_sample), int(self.downsample_rate*len(train_dataset)))
-                train_dataset = train_dataset.select(permutations[:min_sample])
+                if "length" in train_dataset.column_names and len(self.train_lengths) > 1:
+                    sampled_train_splits = []
+                    for train_length in self.train_lengths:
+                        length_subset = train_dataset.filter(lambda x, train_length=train_length: x["length"] == train_length)
+                        if len(length_subset) == 0:
+                            continue
+                        permutations = rng.permutation(len(length_subset))
+                        min_sample = max(int(self.minimum_sample), int(self.downsample_rate * len(length_subset)))
+                        length_subset = length_subset.select(permutations[:min_sample])
+                        sampled_train_splits.append(length_subset)
+                    if len(sampled_train_splits) > 0:
+                        train_dataset = concatenate_datasets(sampled_train_splits)
+                else:
+                    permutations = rng.permutation(len(train_dataset))
+                    min_sample = max(int(self.minimum_sample), int(self.downsample_rate*len(train_dataset)))
+                    train_dataset = train_dataset.select(permutations[:min_sample])
 
             if self.downsample_rate < 1.0:
                 rng = np.random.default_rng(self.downsample_seed)
-                permutations = rng.permutation(len(eval_dataset))
-                min_sample = max(int(self.minimum_sample_validation), int(self.downsample_rate*len(eval_dataset)))
-                eval_dataset = eval_dataset.select(permutations[:min_sample])
+                if "length" in eval_dataset.column_names and len(self.train_lengths) > 1:
+                    sampled_eval_splits = []
+                    for train_length in self.train_lengths:
+                        length_subset = eval_dataset.filter(lambda x, train_length=train_length: x["length"] == train_length)
+                        if len(length_subset) == 0:
+                            continue
+                        permutations = rng.permutation(len(length_subset))
+                        min_sample = max(int(self.minimum_sample_validation), int(self.downsample_rate * len(length_subset)))
+                        length_subset = length_subset.select(permutations[:min_sample])
+                        sampled_eval_splits.append(length_subset)
+                    if len(sampled_eval_splits) > 0:
+                        eval_dataset = concatenate_datasets(sampled_eval_splits)
+                else:
+                    permutations = rng.permutation(len(eval_dataset))
+                    min_sample = max(int(self.minimum_sample_validation), int(self.downsample_rate*len(eval_dataset)))
+                    eval_dataset = eval_dataset.select(permutations[:min_sample])
 
             if self.downsample_rate < 1.0:
                 rng = np.random.default_rng(self.downsample_seed)
-                permutations = rng.permutation(len(predict_dataset))
-                min_sample = max(int(self.minimum_sample_validation), int(self.downsample_rate*len(predict_dataset)))
-                predict_dataset = predict_dataset.select(permutations[:min_sample])
+                # When multiple test lengths are requested, sample each length bucket
+                # independently so each test subset gets the configured sample floor.
+                if "length" in predict_dataset.column_names and len(self.test_lengths) > 1:
+                    sampled_predict_splits = []
+                    for test_length in self.test_lengths:
+                        length_subset = predict_dataset.filter(lambda x, test_length=test_length: x["length"] == test_length)
+                        if len(length_subset) == 0:
+                            continue
+                        permutations = rng.permutation(len(length_subset))
+                        min_sample = max(int(self.minimum_sample_validation), int(self.downsample_rate * len(length_subset)))
+                        length_subset = length_subset.select(permutations[:min_sample])
+                        sampled_predict_splits.append(length_subset)
+                    if len(sampled_predict_splits) > 0:
+                        predict_dataset = concatenate_datasets(sampled_predict_splits)
+                else:
+                    permutations = rng.permutation(len(predict_dataset))
+                    min_sample = max(int(self.minimum_sample_validation), int(self.downsample_rate*len(predict_dataset)))
+                    predict_dataset = predict_dataset.select(permutations[:min_sample])
             
             # Add sample_idx to each sample BEFORE storing in task_to_train_datasets
             # This ensures each original data point gets a unique index (0, 1, 2, ..., N-1) per task
@@ -365,12 +411,23 @@ class TextCLRSDataModule(pl.LightningDataModule):
         )
 
     def val_dataloader(self):
-        return DataLoader(
+        valid_loader = DataLoader(
             self.multitask_valid_dataset,
             batch_sampler=self.multitask_valid_sampler,
             collate_fn=self.multitask_collator,
             num_workers=15
         )
+
+        if self.eval_test_during_fit:
+            test_loader = DataLoader(
+                self.multitask_test_dataset,
+                batch_sampler=self.multitask_test_sampler,
+                collate_fn=self.multitask_collator,
+                num_workers=15
+            )
+            return [valid_loader, test_loader]
+
+        return valid_loader
 
     def test_dataloader(self):
         return DataLoader(
