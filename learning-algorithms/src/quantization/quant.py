@@ -164,6 +164,8 @@ class QuantConfig:
 
 
 class QuantizeLinear(nn.Linear):
+    _printed_lora_train_forward = False
+
     def __init__(
         self,
         in_features,
@@ -190,6 +192,7 @@ class QuantizeLinear(nn.Linear):
         self.noise_sigma_weights = 0.0
         self.noise_sigma_clipvals = 0.0
         self.trainable_noise_scale = False
+        self.is_lora_quant = False
         self._frozen_weight_noise = None
         self._frozen_clip_noise = None
         self._frozen_post_noise = None
@@ -359,7 +362,17 @@ class QuantizeLinear(nn.Linear):
         return q_weight
 
     def forward(self, input_):
-        weight = self.quantized_weight(dtype=input_.dtype, apply_noise=True)
+        if self.training and self.is_lora_quant and not QuantizeLinear._printed_lora_train_forward:
+            print(
+                f"[Quant] Training forward pass is using {self.w_bits}-bit quantized LoRA layers",
+                flush=True,
+            )
+            QuantizeLinear._printed_lora_train_forward = True
+            print(self.weight)
+            weight = self.quantized_weight(dtype=input_.dtype, apply_noise=True)
+            print(weight)
+        else:
+            weight = self.quantized_weight(dtype=input_.dtype, apply_noise=True)
         return nn.functional.linear(input_, weight, self.bias)
 
 
@@ -425,6 +438,7 @@ def apply_quant_lora_quantization(model: nn.Module, config: QuantConfig) -> int:
                 if not isinstance(layer, nn.Linear):
                     continue
                 quantized = QuantizeLinear.from_linear(layer, config)
+                quantized.is_lora_quant = True
                 quantized.weight.requires_grad = True
                 if hasattr(quantized, "weight_clip_val"):
                     quantized.weight_clip_val.requires_grad = True

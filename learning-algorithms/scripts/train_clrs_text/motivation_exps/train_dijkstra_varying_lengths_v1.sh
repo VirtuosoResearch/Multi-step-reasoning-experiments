@@ -12,7 +12,7 @@
 # do
 # done
 
-sample=2000
+sample=5000
 device=0
 python train_clrs_text.py --task_names "dijkstra" \
     --model_key "Qwen/Qwen2.5-1.5B" \
