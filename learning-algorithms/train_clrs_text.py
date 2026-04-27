@@ -13,6 +13,13 @@ from src.custom.self_training_multitask_model import SelfTrainingMultitaskModel
 from src.model.GraphLlama import GraphLlamaForCausalLM
 from src.model.gnn_models.config import load_cfg
 from src.model.projectors import create_intrinsic_model
+from src.quantization import (
+    QuantConfig,
+    QuantReinitializeCallback,
+    apply_quant_full_model_quantization,
+    apply_quant_lora_quantization,
+    normalize_quant_module_names,
+)
 
 from functools import partial
 from pytorch_lightning.trainer.states import RunningStage, TrainerFn
@@ -41,6 +48,8 @@ from torch._inductor.async_compile import AsyncCompile
 logging.basicConfig(level=logging.INFO, force=True)
 torch.set_float32_matmul_precision("high")
 
+DEFAULT_QUANT_MODULES = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
 def add_result_to_csv(result_datapoint, file_name):
     for key, val in result_datapoint.items():
         result_datapoint[key] = [val, ]
@@ -65,6 +74,46 @@ def layer_index_from_name(name, default=0):
         if m:
             return int(m.group(2))
     return default
+
+
+def build_quant_config(args):
+    return QuantConfig(
+        w_bits=args.quant_w_bits,
+        noise_injection=args.quant_noise_injection,
+        pre_quantization_noise=args.quant_pre_quantization_noise,
+        post_quantization_noise=args.quant_post_quantization_noise,
+        noise_sigma_weights=args.quant_sigma_weights,
+        noise_sigma_clipvals=args.quant_sigma_clipvals,
+        initialize_noise=args.quant_initialize_noise,
+        trainable_noise_scale=args.quant_trainable_noise_scale,
+    )
+
+
+def validate_quant_args(args):
+    args.quant_modules = normalize_quant_module_names(args.quant_modules)
+    if not args.use_quant:
+        return
+
+    if args.quant_w_bits < 0:
+        raise ValueError("--quant_w_bits must be non-negative")
+
+    if args.quant_training_mode == "lora" and not args.train_lora:
+        raise ValueError("--use_quant with --quant_training_mode lora requires --train_lora")
+
+    if args.quant_training_mode == "full":
+        incompatible_flags = []
+        for flag_name in ["train_lora", "train_adapter", "use_qlora", "use_qadapter", "use_3bit", "use_2bit"]:
+            if getattr(args, flag_name):
+                incompatible_flags.append(f"--{flag_name}")
+        if incompatible_flags:
+            raise ValueError(
+                "--quant_training_mode full is incompatible with "
+                + ", ".join(incompatible_flags)
+                + ". Use full-model QAT without PEFT/QLoRA flags."
+            )
+
+    if len(args.quant_modules) == 0 and args.quant_training_mode == "full":
+        raise ValueError("--quant_modules must name at least one module in full QAT mode")
 
 
 def add_gaussian_noise_to_weights(model, std=0.01, only_lora=False):
@@ -161,6 +210,19 @@ def initialize_model(args):
         append_eos = True
     else:
         raise NotImplementedError(args.model_key)
+
+    if args.use_quant and args.quant_training_mode == "full":
+        replaced = apply_quant_full_model_quantization(
+            model,
+            target_modules=args.quant_modules,
+            config=build_quant_config(args),
+        )
+        if replaced == 0:
+            raise ValueError(
+                "Quant full-model QAT did not replace any linear layers. "
+                f"Check --quant_modules={args.quant_modules} for model {args.model_key}."
+            )
+        print(f"[Quant] Full-model QAT enabled: replaced {replaced} linear layers with {args.quant_w_bits}-bit Quant layers")
     
     if args.use_graph_llama:
         cfg = load_cfg("./src/model/gnn_models/configs/SAGE.yml")
@@ -280,6 +342,11 @@ def initialize_model(args):
                 modules_to_save=[],
             )
         model = get_peft_model(model, config)
+        if args.use_quant and args.quant_training_mode == "lora":
+            replaced = apply_quant_lora_quantization(model, build_quant_config(args))
+            if replaced == 0:
+                raise ValueError("Quant LoRA mode did not find any LoRA linear layers to quantize.")
+            print(f"[Quant] LoRA QAT enabled: replaced {replaced} LoRA linear layers with {args.quant_w_bits}-bit Quant layers")
         if args.use_graph_llama:
             # only the graph tower is trainable
             if not args.freeze_graph_tower:
@@ -375,6 +442,20 @@ if __name__ == "__main__":
     parser.add_argument("--use_qlora", action="store_true")
     parser.add_argument("--use_3bit", action="store_true")
     parser.add_argument("--use_2bit", action="store_true")
+
+    parser.add_argument("--use_quant", action="store_true")
+    parser.add_argument("--quant_training_mode", type=str, choices=["lora", "full"], default="lora")
+    parser.add_argument("--quant_w_bits", type=int, default=2)
+    parser.add_argument("--quant_modules", type=str, nargs="+", default=DEFAULT_QUANT_MODULES)
+    parser.add_argument("--quant_noise_injection", action="store_true")
+    parser.add_argument("--quant_pre_quantization_noise", action="store_true")
+    parser.add_argument("--quant_post_quantization_noise", action="store_true")
+    parser.add_argument("--quant_sigma_weights", type=float, default=0.0)
+    parser.add_argument("--quant_sigma_clipvals", type=float, default=0.0)
+    parser.add_argument("--quant_initialize_noise", action="store_true")
+    parser.add_argument("--quant_trainable_noise_scale", action="store_true")
+    parser.add_argument("--quant_reinitialize_steps", type=int, default=0)
+    parser.add_argument("--quant_reinitialize_alpha", type=float, default=0.2)
     
     parser.add_argument("--save_name", type=str, default=None)
     parser.add_argument("--runs", type=int, default=3)
@@ -390,6 +471,7 @@ if __name__ == "__main__":
     parser.add_argument("--intrinsic_mode", type=str, default="rdkronqr")
 
     args = parser.parse_args()
+    validate_quant_args(args)
     args.enable_checkpointing = not args.disable_checkpointing
     print("arguments".upper().center(80, "-"))
     print(args)
@@ -401,6 +483,7 @@ if __name__ == "__main__":
                 (f"_{args.minimum_samples}") + \
                 (f"_len_{args.train_lengths}") + \
                 (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
+                (f"_quant_{args.quant_training_mode}_{args.quant_w_bits}bit" if args.use_quant else "") + \
                 (f"_use_only_answer_output" if args.only_answer_output else "")
     file_dir = os.path.join("./results/", save_name)
     if not os.path.exists(file_dir):
@@ -412,6 +495,7 @@ if __name__ == "__main__":
                 (f"_{args.minimum_samples}") + \
                 (f"_len_{args.train_lengths}") + \
                 (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
+                (f"_quant_{args.quant_training_mode}_{args.quant_w_bits}bit" if args.use_quant else "") + \
                 (f"_use_only_answer_output" if args.only_answer_output else "")
     # Remove leading underscore if present
     wandb_name_base = wandb_name_base.lstrip("_")
@@ -666,6 +750,7 @@ if __name__ == "__main__":
                                         (f"_len_{args.train_lengths}") + \
                                         (f"_use_only_answer_output" if args.only_answer_output else "") + \
                                         (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
+                                        (f"_quant_{args.quant_training_mode}_{args.quant_w_bits}bit" if args.use_quant else "") + \
                                         (f"_reweight_eta_{args.reweight_eta}" if args.use_reweight else "") + \
                                         (f"_{args.save_name}" if args.save_name else "") + \
                                         f"_run_{run}"
@@ -683,12 +768,24 @@ if __name__ == "__main__":
             save_top_k=(-1 if args.save_every_epoch else 1),
             mode=monitor_mode,
         )
+        callbacks = [checkpoint_callback]
+        if args.use_quant and args.quant_reinitialize_steps > 0:
+            callbacks.append(
+                QuantReinitializeCallback(
+                    reinitialize_steps=args.quant_reinitialize_steps,
+                    reinitialize_alpha=args.quant_reinitialize_alpha,
+                )
+            )
+            print(
+                f"[Quant] Periodic reinitialization enabled every {args.quant_reinitialize_steps} "
+                f"optimizer steps with alpha={args.quant_reinitialize_alpha}"
+            )
 
         trainer = pl.Trainer(accelerator="gpu", devices=args.devices, strategy=args.strategy,
                             default_root_dir=default_root_dir, min_epochs=args.epochs, max_epochs=args.epochs,
                             accumulate_grad_batches=args.accumulate, precision=args.precision,
                             enable_checkpointing=args.enable_checkpointing,
-                            callbacks=[checkpoint_callback]
+                            callbacks=callbacks
                             )
         # save initial weights
         if args.train_lora:

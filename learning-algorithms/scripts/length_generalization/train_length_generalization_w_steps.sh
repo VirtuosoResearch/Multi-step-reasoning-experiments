@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-task="$1" # default to "bfs" if not provided
-device="$2" # default to "0" if not provided
-if [ -z "$task" ]; then
-  task="bfs"
+task1="${1:-}" # default to "bfs" if not provided
+task2="${2:-}" # optional second task for multi-task training, default to empty string if not provided
+device="${3:-}" # default to "0" if not provided
+if [ -z "$task1" ]; then
+  task1="bfs"
+fi
+if [ -z "$task2" ]; then
+  task2=""
 fi
 if [ -z "$device" ]; then
   device="0"
@@ -12,7 +16,7 @@ fi
 # Length generalization setup:
 # train on lengths 4 and 5, evaluate on lengths 10, 11, and 12.
 TRAIN_LENGTHS=(4 5)
-TEST_LENGTHS=(10 11 12)
+TEST_LENGTHS=(10)
 
 # Number of intermediate steps to evaluate.
 # Metrics will include: <task>_step_0_accuracy ... <task>_step_N_accuracy and <task>_step_final_accuracy.
@@ -32,8 +36,13 @@ DOWNSAMPLE_RATIO=0.01
 MINIMUM_SAMPLES_VALIDATION=100
 
 # Use task-specific max lengths to avoid truncation for longer reasoning traces.
-for task in "$task"
+for task in "$task1" "$task2"
 do
+  # Skip the optional second task when it is not provided.
+  if [ -z "$task" ]; then
+    continue
+  fi
+
   case "$task" in
     bfs)
       MAX_LENGTH=345
@@ -47,9 +56,17 @@ do
       MAX_LENGTH=509
       MAX_OUTPUT_LENGTH=210
       ;;
-    mst_kruskal)
+    mst_prim)
       MAX_LENGTH=615
       MAX_OUTPUT_LENGTH=405
+      ;;
+    bellman_ford)
+      MAX_LENGTH=458
+      MAX_OUTPUT_LENGTH=200
+      ;;
+    dijkstra)
+      MAX_LENGTH=456
+      MAX_OUTPUT_LENGTH=219
       ;;
     *)
       echo "Unknown task: $task"
