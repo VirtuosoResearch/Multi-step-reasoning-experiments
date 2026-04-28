@@ -10,3 +10,4 @@ GVM/
 learning-algorithms/external_lightning_logs/*
 wandb/
 */cmd_results/
+temporary/
