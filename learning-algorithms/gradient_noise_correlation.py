@@ -106,6 +106,7 @@ def main():
     parser.add_argument("--few_shot_k", type=int, default=0)
     parser.add_argument("--only_answer_output", action="store_true")
     parser.add_argument("--reduce_steps_ratio", type=float, default=1.0)
+    parser.add_argument("--reduce_steps_equally_spaced", action="store_true")
 
     parser.add_argument("--num_examples", type=int, default=8)
     parser.add_argument("--num_perturbations", type=int, default=20)
@@ -167,6 +168,7 @@ def main():
         few_shot_k=args.few_shot_k,
         only_answer_output=args.only_answer_output,
         reduce_steps_ratio=args.reduce_steps_ratio,
+        reduce_steps_equally_spaced=args.reduce_steps_equally_spaced,
     )
     data_module.setup(stage="fit")
 

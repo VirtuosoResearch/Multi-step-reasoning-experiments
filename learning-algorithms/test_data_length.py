@@ -4,12 +4,12 @@ from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-1.5B", trust_remote_code=True)
 data_module =TextCLRSDataModule(
-    task_names=["dijkstra"],
+    task_names=["bfs"],
     tokenizer=tokenizer,
     batch_size=8,
     inference_batch_size=8,
-    max_input_length=1024,
-    max_output_length=1024,
+    max_input_length=2048,
+    max_output_length=2048,
     eval_all=True,
     eval_split=0.2,
     downsample_ratio=1,
