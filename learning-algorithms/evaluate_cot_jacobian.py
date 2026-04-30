@@ -80,6 +80,22 @@ def split_generated_answer(answer: str) -> Tuple[List[str], str, str]:
     return pieces[:-1], pieces[-1], answer
 
 
+def generated_prefix_for_step(generated_steps: Sequence[str], target_step: int, total_steps: int) -> str:
+    if target_step <= 1:
+        return ""
+
+    pieces: List[str] = []
+    for prev_step in range(1, target_step):
+        if prev_step > len(generated_steps):
+            break
+        pieces.append(generated_steps[prev_step - 1])
+        if prev_step == total_steps - 1:
+            pieces.append(" | ")
+        else:
+            pieces.append(", ")
+    return "".join(pieces)
+
+
 def decode_sample(tokenizer, input_ids: torch.Tensor, labels: torch.Tensor, attention_mask: torch.Tensor) -> StepSequence:
     nonpad = attention_mask.bool()
     source_mask = (labels == -100) & nonpad
@@ -521,6 +537,15 @@ def local_log_amplifications(jac_norms: Dict[Tuple[int, int], float], total_step
     return result
 
 
+def prefix_log_amplifications_from_first(jac_norms: Dict[Tuple[int, int], float], total_steps: int) -> Dict[int, float]:
+    result: Dict[int, float] = {1: 0.0}
+    log_amp = 0.0
+    for t in range(2, total_steps + 1):
+        log_amp += math.log(max(jac_norms.get((t, t - 1), 0.0), EPS))
+        result[t] = log_amp
+    return result
+
+
 def write_csv(path: str, rows: List[Dict], fieldnames: Sequence[str]) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", newline="") as f:
@@ -732,6 +757,8 @@ def evaluate(args) -> None:
 
     example_rows: List[Dict] = []
     jacobian_rows: List[Dict] = []
+    rho_prefix_rows: List[Dict] = []
+    generated_step_loss_rows: List[Dict] = []
     finite_difference_rows: List[Dict] = []
     processed = 0
     finite_difference_count = 0
@@ -774,7 +801,8 @@ def evaluate(args) -> None:
                 device,
                 max_new_tokens=args.generation_max_new_tokens or args.max_output_length,
             )
-            _, pred_final, generated_prefix = split_generated_answer(generated_answer)
+            generated_steps, pred_final, generated_prefix = split_generated_answer(generated_answer)
+            generated_sequence_steps = list(generated_steps) + ([pred_final] if pred_final else [])
             gold_final = seq.steps[-1]
             generated_final_enc = build_free_prefix_encoding(
                 tokenizer,
@@ -787,6 +815,52 @@ def evaluate(args) -> None:
             final_metrics = compute_accuracy([pred_final], [[gold_final]])
             generated_final_correct = final_metrics["accuracy"] / 100.0
             generated_edit_distance = final_metrics["edit_distance"]
+
+            for target_step in range(1, total_steps + 1):
+                step_generated_prefix = generated_prefix_for_step(
+                    generated_sequence_steps,
+                    target_step,
+                    total_steps,
+                )
+                step_generated_enc = build_free_prefix_encoding(
+                    tokenizer,
+                    seq.source,
+                    step_generated_prefix,
+                    seq.steps[target_step - 1],
+                    device,
+                )
+                generated_step_loss = metric_float(step_ce_loss(model, step_generated_enc))
+                generated_step_pred = (
+                    generated_sequence_steps[target_step - 1]
+                    if target_step - 1 < len(generated_sequence_steps)
+                    else ""
+                )
+                generated_step_metrics = compute_accuracy(
+                    [generated_step_pred],
+                    [[seq.steps[target_step - 1]]],
+                )
+                generated_step_loss_rows.append(
+                    {
+                        "task": task_name,
+                        "checkpoint": checkpoint_path or "",
+                        "split": args.split,
+                        "length": length,
+                        "sample_idx": sample_idx,
+                        "t": target_step,
+                        "num_steps": total_steps,
+                        "teacher_step_loss": metric_float(step_losses[target_step - 1]),
+                        "generated_prefix_step_loss": generated_step_loss,
+                        "step_loss_gap": (
+                            generated_step_loss - metric_float(step_losses[target_step - 1])
+                            if np.isfinite(generated_step_loss) and np.isfinite(metric_float(step_losses[target_step - 1]))
+                            else float("nan")
+                        ),
+                        "generated_step_correct": generated_step_metrics["accuracy"] / 100.0,
+                        "generated_step_edit_distance": generated_step_metrics["edit_distance"],
+                        "gold_step": seq.steps[target_step - 1],
+                        "generated_step": generated_step_pred,
+                    }
+                )
 
             pairs: List[Tuple[int, int]] = []
             if args.include_input_jacobian or total_steps == 1:
@@ -838,6 +912,7 @@ def evaluate(args) -> None:
 
             rho = compute_rho(jac_norms, total_steps) if args.full_jacobian else {}
             local_logs = local_log_amplifications(jac_norms, total_steps)
+            prefix_logs = prefix_log_amplifications_from_first(jac_norms, total_steps)
             adjacent_norms = [jac_norms.get((t, t - 1), float("nan")) for t in range(2, total_steps + 1)]
             input_jac_norms = [
                 jac_norms.get((t, 0), float("nan"))
@@ -870,6 +945,30 @@ def evaluate(args) -> None:
             ):
                 bound_proxy = input_jac_norm * train_errors[0]
                 log_bound_proxy = math.log(max(bound_proxy, EPS))
+
+            for prefix_t in range(1, total_steps + 1):
+                adjacent_log_rho_t_1 = prefix_logs.get(prefix_t, float("nan"))
+                adjacent_rho_t_1 = math.exp(adjacent_log_rho_t_1) if np.isfinite(adjacent_log_rho_t_1) else float("nan")
+                recursive_rho_t_1 = 1.0 if prefix_t == 1 else rho.get((prefix_t, 1), float("nan"))
+                recursive_log_rho_t_1 = (
+                    math.log(max(recursive_rho_t_1, EPS)) if np.isfinite(recursive_rho_t_1) else float("nan")
+                )
+                rho_prefix_rows.append(
+                    {
+                        "task": task_name,
+                        "checkpoint": checkpoint_path or "",
+                        "split": args.split,
+                        "length": length,
+                        "sample_idx": sample_idx,
+                        "t": prefix_t,
+                        "num_steps": total_steps,
+                        "adjacent_rho_t_1": adjacent_rho_t_1,
+                        "adjacent_log_rho_t_1": adjacent_log_rho_t_1,
+                        "recursive_rho_t_1": recursive_rho_t_1,
+                        "recursive_log_rho_t_1": recursive_log_rho_t_1,
+                        "computed_full_jacobian": bool(args.full_jacobian),
+                    }
+                )
 
             for (target_step, source_step), jac_norm in sorted(jac_norms.items()):
                 jacobian_rows.append(
@@ -951,6 +1050,44 @@ def evaluate(args) -> None:
             "generated_final_loss",
             "generated_final_correct",
             "computed_full_jacobian",
+        ],
+    )
+    write_csv(
+        os.path.join(args.output_dir, "rho_prefix_rows.csv"),
+        rho_prefix_rows,
+        [
+            "task",
+            "checkpoint",
+            "split",
+            "length",
+            "sample_idx",
+            "t",
+            "num_steps",
+            "adjacent_rho_t_1",
+            "adjacent_log_rho_t_1",
+            "recursive_rho_t_1",
+            "recursive_log_rho_t_1",
+            "computed_full_jacobian",
+        ],
+    )
+    write_csv(
+        os.path.join(args.output_dir, "generated_step_loss_rows.csv"),
+        generated_step_loss_rows,
+        [
+            "task",
+            "checkpoint",
+            "split",
+            "length",
+            "sample_idx",
+            "t",
+            "num_steps",
+            "teacher_step_loss",
+            "generated_prefix_step_loss",
+            "step_loss_gap",
+            "generated_step_correct",
+            "generated_step_edit_distance",
+            "gold_step",
+            "generated_step",
         ],
     )
     write_csv(
