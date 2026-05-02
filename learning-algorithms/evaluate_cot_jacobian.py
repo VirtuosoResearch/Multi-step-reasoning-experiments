@@ -749,7 +749,12 @@ def evaluate(args) -> None:
         reduce_steps_equally_spaced=args.reduce_steps_equally_spaced,
     )
     data_module.setup(stage="fit")
-    dataloader = data_module.test_dataloader() if args.split == "test" else data_module.val_dataloader()
+    if args.split == "train":
+        dataloader = data_module.train_dataloader()
+    elif args.split == "test":
+        dataloader = data_module.test_dataloader()
+    else:
+        dataloader = data_module.val_dataloader()
 
     input_embeddings = model.get_input_embeddings()
     if input_embeddings is None:
@@ -780,6 +785,8 @@ def evaluate(args) -> None:
                 data["labels"][b].cpu(),
                 data["attention_mask"][b].cpu(),
             )
+            if len(seq.steps) < args.min_jacobian_steps:
+                continue
             if args.max_jacobian_steps > 0 and len(seq.steps) > args.max_jacobian_steps:
                 seq.steps = seq.steps[: args.max_jacobian_steps]
             if len(seq.steps) == 0:
@@ -1151,7 +1158,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--precision", type=str, default="32")
 
     parser.add_argument("--task_names", type=str, nargs="+", default=["dfs"])
-    parser.add_argument("--split", type=str, choices=["val", "test"], default="test")
+    parser.add_argument("--split", type=str, choices=["train", "val", "test"], default="test")
     parser.add_argument("--max_length", type=int, default=256)
     parser.add_argument("--max_output_length", type=int, default=64)
     parser.add_argument("--train_lengths", type=int, nargs="+", default=[4])
@@ -1167,6 +1174,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--eval_batch_size", type=int, default=1)
     parser.add_argument("--max_examples", type=int, default=5)
+    parser.add_argument("--min_jacobian_steps", type=int, default=0)
     parser.add_argument("--max_jacobian_steps", type=int, default=0)
     parser.add_argument("--power_iters", type=int, default=5)
     parser.add_argument("--max_target_tokens_for_jacobian", type=int, default=8)

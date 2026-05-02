@@ -8,23 +8,19 @@ import numpy as np
 from matplotlib import rc
 
 
-T_VALUES = np.array([1, 2, 3, 4, 5])
+T_VALUES = np.array([1, 2, 3, 4, 5, 6])
 MEAN_L_T_GAP = np.array([
-    0.0,
-    0.0155784765879313,
-    0.025439659754435,
-    0.1065035912725661,
-    0.42739495635032654,
+0.0,
+0.084861308,
+0.24620386,
+0.4704211,
+0.72792237,
+1.75151193,
 ])
-MEAN_RECURSIVE_LOG_RHO_T_1 = np.exp2(np.array([
-    0.0,
-    3.851507591059073,
-    7.626284341554456,
-    11.205079248344603,
-    13.678462900538833,
-]))
+MEAN_RECURSIVE_LOG_RHO_T_1 = np.array([1.00000000e+06, 3.64644204e+06, 1.25179169e+07, 4.26330198e+07,
+       1.33170437e+08, 4.46009497e+08])
 
-prefix="mst_prim"  # "bellman_ford" # "bfs" #
+prefix="bellman_ford"  # "bellman_ford" # "bfs" #
 output_dir=Path(__file__).resolve().parents[1] / "notebooks" / "figures"
 
 rc("font", **{"family": "sans-serif", "sans-serif": ["Helvetica"]})
@@ -34,7 +30,7 @@ mpl.rcParams["text.usetex"] = True
 output_dir.mkdir(parents=True, exist_ok=True)
 output_path = output_dir / f"{prefix}_jacobian_scaling.pdf"
 
-fig, ax_loss = plt.subplots(figsize=(5.5, 4.5))
+fig, ax_loss = plt.subplots(figsize=(4.5, 4.5))
 ax_rho = ax_loss.twinx()
 
 loss_color = "royalblue"
@@ -48,7 +44,7 @@ loss_line = ax_loss.plot(
     linestyle="solid",
     marker="o",
     markersize=12,
-    label=r"$L_t(f_W)-L_t^{\mathrm{CoT}}(f_W)$",
+    label=r"$L_T(f_W)-L_T^{\mathrm{CoT}}(f_W)$",
 )[0]
 rho_line = ax_rho.plot(
     T_VALUES,
@@ -58,10 +54,10 @@ rho_line = ax_rho.plot(
     linestyle="dashed",
     marker="s",
     markersize=12,
-    label=r"$\rho_{t,1}\mathrm{~(right~axis)}$",
+    label=r"$\sum_{i=1}^{T-1}\rho_{T,i}\mathbf{~(right)}$",
 )[0]
 
-ax_loss.set_xlabel(r"$t$", fontsize=32)
+ax_loss.set_xlabel(r"$T$", fontsize=32)
 # ax_loss.set_ylabel( fontsize=28)
 # ax_rho.set_ylabel(r"$\rho_{t,1}$", fontsize=32)
 
@@ -70,8 +66,9 @@ ax_loss.tick_params(axis="both", labelsize=28)
 ax_rho.tick_params(axis="y", labelsize=28)
 ax_loss.tick_params(axis="y")
 ax_rho.tick_params(axis="y")
-ax_loss.set_ylim(-0.06, 1.2)
-ax_rho.set_ylim(-1e3, 1.5e4)
+ax_loss.set_ylim(-0.12, 6)
+ax_loss.set_yticks([0, 2, 4, 6])
+ax_rho.set_ylim(-1e7, 5e8)
 
 ax_loss.grid(ls=":", lw=0.8)
 ax_rho.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
@@ -79,7 +76,7 @@ ax_rho.yaxis.get_offset_text().set_fontsize(26)
 
 ax_loss.legend(
     handles=[loss_line, rho_line],
-    fontsize=22,
+    fontsize=21,
     loc="upper left",
     frameon=True,
 )
