@@ -694,19 +694,19 @@ class MultitaskModel(pl.LightningModule):
                             pred_steps_str = pred[:pred.index("|")].strip()
                             pred_final = pred[pred.index("|") + 1:].strip()
                         else:
-                            pred_steps_str = pred.strip()
-                            pred_final = ""
+                            pred_steps_str = ""
+                            pred_final = pred.strip()
                             if step == 0 and i < 2:
-                                print(f"WARNING: pred_answers[{i}] has no | separator (first 100 chars): {pred[:100]}")
+                                print(f"DEBUG: pred_answers[{i}] has no | separator; treating as final answer (first 100 chars): {pred[:100]}")
 
                         if "|" in gold:
                             gold_steps_str = gold[:gold.index("|")].strip()
                             gold_final = gold[gold.index("|") + 1:].strip()
                         else:
-                            gold_steps_str = gold.strip()
-                            gold_final = ""
+                            gold_steps_str = ""
+                            gold_final = gold.strip()
                             if step == 0 and i < 2:
-                                print(f"ERROR: gold_answers[{i}] has no | separator (first 100 chars): {gold[:100]}")
+                                print(f"DEBUG: gold_answers[{i}] has no | separator; treating as final answer (first 100 chars): {gold[:100]}")
 
                         pred_steps = [s.strip() for s in pred_steps_str.split(",") if s.strip()] if pred_steps_str else []
                         gold_steps = [s.strip() for s in gold_steps_str.split(",") if s.strip()] if gold_steps_str else []

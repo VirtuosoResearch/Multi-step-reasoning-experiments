@@ -1,0 +1,3402 @@
+[
+  {
+    "question": "lego_reasoning:\nsequence: f = val r, t = not n, e = not t, r = val h, j = val l, l = val e, n = val 1, h = val j,\nvariables: f t e r j l n h\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n], [n 0 n n n n 1 n], [n 0 1 n n n 1 n], [n 0 1 n n 1 1 n], [n 0 1 n 1 1 1 n], [n 0 1 n 1 1 1 1], [n 0 1 1 1 1 1 1], [1 0 1 1 1 1 1 1] | [1 0 1 1 1 1 1 1]",
+    "final_values": [
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "f",
+      "t",
+      "e",
+      "r",
+      "j",
+      "l",
+      "n",
+      "h"
+    ],
+    "dependency_order": [
+      "n",
+      "t",
+      "e",
+      "l",
+      "j",
+      "h",
+      "r",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: e = val d, l = not k, j = val h, g = val j, h = not l, d = val 1, k = val e, b = not g,\nvariables: e l j g h d k b\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n], [1 n n n n 1 n n], [1 n n n n 1 1 n], [1 0 n n n 1 1 n], [1 0 n n 1 1 1 n], [1 0 1 n 1 1 1 n], [1 0 1 1 1 1 1 n], [1 0 1 1 1 1 1 0] | [1 0 1 1 1 1 1 0]",
+    "final_values": [
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "e",
+      "l",
+      "j",
+      "g",
+      "h",
+      "d",
+      "k",
+      "b"
+    ],
+    "dependency_order": [
+      "d",
+      "e",
+      "k",
+      "l",
+      "h",
+      "j",
+      "g",
+      "b"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: w = val h, r = val 1, x = not e, h = not r, l = not s, s = val x, c = val l, e = val w,\nvariables: w r x h l s c e\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n 0 n n n n], [0 1 n 0 n n n n], [0 1 n 0 n n n 0], [0 1 1 0 n n n 0], [0 1 1 0 n 1 n 0], [0 1 1 0 0 1 n 0], [0 1 1 0 0 1 0 0] | [0 1 1 0 0 1 0 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "w",
+      "r",
+      "x",
+      "h",
+      "l",
+      "s",
+      "c",
+      "e"
+    ],
+    "dependency_order": [
+      "r",
+      "h",
+      "w",
+      "e",
+      "x",
+      "s",
+      "l",
+      "c"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: d = val z, z = not a, b = not d, s = val v, v = val m, i = val 0, m = val b, a = val i,\nvariables: d z b s v i m a\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 0 n n], [n n n n n 0 n 0], [n 1 n n n 0 n 0], [1 1 n n n 0 n 0], [1 1 0 n n 0 n 0], [1 1 0 n n 0 0 0], [1 1 0 n 0 0 0 0], [1 1 0 0 0 0 0 0] | [1 1 0 0 0 0 0 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "d",
+      "z",
+      "b",
+      "s",
+      "v",
+      "i",
+      "m",
+      "a"
+    ],
+    "dependency_order": [
+      "i",
+      "a",
+      "z",
+      "d",
+      "b",
+      "m",
+      "v",
+      "s"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: c = val a, v = val 1, z = val u, m = not j, k = not z, a = val k, j = val c, u = not v,\nvariables: c v z m k a j u\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n n n n n 0], [n 1 0 n n n n 0], [n 1 0 n 1 n n 0], [n 1 0 n 1 1 n 0], [1 1 0 n 1 1 n 0], [1 1 0 n 1 1 1 0], [1 1 0 0 1 1 1 0] | [1 1 0 0 1 1 1 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "c",
+      "v",
+      "z",
+      "m",
+      "k",
+      "a",
+      "j",
+      "u"
+    ],
+    "dependency_order": [
+      "v",
+      "u",
+      "z",
+      "k",
+      "a",
+      "c",
+      "j",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: s = val t, k = not s, w = not p, l = not q, q = not d, t = val w, p = val l, d = val 0,\nvariables: s k w l q t p d\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0], [n n n n 1 n n 0], [n n n 0 1 n n 0], [n n n 0 1 n 0 0], [n n 1 0 1 n 0 0], [n n 1 0 1 1 0 0], [1 n 1 0 1 1 0 0], [1 0 1 0 1 1 0 0] | [1 0 1 0 1 1 0 0]",
+    "final_values": [
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "s",
+      "k",
+      "w",
+      "l",
+      "q",
+      "t",
+      "p",
+      "d"
+    ],
+    "dependency_order": [
+      "d",
+      "q",
+      "l",
+      "p",
+      "w",
+      "t",
+      "s",
+      "k"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: s = val q, y = not g, u = not y, q = val 1, j = not b, b = not u, o = val s, g = not o,\nvariables: s y u q j b o g\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [1 n n 1 n n n n], [1 n n 1 n n 1 n], [1 n n 1 n n 1 0], [1 1 n 1 n n 1 0], [1 1 0 1 n n 1 0], [1 1 0 1 n 1 1 0], [1 1 0 1 0 1 1 0] | [1 1 0 1 0 1 1 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "s",
+      "y",
+      "u",
+      "q",
+      "j",
+      "b",
+      "o",
+      "g"
+    ],
+    "dependency_order": [
+      "q",
+      "s",
+      "o",
+      "g",
+      "y",
+      "u",
+      "b",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: t = val j, x = not y, i = val f, z = not t, j = not i, g = not z, y = val 1, f = val x,\nvariables: t x i z j g y f\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n], [n 0 n n n n 1 n], [n 0 n n n n 1 0], [n 0 0 n n n 1 0], [n 0 0 n 1 n 1 0], [1 0 0 n 1 n 1 0], [1 0 0 0 1 n 1 0], [1 0 0 0 1 1 1 0] | [1 0 0 0 1 1 1 0]",
+    "final_values": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "t",
+      "x",
+      "i",
+      "z",
+      "j",
+      "g",
+      "y",
+      "f"
+    ],
+    "dependency_order": [
+      "y",
+      "x",
+      "f",
+      "i",
+      "j",
+      "t",
+      "z",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: v = val y, o = not b, b = not l, y = val 1, q = not n, l = not e, e = val q, n = val v,\nvariables: v o b y q l e n\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [1 n n 1 n n n n], [1 n n 1 n n n 1], [1 n n 1 0 n n 1], [1 n n 1 0 n 0 1], [1 n n 1 0 1 0 1], [1 n 0 1 0 1 0 1], [1 1 0 1 0 1 0 1] | [1 1 0 1 0 1 0 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "v",
+      "o",
+      "b",
+      "y",
+      "q",
+      "l",
+      "e",
+      "n"
+    ],
+    "dependency_order": [
+      "y",
+      "v",
+      "n",
+      "q",
+      "e",
+      "l",
+      "b",
+      "o"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: v = val d, q = not l, c = val f, p = val v, n = not q, d = val 0, f = not n, l = val p,\nvariables: v q c p n d f l\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 0 n n], [0 n n n n 0 n n], [0 n n 0 n 0 n n], [0 n n 0 n 0 n 0], [0 1 n 0 n 0 n 0], [0 1 n 0 0 0 n 0], [0 1 n 0 0 0 1 0], [0 1 1 0 0 0 1 0] | [0 1 1 0 0 0 1 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "v",
+      "q",
+      "c",
+      "p",
+      "n",
+      "d",
+      "f",
+      "l"
+    ],
+    "dependency_order": [
+      "d",
+      "v",
+      "p",
+      "l",
+      "q",
+      "n",
+      "f",
+      "c"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: t = not h, q = val t, h = not f, f = not b, j = not a, m = not j, a = val 0, b = not m,\nvariables: t q h f j m a b\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n], [n n n n 1 n 0 n], [n n n n 1 0 0 n], [n n n n 1 0 0 1], [n n n 0 1 0 0 1], [n n 1 0 1 0 0 1], [0 n 1 0 1 0 0 1], [0 0 1 0 1 0 0 1] | [0 0 1 0 1 0 0 1]",
+    "final_values": [
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "t",
+      "q",
+      "h",
+      "f",
+      "j",
+      "m",
+      "a",
+      "b"
+    ],
+    "dependency_order": [
+      "a",
+      "j",
+      "m",
+      "b",
+      "f",
+      "h",
+      "t",
+      "q"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: j = val u, e = val j, i = val o, l = val p, p = val e, r = not i, u = not r, o = val 1,\nvariables: j e i l p r u o\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 1], [n n 1 n n n n 1], [n n 1 n n 0 n 1], [n n 1 n n 0 1 1], [1 n 1 n n 0 1 1], [1 1 1 n n 0 1 1], [1 1 1 n 1 0 1 1], [1 1 1 1 1 0 1 1] | [1 1 1 1 1 0 1 1]",
+    "final_values": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "j",
+      "e",
+      "i",
+      "l",
+      "p",
+      "r",
+      "u",
+      "o"
+    ],
+    "dependency_order": [
+      "o",
+      "i",
+      "r",
+      "u",
+      "j",
+      "e",
+      "p",
+      "l"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: e = val m, k = not s, u = val e, n = not c, m = val k, l = val 0, c = val l, s = not n,\nvariables: e k u n m l c s\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 0 n n], [n n n n n 0 0 n], [n n n 1 n 0 0 n], [n n n 1 n 0 0 0], [n 1 n 1 n 0 0 0], [n 1 n 1 1 0 0 0], [1 1 n 1 1 0 0 0], [1 1 1 1 1 0 0 0] | [1 1 1 1 1 0 0 0]",
+    "final_values": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "e",
+      "k",
+      "u",
+      "n",
+      "m",
+      "l",
+      "c",
+      "s"
+    ],
+    "dependency_order": [
+      "l",
+      "c",
+      "n",
+      "s",
+      "k",
+      "m",
+      "e",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: k = val i, i = val z, v = not f, p = val 1, z = not p, f = val u, s = not k, u = val s,\nvariables: k i v p z f s u\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [n n n 1 0 n n n], [n 0 n 1 0 n n n], [0 0 n 1 0 n n n], [0 0 n 1 0 n 1 n], [0 0 n 1 0 n 1 1], [0 0 n 1 0 1 1 1], [0 0 0 1 0 1 1 1] | [0 0 0 1 0 1 1 1]",
+    "final_values": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "k",
+      "i",
+      "v",
+      "p",
+      "z",
+      "f",
+      "s",
+      "u"
+    ],
+    "dependency_order": [
+      "p",
+      "z",
+      "i",
+      "k",
+      "s",
+      "u",
+      "f",
+      "v"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: p = val w, l = not q, t = val s, w = val 0, s = not v, v = val l, z = val t, q = not p,\nvariables: p l t w s v z q\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n], [0 n n 0 n n n n], [0 n n 0 n n n 1], [0 0 n 0 n n n 1], [0 0 n 0 n 0 n 1], [0 0 n 0 1 0 n 1], [0 0 1 0 1 0 n 1], [0 0 1 0 1 0 1 1] | [0 0 1 0 1 0 1 1]",
+    "final_values": [
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "p",
+      "l",
+      "t",
+      "w",
+      "s",
+      "v",
+      "z",
+      "q"
+    ],
+    "dependency_order": [
+      "w",
+      "p",
+      "q",
+      "l",
+      "v",
+      "s",
+      "t",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: e = val 0, d = not g, w = not d, g = val r, r = val k, a = not z, k = val a, z = val e,\nvariables: e d w g r a k z\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[0 n n n n n n n], [0 n n n n n n 0], [0 n n n n 1 n 0], [0 n n n n 1 1 0], [0 n n n 1 1 1 0], [0 n n 1 1 1 1 0], [0 0 n 1 1 1 1 0], [0 0 1 1 1 1 1 0] | [0 0 1 1 1 1 1 0]",
+    "final_values": [
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "e",
+      "d",
+      "w",
+      "g",
+      "r",
+      "a",
+      "k",
+      "z"
+    ],
+    "dependency_order": [
+      "e",
+      "z",
+      "a",
+      "k",
+      "r",
+      "g",
+      "d",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: r = val e, c = not u, u = not d, e = val h, j = not b, b = val r, h = val c, d = val 0,\nvariables: r c u e j b h d\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0], [n n 1 n n n n 0], [n 0 1 n n n n 0], [n 0 1 n n n 0 0], [n 0 1 0 n n 0 0], [0 0 1 0 n n 0 0], [0 0 1 0 n 0 0 0], [0 0 1 0 1 0 0 0] | [0 0 1 0 1 0 0 0]",
+    "final_values": [
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "r",
+      "c",
+      "u",
+      "e",
+      "j",
+      "b",
+      "h",
+      "d"
+    ],
+    "dependency_order": [
+      "d",
+      "u",
+      "c",
+      "h",
+      "e",
+      "r",
+      "b",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: i = val w, j = val 0, y = not m, b = val y, w = not k, p = not i, m = val j, k = not b,\nvariables: i j y b w p m k\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 0 n n n n n n], [n 0 n n n n 0 n], [n 0 1 n n n 0 n], [n 0 1 1 n n 0 n], [n 0 1 1 n n 0 0], [n 0 1 1 1 n 0 0], [1 0 1 1 1 n 0 0], [1 0 1 1 1 0 0 0] | [1 0 1 1 1 0 0 0]",
+    "final_values": [
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "i",
+      "j",
+      "y",
+      "b",
+      "w",
+      "p",
+      "m",
+      "k"
+    ],
+    "dependency_order": [
+      "j",
+      "m",
+      "y",
+      "b",
+      "k",
+      "w",
+      "i",
+      "p"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: u = val g, c = not p, g = not c, r = val h, p = not r, o = not u, b = not o, h = val 0,\nvariables: u c g r p o b h\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0], [n n n 0 n n n 0], [n n n 0 1 n n 0], [n 0 n 0 1 n n 0], [n 0 1 0 1 n n 0], [1 0 1 0 1 n n 0], [1 0 1 0 1 0 n 0], [1 0 1 0 1 0 1 0] | [1 0 1 0 1 0 1 0]",
+    "final_values": [
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "u",
+      "c",
+      "g",
+      "r",
+      "p",
+      "o",
+      "b",
+      "h"
+    ],
+    "dependency_order": [
+      "h",
+      "r",
+      "p",
+      "c",
+      "g",
+      "u",
+      "o",
+      "b"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: u = not p, q = val u, t = not h, n = val t, v = not f, h = not q, p = val 0, f = val n,\nvariables: u q t n v h p f\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n], [1 n n n n n 0 n], [1 1 n n n n 0 n], [1 1 n n n 0 0 n], [1 1 1 n n 0 0 n], [1 1 1 1 n 0 0 n], [1 1 1 1 n 0 0 1], [1 1 1 1 0 0 0 1] | [1 1 1 1 0 0 0 1]",
+    "final_values": [
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "u",
+      "q",
+      "t",
+      "n",
+      "v",
+      "h",
+      "p",
+      "f"
+    ],
+    "dependency_order": [
+      "p",
+      "u",
+      "q",
+      "h",
+      "t",
+      "n",
+      "f",
+      "v"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: r = val 0, e = not k, k = not r, z = val c, c = not m, m = val q, q = not e, n = not z,\nvariables: r e k z c m q n\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[0 n n n n n n n], [0 n 1 n n n n n], [0 0 1 n n n n n], [0 0 1 n n n 1 n], [0 0 1 n n 1 1 n], [0 0 1 n 0 1 1 n], [0 0 1 0 0 1 1 n], [0 0 1 0 0 1 1 1] | [0 0 1 0 0 1 1 1]",
+    "final_values": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "r",
+      "e",
+      "k",
+      "z",
+      "c",
+      "m",
+      "q",
+      "n"
+    ],
+    "dependency_order": [
+      "r",
+      "k",
+      "e",
+      "q",
+      "m",
+      "c",
+      "z",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: u = val o, z = val 1, m = not u, r = val n, e = not m, n = not e, y = val z, o = val y,\nvariables: u z m r e n y o\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n n n n 1 n], [n 1 n n n n 1 1], [1 1 n n n n 1 1], [1 1 0 n n n 1 1], [1 1 0 n 1 n 1 1], [1 1 0 n 1 0 1 1], [1 1 0 0 1 0 1 1] | [1 1 0 0 1 0 1 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "u",
+      "z",
+      "m",
+      "r",
+      "e",
+      "n",
+      "y",
+      "o"
+    ],
+    "dependency_order": [
+      "z",
+      "y",
+      "o",
+      "u",
+      "m",
+      "e",
+      "n",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: f = val 0, s = not x, x = val e, t = not f, y = val s, u = not t, k = not u, e = not k,\nvariables: f s x t y u k e\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[0 n n n n n n n], [0 n n 1 n n n n], [0 n n 1 n 0 n n], [0 n n 1 n 0 1 n], [0 n n 1 n 0 1 0], [0 n 0 1 n 0 1 0], [0 1 0 1 n 0 1 0], [0 1 0 1 1 0 1 0] | [0 1 0 1 1 0 1 0]",
+    "final_values": [
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "f",
+      "s",
+      "x",
+      "t",
+      "y",
+      "u",
+      "k",
+      "e"
+    ],
+    "dependency_order": [
+      "f",
+      "t",
+      "u",
+      "k",
+      "e",
+      "x",
+      "s",
+      "y"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: r = not d, j = not v, d = not a, k = val 1, g = not j, v = val k, a = val q, q = not g,\nvariables: r j d k g v a q\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [n n n 1 n 1 n n], [n 0 n 1 n 1 n n], [n 0 n 1 1 1 n n], [n 0 n 1 1 1 n 0], [n 0 n 1 1 1 0 0], [n 0 1 1 1 1 0 0], [0 0 1 1 1 1 0 0] | [0 0 1 1 1 1 0 0]",
+    "final_values": [
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "r",
+      "j",
+      "d",
+      "k",
+      "g",
+      "v",
+      "a",
+      "q"
+    ],
+    "dependency_order": [
+      "k",
+      "v",
+      "j",
+      "g",
+      "q",
+      "a",
+      "d",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: t = not v, u = not j, p = not g, f = val u, g = val e, v = val 1, j = not t, e = not f,\nvariables: t u p f g v j e\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n], [0 n n n n 1 n n], [0 n n n n 1 1 n], [0 0 n n n 1 1 n], [0 0 n 0 n 1 1 n], [0 0 n 0 n 1 1 1], [0 0 n 0 1 1 1 1], [0 0 0 0 1 1 1 1] | [0 0 0 0 1 1 1 1]",
+    "final_values": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "t",
+      "u",
+      "p",
+      "f",
+      "g",
+      "v",
+      "j",
+      "e"
+    ],
+    "dependency_order": [
+      "v",
+      "t",
+      "j",
+      "u",
+      "f",
+      "e",
+      "g",
+      "p"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: a = not l, k = not i, n = val k, i = not b, h = val 1, l = val h, w = not n, b = val a,\nvariables: a k n i h l w b\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 1 n n n], [n n n n 1 1 n n], [0 n n n 1 1 n n], [0 n n n 1 1 n 0], [0 n n 1 1 1 n 0], [0 0 n 1 1 1 n 0], [0 0 0 1 1 1 n 0], [0 0 0 1 1 1 1 0] | [0 0 0 1 1 1 1 0]",
+    "final_values": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "a",
+      "k",
+      "n",
+      "i",
+      "h",
+      "l",
+      "w",
+      "b"
+    ],
+    "dependency_order": [
+      "h",
+      "l",
+      "a",
+      "b",
+      "i",
+      "k",
+      "n",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: u = not w, y = not p, w = val x, n = not o, o = val 0, x = not n, k = val y, p = not u,\nvariables: u y w n o x k p\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n], [n n n 1 0 n n n], [n n n 1 0 0 n n], [n n 0 1 0 0 n n], [1 n 0 1 0 0 n n], [1 n 0 1 0 0 n 0], [1 1 0 1 0 0 n 0], [1 1 0 1 0 0 1 0] | [1 1 0 1 0 0 1 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "u",
+      "y",
+      "w",
+      "n",
+      "o",
+      "x",
+      "k",
+      "p"
+    ],
+    "dependency_order": [
+      "o",
+      "n",
+      "x",
+      "w",
+      "u",
+      "p",
+      "y",
+      "k"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: n = not a, a = val 0, e = not l, u = val n, c = val p, p = val s, s = not e, l = not u,\nvariables: n a e u c p s l\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 0 n n n n n n], [1 0 n n n n n n], [1 0 n 1 n n n n], [1 0 n 1 n n n 0], [1 0 1 1 n n n 0], [1 0 1 1 n n 0 0], [1 0 1 1 n 0 0 0], [1 0 1 1 0 0 0 0] | [1 0 1 1 0 0 0 0]",
+    "final_values": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "n",
+      "a",
+      "e",
+      "u",
+      "c",
+      "p",
+      "s",
+      "l"
+    ],
+    "dependency_order": [
+      "a",
+      "n",
+      "u",
+      "l",
+      "e",
+      "s",
+      "p",
+      "c"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: h = val l, l = not u, k = not e, j = not r, u = val 0, o = val j, r = val k, e = val h,\nvariables: h l k j u o r e\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n], [n 1 n n 0 n n n], [1 1 n n 0 n n n], [1 1 n n 0 n n 1], [1 1 0 n 0 n n 1], [1 1 0 n 0 n 0 1], [1 1 0 1 0 n 0 1], [1 1 0 1 0 1 0 1] | [1 1 0 1 0 1 0 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "h",
+      "l",
+      "k",
+      "j",
+      "u",
+      "o",
+      "r",
+      "e"
+    ],
+    "dependency_order": [
+      "u",
+      "l",
+      "h",
+      "e",
+      "k",
+      "r",
+      "j",
+      "o"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: k = not s, a = not m, o = not y, s = val 1, m = not v, y = not a, n = not k, v = val n,\nvariables: k a o s m y n v\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [0 n n 1 n n n n], [0 n n 1 n n 1 n], [0 n n 1 n n 1 1], [0 n n 1 0 n 1 1], [0 1 n 1 0 n 1 1], [0 1 n 1 0 0 1 1], [0 1 1 1 0 0 1 1] | [0 1 1 1 0 0 1 1]",
+    "final_values": [
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "k",
+      "a",
+      "o",
+      "s",
+      "m",
+      "y",
+      "n",
+      "v"
+    ],
+    "dependency_order": [
+      "s",
+      "k",
+      "n",
+      "v",
+      "m",
+      "a",
+      "y",
+      "o"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: o = not q, e = val 1, q = not z, l = val n, j = not r, r = not e, n = not j, z = not l,\nvariables: o e q l j r n z\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n n n 0 n n], [n 1 n n 1 0 n n], [n 1 n n 1 0 0 n], [n 1 n 0 1 0 0 n], [n 1 n 0 1 0 0 1], [n 1 0 0 1 0 0 1], [1 1 0 0 1 0 0 1] | [1 1 0 0 1 0 0 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "o",
+      "e",
+      "q",
+      "l",
+      "j",
+      "r",
+      "n",
+      "z"
+    ],
+    "dependency_order": [
+      "e",
+      "r",
+      "j",
+      "n",
+      "l",
+      "z",
+      "q",
+      "o"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: v = val p, t = val u, s = val 0, m = not t, j = val v, u = not j, p = not s, b = val m,\nvariables: v t s m j u p b\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 0 n n n n n], [n n 0 n n n 1 n], [1 n 0 n n n 1 n], [1 n 0 n 1 n 1 n], [1 n 0 n 1 0 1 n], [1 0 0 n 1 0 1 n], [1 0 0 1 1 0 1 n], [1 0 0 1 1 0 1 1] | [1 0 0 1 1 0 1 1]",
+    "final_values": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "v",
+      "t",
+      "s",
+      "m",
+      "j",
+      "u",
+      "p",
+      "b"
+    ],
+    "dependency_order": [
+      "s",
+      "p",
+      "v",
+      "j",
+      "u",
+      "t",
+      "m",
+      "b"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: z = not n, d = val z, g = val j, k = val 0, n = val g, h = not d, j = val o, o = val k,\nvariables: z d g k n h j o\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n], [n n n 0 n n n 0], [n n n 0 n n 0 0], [n n 0 0 n n 0 0], [n n 0 0 0 n 0 0], [1 n 0 0 0 n 0 0], [1 1 0 0 0 n 0 0], [1 1 0 0 0 0 0 0] | [1 1 0 0 0 0 0 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "z",
+      "d",
+      "g",
+      "k",
+      "n",
+      "h",
+      "j",
+      "o"
+    ],
+    "dependency_order": [
+      "k",
+      "o",
+      "j",
+      "g",
+      "n",
+      "z",
+      "d",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: b = val m, y = val 1, h = not l, l = val w, i = val b, q = not h, w = val y, m = not q,\nvariables: b y h l i q w m\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n n n n 1 n], [n 1 n 1 n n 1 n], [n 1 0 1 n n 1 n], [n 1 0 1 n 1 1 n], [n 1 0 1 n 1 1 0], [0 1 0 1 n 1 1 0], [0 1 0 1 0 1 1 0] | [0 1 0 1 0 1 1 0]",
+    "final_values": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "b",
+      "y",
+      "h",
+      "l",
+      "i",
+      "q",
+      "w",
+      "m"
+    ],
+    "dependency_order": [
+      "y",
+      "w",
+      "l",
+      "h",
+      "q",
+      "m",
+      "b",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: f = not c, c = val p, e = val q, s = val 0, w = not f, q = not s, p = val z, z = not e,\nvariables: f c e s w q p z\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n], [n n n 0 n 1 n n], [n n 1 0 n 1 n n], [n n 1 0 n 1 n 0], [n n 1 0 n 1 0 0], [n 0 1 0 n 1 0 0], [1 0 1 0 n 1 0 0], [1 0 1 0 0 1 0 0] | [1 0 1 0 0 1 0 0]",
+    "final_values": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "f",
+      "c",
+      "e",
+      "s",
+      "w",
+      "q",
+      "p",
+      "z"
+    ],
+    "dependency_order": [
+      "s",
+      "q",
+      "e",
+      "z",
+      "p",
+      "c",
+      "f",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: z = not m, i = val a, w = val z, h = not w, m = val 0, l = not s, s = val h, a = val l,\nvariables: z i w h m l s a\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n], [1 n n n 0 n n n], [1 n 1 n 0 n n n], [1 n 1 0 0 n n n], [1 n 1 0 0 n 0 n], [1 n 1 0 0 1 0 n], [1 n 1 0 0 1 0 1], [1 1 1 0 0 1 0 1] | [1 1 1 0 0 1 0 1]",
+    "final_values": [
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "z",
+      "i",
+      "w",
+      "h",
+      "m",
+      "l",
+      "s",
+      "a"
+    ],
+    "dependency_order": [
+      "m",
+      "z",
+      "w",
+      "h",
+      "s",
+      "l",
+      "a",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: e = val y, v = val n, h = val 0, n = val e, y = not g, g = not f, w = not h, f = val w,\nvariables: e v h n y g w f\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 0 n n n n n], [n n 0 n n n 1 n], [n n 0 n n n 1 1], [n n 0 n n 0 1 1], [n n 0 n 1 0 1 1], [1 n 0 n 1 0 1 1], [1 n 0 1 1 0 1 1], [1 1 0 1 1 0 1 1] | [1 1 0 1 1 0 1 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "e",
+      "v",
+      "h",
+      "n",
+      "y",
+      "g",
+      "w",
+      "f"
+    ],
+    "dependency_order": [
+      "h",
+      "w",
+      "f",
+      "g",
+      "y",
+      "e",
+      "n",
+      "v"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: h = val 0, g = not k, v = not i, i = not y, k = not v, y = not r, b = val g, r = val h,\nvariables: h g v i k y b r\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[0 n n n n n n n], [0 n n n n n n 0], [0 n n n n 1 n 0], [0 n n 0 n 1 n 0], [0 n 1 0 n 1 n 0], [0 n 1 0 0 1 n 0], [0 1 1 0 0 1 n 0], [0 1 1 0 0 1 1 0] | [0 1 1 0 0 1 1 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "h",
+      "g",
+      "v",
+      "i",
+      "k",
+      "y",
+      "b",
+      "r"
+    ],
+    "dependency_order": [
+      "h",
+      "r",
+      "y",
+      "i",
+      "v",
+      "k",
+      "g",
+      "b"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: m = val 1, z = val t, r = val j, t = val r, j = not b, b = not y, y = val n, n = not m,\nvariables: m z r t j b y n\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 n n n n n n 0], [1 n n n n n 0 0], [1 n n n n 1 0 0], [1 n n n 0 1 0 0], [1 n 0 n 0 1 0 0], [1 n 0 0 0 1 0 0], [1 0 0 0 0 1 0 0] | [1 0 0 0 0 1 0 0]",
+    "final_values": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "m",
+      "z",
+      "r",
+      "t",
+      "j",
+      "b",
+      "y",
+      "n"
+    ],
+    "dependency_order": [
+      "m",
+      "n",
+      "y",
+      "b",
+      "j",
+      "r",
+      "t",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: b = not w, k = val 1, e = val o, w = not k, l = not t, a = val l, o = not b, t = val e,\nvariables: b k e w l a o t\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n 0 n n n n], [1 1 n 0 n n n n], [1 1 n 0 n n 0 n], [1 1 0 0 n n 0 n], [1 1 0 0 n n 0 0], [1 1 0 0 1 n 0 0], [1 1 0 0 1 1 0 0] | [1 1 0 0 1 1 0 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "b",
+      "k",
+      "e",
+      "w",
+      "l",
+      "a",
+      "o",
+      "t"
+    ],
+    "dependency_order": [
+      "k",
+      "w",
+      "b",
+      "o",
+      "e",
+      "t",
+      "l",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: u = val k, g = not j, e = not u, b = not v, j = not b, i = val 0, k = val i, v = val e,\nvariables: u g e b j i k v\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 0 n n], [n n n n n 0 0 n], [0 n n n n 0 0 n], [0 n 1 n n 0 0 n], [0 n 1 n n 0 0 1], [0 n 1 0 n 0 0 1], [0 n 1 0 1 0 0 1], [0 0 1 0 1 0 0 1] | [0 0 1 0 1 0 0 1]",
+    "final_values": [
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "u",
+      "g",
+      "e",
+      "b",
+      "j",
+      "i",
+      "k",
+      "v"
+    ],
+    "dependency_order": [
+      "i",
+      "k",
+      "u",
+      "e",
+      "v",
+      "b",
+      "j",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: a = not w, y = val n, w = not e, x = val y, e = not x, n = val 1, k = val a, j = val k,\nvariables: a y w x e n k j\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n], [n 1 n n n 1 n n], [n 1 n 1 n 1 n n], [n 1 n 1 0 1 n n], [n 1 1 1 0 1 n n], [0 1 1 1 0 1 n n], [0 1 1 1 0 1 0 n], [0 1 1 1 0 1 0 0] | [0 1 1 1 0 1 0 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "a",
+      "y",
+      "w",
+      "x",
+      "e",
+      "n",
+      "k",
+      "j"
+    ],
+    "dependency_order": [
+      "n",
+      "y",
+      "x",
+      "e",
+      "w",
+      "a",
+      "k",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: n = not z, r = val 1, g = val u, z = val g, w = val f, u = not p, p = val w, f = not r,\nvariables: n r g z w u p f\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n n n n n 0], [n 1 n n 0 n n 0], [n 1 n n 0 n 0 0], [n 1 n n 0 1 0 0], [n 1 1 n 0 1 0 0], [n 1 1 1 0 1 0 0], [0 1 1 1 0 1 0 0] | [0 1 1 1 0 1 0 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "n",
+      "r",
+      "g",
+      "z",
+      "w",
+      "u",
+      "p",
+      "f"
+    ],
+    "dependency_order": [
+      "r",
+      "f",
+      "w",
+      "p",
+      "u",
+      "g",
+      "z",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: u = val 1, v = not f, f = not o, q = val y, a = not m, y = not a, m = val u, o = val q,\nvariables: u v f q a y m o\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 n n n n n 1 n], [1 n n n 0 n 1 n], [1 n n n 0 1 1 n], [1 n n 1 0 1 1 n], [1 n n 1 0 1 1 1], [1 n 0 1 0 1 1 1], [1 1 0 1 0 1 1 1] | [1 1 0 1 0 1 1 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "u",
+      "v",
+      "f",
+      "q",
+      "a",
+      "y",
+      "m",
+      "o"
+    ],
+    "dependency_order": [
+      "u",
+      "m",
+      "a",
+      "y",
+      "q",
+      "o",
+      "f",
+      "v"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: w = val x, m = not w, y = not f, z = val g, o = val y, x = val z, f = not m, g = val 0,\nvariables: w m y z o x f g\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0], [n n n 0 n n n 0], [n n n 0 n 0 n 0], [0 n n 0 n 0 n 0], [0 1 n 0 n 0 n 0], [0 1 n 0 n 0 0 0], [0 1 1 0 n 0 0 0], [0 1 1 0 1 0 0 0] | [0 1 1 0 1 0 0 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "w",
+      "m",
+      "y",
+      "z",
+      "o",
+      "x",
+      "f",
+      "g"
+    ],
+    "dependency_order": [
+      "g",
+      "z",
+      "x",
+      "w",
+      "m",
+      "f",
+      "y",
+      "o"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: j = not k, b = not x, s = not b, t = not j, x = val u, f = val 1, k = not f, u = not t,\nvariables: j b s t x f k u\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n], [n n n n n 1 0 n], [1 n n n n 1 0 n], [1 n n 0 n 1 0 n], [1 n n 0 n 1 0 1], [1 n n 0 1 1 0 1], [1 0 n 0 1 1 0 1], [1 0 1 0 1 1 0 1] | [1 0 1 0 1 1 0 1]",
+    "final_values": [
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "j",
+      "b",
+      "s",
+      "t",
+      "x",
+      "f",
+      "k",
+      "u"
+    ],
+    "dependency_order": [
+      "f",
+      "k",
+      "j",
+      "t",
+      "u",
+      "x",
+      "b",
+      "s"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: h = val j, o = not g, l = val i, i = not z, z = val 1, u = not o, g = not h, j = val l,\nvariables: h o l i z u g j\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 1 n n n], [n n n 0 1 n n n], [n n 0 0 1 n n n], [n n 0 0 1 n n 0], [0 n 0 0 1 n n 0], [0 n 0 0 1 n 1 0], [0 0 0 0 1 n 1 0], [0 0 0 0 1 1 1 0] | [0 0 0 0 1 1 1 0]",
+    "final_values": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "h",
+      "o",
+      "l",
+      "i",
+      "z",
+      "u",
+      "g",
+      "j"
+    ],
+    "dependency_order": [
+      "z",
+      "i",
+      "l",
+      "j",
+      "h",
+      "g",
+      "o",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: f = not u, t = val b, m = not t, o = val 0, u = not s, b = not o, s = not m, a = not f,\nvariables: f t m o u b s a\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n], [n n n 0 n 1 n n], [n 1 n 0 n 1 n n], [n 1 0 0 n 1 n n], [n 1 0 0 n 1 1 n], [n 1 0 0 0 1 1 n], [1 1 0 0 0 1 1 n], [1 1 0 0 0 1 1 0] | [1 1 0 0 0 1 1 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "f",
+      "t",
+      "m",
+      "o",
+      "u",
+      "b",
+      "s",
+      "a"
+    ],
+    "dependency_order": [
+      "o",
+      "b",
+      "t",
+      "m",
+      "s",
+      "u",
+      "f",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: e = val v, s = val g, c = val b, g = val e, b = val u, u = not s, v = val 1, x = val c,\nvariables: e s c g b u v x\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n], [1 n n n n n 1 n], [1 n n 1 n n 1 n], [1 1 n 1 n n 1 n], [1 1 n 1 n 0 1 n], [1 1 n 1 0 0 1 n], [1 1 0 1 0 0 1 n], [1 1 0 1 0 0 1 0] | [1 1 0 1 0 0 1 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "e",
+      "s",
+      "c",
+      "g",
+      "b",
+      "u",
+      "v",
+      "x"
+    ],
+    "dependency_order": [
+      "v",
+      "e",
+      "g",
+      "s",
+      "u",
+      "b",
+      "c",
+      "x"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: m = val f, p = val 1, k = not l, f = val q, a = not p, l = val a, t = val k, q = val t,\nvariables: m p k f a l t q\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n n 0 n n n], [n 1 n n 0 0 n n], [n 1 1 n 0 0 n n], [n 1 1 n 0 0 1 n], [n 1 1 n 0 0 1 1], [n 1 1 1 0 0 1 1], [1 1 1 1 0 0 1 1] | [1 1 1 1 0 0 1 1]",
+    "final_values": [
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "m",
+      "p",
+      "k",
+      "f",
+      "a",
+      "l",
+      "t",
+      "q"
+    ],
+    "dependency_order": [
+      "p",
+      "a",
+      "l",
+      "k",
+      "t",
+      "q",
+      "f",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: j = val 1, i = val c, q = not y, d = val l, y = val j, l = val w, w = val q, c = val d,\nvariables: j i q d y l w c\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 n n n 1 n n n], [1 n 0 n 1 n n n], [1 n 0 n 1 n 0 n], [1 n 0 n 1 0 0 n], [1 n 0 0 1 0 0 n], [1 n 0 0 1 0 0 0], [1 0 0 0 1 0 0 0] | [1 0 0 0 1 0 0 0]",
+    "final_values": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "j",
+      "i",
+      "q",
+      "d",
+      "y",
+      "l",
+      "w",
+      "c"
+    ],
+    "dependency_order": [
+      "j",
+      "y",
+      "q",
+      "w",
+      "l",
+      "d",
+      "c",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: d = val u, k = val 0, t = not b, y = not f, f = val k, b = not s, u = not y, s = val d,\nvariables: d k t y f b u s\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 0 n n n n n n], [n 0 n n 0 n n n], [n 0 n 1 0 n n n], [n 0 n 1 0 n 0 n], [0 0 n 1 0 n 0 n], [0 0 n 1 0 n 0 0], [0 0 n 1 0 1 0 0], [0 0 0 1 0 1 0 0] | [0 0 0 1 0 1 0 0]",
+    "final_values": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "d",
+      "k",
+      "t",
+      "y",
+      "f",
+      "b",
+      "u",
+      "s"
+    ],
+    "dependency_order": [
+      "k",
+      "f",
+      "y",
+      "u",
+      "d",
+      "s",
+      "b",
+      "t"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: s = not j, r = not a, v = not s, j = val k, k = val p, a = val v, z = not r, p = val 0,\nvariables: s r v j k a z p\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0], [n n n n 0 n n 0], [n n n 0 0 n n 0], [1 n n 0 0 n n 0], [1 n 0 0 0 n n 0], [1 n 0 0 0 0 n 0], [1 1 0 0 0 0 n 0], [1 1 0 0 0 0 0 0] | [1 1 0 0 0 0 0 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "s",
+      "r",
+      "v",
+      "j",
+      "k",
+      "a",
+      "z",
+      "p"
+    ],
+    "dependency_order": [
+      "p",
+      "k",
+      "j",
+      "s",
+      "v",
+      "a",
+      "r",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: j = val 1, s = val g, p = not j, q = val x, x = val p, v = not d, d = val s, g = not q,\nvariables: j s p q x v d g\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 n 0 n n n n n], [1 n 0 n 0 n n n], [1 n 0 0 0 n n n], [1 n 0 0 0 n n 1], [1 1 0 0 0 n n 1], [1 1 0 0 0 n 1 1], [1 1 0 0 0 0 1 1] | [1 1 0 0 0 0 1 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "j",
+      "s",
+      "p",
+      "q",
+      "x",
+      "v",
+      "d",
+      "g"
+    ],
+    "dependency_order": [
+      "j",
+      "p",
+      "x",
+      "q",
+      "g",
+      "s",
+      "d",
+      "v"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: c = not o, q = val d, j = not b, d = val j, b = val 0, l = not q, o = not l, w = val c,\nvariables: c q j d b l o w\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n], [n n 1 n 0 n n n], [n n 1 1 0 n n n], [n 1 1 1 0 n n n], [n 1 1 1 0 0 n n], [n 1 1 1 0 0 1 n], [0 1 1 1 0 0 1 n], [0 1 1 1 0 0 1 0] | [0 1 1 1 0 0 1 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "c",
+      "q",
+      "j",
+      "d",
+      "b",
+      "l",
+      "o",
+      "w"
+    ],
+    "dependency_order": [
+      "b",
+      "j",
+      "d",
+      "q",
+      "l",
+      "o",
+      "c",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: o = val i, w = not n, a = val q, i = val w, h = not a, q = val k, k = not o, n = val 0,\nvariables: o w a i h q k n\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0], [n 1 n n n n n 0], [n 1 n 1 n n n 0], [1 1 n 1 n n n 0], [1 1 n 1 n n 0 0], [1 1 n 1 n 0 0 0], [1 1 0 1 n 0 0 0], [1 1 0 1 1 0 0 0] | [1 1 0 1 1 0 0 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "o",
+      "w",
+      "a",
+      "i",
+      "h",
+      "q",
+      "k",
+      "n"
+    ],
+    "dependency_order": [
+      "n",
+      "w",
+      "i",
+      "o",
+      "k",
+      "q",
+      "a",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: p = val 1, m = not f, d = not y, f = val s, i = val p, s = not i, x = val d, y = val m,\nvariables: p m d f i s x y\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 n n n 1 n n n], [1 n n n 1 0 n n], [1 n n 0 1 0 n n], [1 1 n 0 1 0 n n], [1 1 n 0 1 0 n 1], [1 1 0 0 1 0 n 1], [1 1 0 0 1 0 0 1] | [1 1 0 0 1 0 0 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "p",
+      "m",
+      "d",
+      "f",
+      "i",
+      "s",
+      "x",
+      "y"
+    ],
+    "dependency_order": [
+      "p",
+      "i",
+      "s",
+      "f",
+      "m",
+      "y",
+      "d",
+      "x"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: v = not m, m = val 0, i = not k, z = val v, h = not z, k = not h, j = val i, c = val j,\nvariables: v m i z h k j c\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 0 n n n n n n], [1 0 n n n n n n], [1 0 n 1 n n n n], [1 0 n 1 0 n n n], [1 0 n 1 0 1 n n], [1 0 0 1 0 1 n n], [1 0 0 1 0 1 0 n], [1 0 0 1 0 1 0 0] | [1 0 0 1 0 1 0 0]",
+    "final_values": [
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "v",
+      "m",
+      "i",
+      "z",
+      "h",
+      "k",
+      "j",
+      "c"
+    ],
+    "dependency_order": [
+      "m",
+      "v",
+      "z",
+      "h",
+      "k",
+      "i",
+      "j",
+      "c"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: w = val r, p = val n, r = not s, s = val 1, n = val d, d = not w, z = val q, q = val p,\nvariables: w p r s n d z q\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [n n 0 1 n n n n], [0 n 0 1 n n n n], [0 n 0 1 n 1 n n], [0 n 0 1 1 1 n n], [0 1 0 1 1 1 n n], [0 1 0 1 1 1 n 1], [0 1 0 1 1 1 1 1] | [0 1 0 1 1 1 1 1]",
+    "final_values": [
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "w",
+      "p",
+      "r",
+      "s",
+      "n",
+      "d",
+      "z",
+      "q"
+    ],
+    "dependency_order": [
+      "s",
+      "r",
+      "w",
+      "d",
+      "n",
+      "p",
+      "q",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: i = val y, a = val 0, y = val h, h = val m, p = val u, m = val p, u = val s, s = not a,\nvariables: i a y h p m u s\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 0 n n n n n n], [n 0 n n n n n 1], [n 0 n n n n 1 1], [n 0 n n 1 n 1 1], [n 0 n n 1 1 1 1], [n 0 n 1 1 1 1 1], [n 0 1 1 1 1 1 1], [1 0 1 1 1 1 1 1] | [1 0 1 1 1 1 1 1]",
+    "final_values": [
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "i",
+      "a",
+      "y",
+      "h",
+      "p",
+      "m",
+      "u",
+      "s"
+    ],
+    "dependency_order": [
+      "a",
+      "s",
+      "u",
+      "p",
+      "m",
+      "h",
+      "y",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: i = val b, q = val n, b = val m, m = val q, n = not p, p = val z, z = val 1, g = not i,\nvariables: i q b m n p z g\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n], [n n n n n 1 1 n], [n n n n 0 1 1 n], [n 0 n n 0 1 1 n], [n 0 n 0 0 1 1 n], [n 0 0 0 0 1 1 n], [0 0 0 0 0 1 1 n], [0 0 0 0 0 1 1 1] | [0 0 0 0 0 1 1 1]",
+    "final_values": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "i",
+      "q",
+      "b",
+      "m",
+      "n",
+      "p",
+      "z",
+      "g"
+    ],
+    "dependency_order": [
+      "z",
+      "p",
+      "n",
+      "q",
+      "m",
+      "b",
+      "i",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: g = val e, e = val 1, s = val g, c = not s, m = not c, f = val b, k = not m, b = not k,\nvariables: g e s c m f k b\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [1 1 n n n n n n], [1 1 1 n n n n n], [1 1 1 0 n n n n], [1 1 1 0 1 n n n], [1 1 1 0 1 n 0 n], [1 1 1 0 1 n 0 1], [1 1 1 0 1 1 0 1] | [1 1 1 0 1 1 0 1]",
+    "final_values": [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "g",
+      "e",
+      "s",
+      "c",
+      "m",
+      "f",
+      "k",
+      "b"
+    ],
+    "dependency_order": [
+      "e",
+      "g",
+      "s",
+      "c",
+      "m",
+      "k",
+      "b",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: u = val o, r = val d, d = not m, m = not u, s = val r, y = not s, g = val 1, o = not g,\nvariables: u r d m s y g o\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n], [n n n n n n 1 0], [0 n n n n n 1 0], [0 n n 1 n n 1 0], [0 n 0 1 n n 1 0], [0 0 0 1 n n 1 0], [0 0 0 1 0 n 1 0], [0 0 0 1 0 1 1 0] | [0 0 0 1 0 1 1 0]",
+    "final_values": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "u",
+      "r",
+      "d",
+      "m",
+      "s",
+      "y",
+      "g",
+      "o"
+    ],
+    "dependency_order": [
+      "g",
+      "o",
+      "u",
+      "m",
+      "d",
+      "r",
+      "s",
+      "y"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: c = val f, f = val u, u = not d, k = val i, d = val a, t = val 1, a = not k, i = not t,\nvariables: c f u k d t a i\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n], [n n n n n 1 n 0], [n n n 0 n 1 n 0], [n n n 0 n 1 1 0], [n n n 0 1 1 1 0], [n n 0 0 1 1 1 0], [n 0 0 0 1 1 1 0], [0 0 0 0 1 1 1 0] | [0 0 0 0 1 1 1 0]",
+    "final_values": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "c",
+      "f",
+      "u",
+      "k",
+      "d",
+      "t",
+      "a",
+      "i"
+    ],
+    "dependency_order": [
+      "t",
+      "i",
+      "k",
+      "a",
+      "d",
+      "u",
+      "f",
+      "c"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: j = val w, q = not p, v = val h, w = val q, p = val u, h = val 0, i = val j, u = val v,\nvariables: j q v w p h i u\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 0 n n], [n n 0 n n 0 n n], [n n 0 n n 0 n 0], [n n 0 n 0 0 n 0], [n 1 0 n 0 0 n 0], [n 1 0 1 0 0 n 0], [1 1 0 1 0 0 n 0], [1 1 0 1 0 0 1 0] | [1 1 0 1 0 0 1 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "j",
+      "q",
+      "v",
+      "w",
+      "p",
+      "h",
+      "i",
+      "u"
+    ],
+    "dependency_order": [
+      "h",
+      "v",
+      "u",
+      "p",
+      "q",
+      "w",
+      "j",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: d = val 1, v = not d, y = not k, l = val y, k = not f, w = val v, m = val l, f = val w,\nvariables: d v y l k w m f\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 0 n n n n n n], [1 0 n n n 0 n n], [1 0 n n n 0 n 0], [1 0 n n 1 0 n 0], [1 0 0 n 1 0 n 0], [1 0 0 0 1 0 n 0], [1 0 0 0 1 0 0 0] | [1 0 0 0 1 0 0 0]",
+    "final_values": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "d",
+      "v",
+      "y",
+      "l",
+      "k",
+      "w",
+      "m",
+      "f"
+    ],
+    "dependency_order": [
+      "d",
+      "v",
+      "w",
+      "f",
+      "k",
+      "y",
+      "l",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: e = val 1, l = not e, g = not l, b = val s, t = val k, x = not t, s = val g, k = not b,\nvariables: e l g b t x s k\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 0 n n n n n n], [1 0 1 n n n n n], [1 0 1 n n n 1 n], [1 0 1 1 n n 1 n], [1 0 1 1 n n 1 0], [1 0 1 1 0 n 1 0], [1 0 1 1 0 1 1 0] | [1 0 1 1 0 1 1 0]",
+    "final_values": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "e",
+      "l",
+      "g",
+      "b",
+      "t",
+      "x",
+      "s",
+      "k"
+    ],
+    "dependency_order": [
+      "e",
+      "l",
+      "g",
+      "s",
+      "b",
+      "k",
+      "t",
+      "x"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: c = val e, k = val r, e = val 1, n = val b, p = val c, b = val p, r = val n, a = not k,\nvariables: c k e n p b r a\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 1 n n n n n], [1 n 1 n n n n n], [1 n 1 n 1 n n n], [1 n 1 n 1 1 n n], [1 n 1 1 1 1 n n], [1 n 1 1 1 1 1 n], [1 1 1 1 1 1 1 n], [1 1 1 1 1 1 1 0] | [1 1 1 1 1 1 1 0]",
+    "final_values": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "c",
+      "k",
+      "e",
+      "n",
+      "p",
+      "b",
+      "r",
+      "a"
+    ],
+    "dependency_order": [
+      "e",
+      "c",
+      "p",
+      "b",
+      "n",
+      "r",
+      "k",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: l = not c, p = val l, t = not o, o = val a, c = val 0, r = val t, a = val p, j = not r,\nvariables: l p t o c r a j\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n], [1 n n n 0 n n n], [1 1 n n 0 n n n], [1 1 n n 0 n 1 n], [1 1 n 1 0 n 1 n], [1 1 0 1 0 n 1 n], [1 1 0 1 0 0 1 n], [1 1 0 1 0 0 1 1] | [1 1 0 1 0 0 1 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "l",
+      "p",
+      "t",
+      "o",
+      "c",
+      "r",
+      "a",
+      "j"
+    ],
+    "dependency_order": [
+      "c",
+      "l",
+      "p",
+      "a",
+      "o",
+      "t",
+      "r",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: n = val m, m = not i, k = not g, b = val k, r = val n, i = not b, p = val 1, g = not p,\nvariables: n m k b r i p g\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n], [n n n n n n 1 0], [n n 1 n n n 1 0], [n n 1 1 n n 1 0], [n n 1 1 n 0 1 0], [n 1 1 1 n 0 1 0], [1 1 1 1 n 0 1 0], [1 1 1 1 1 0 1 0] | [1 1 1 1 1 0 1 0]",
+    "final_values": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "n",
+      "m",
+      "k",
+      "b",
+      "r",
+      "i",
+      "p",
+      "g"
+    ],
+    "dependency_order": [
+      "p",
+      "g",
+      "k",
+      "b",
+      "i",
+      "m",
+      "n",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: s = val r, p = not u, o = not t, t = not k, u = val 1, k = val p, g = not o, r = val g,\nvariables: s p o t u k g r\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 1 n n n], [n 0 n n 1 n n n], [n 0 n n 1 0 n n], [n 0 n 1 1 0 n n], [n 0 0 1 1 0 n n], [n 0 0 1 1 0 1 n], [n 0 0 1 1 0 1 1], [1 0 0 1 1 0 1 1] | [1 0 0 1 1 0 1 1]",
+    "final_values": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "s",
+      "p",
+      "o",
+      "t",
+      "u",
+      "k",
+      "g",
+      "r"
+    ],
+    "dependency_order": [
+      "u",
+      "p",
+      "k",
+      "t",
+      "o",
+      "g",
+      "r",
+      "s"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: a = val z, b = not a, z = val 0, h = val o, x = not b, u = not h, e = not x, o = val e,\nvariables: a b z h x u e o\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 0 n n n n n], [0 n 0 n n n n n], [0 1 0 n n n n n], [0 1 0 n 0 n n n], [0 1 0 n 0 n 1 n], [0 1 0 n 0 n 1 1], [0 1 0 1 0 n 1 1], [0 1 0 1 0 0 1 1] | [0 1 0 1 0 0 1 1]",
+    "final_values": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "a",
+      "b",
+      "z",
+      "h",
+      "x",
+      "u",
+      "e",
+      "o"
+    ],
+    "dependency_order": [
+      "z",
+      "a",
+      "b",
+      "x",
+      "e",
+      "o",
+      "h",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: n = val w, w = not s, r = val j, c = val 1, s = val p, j = val f, f = not c, p = val r,\nvariables: n w r c s j f p\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [n n n 1 n n 0 n], [n n n 1 n 0 0 n], [n n 0 1 n 0 0 n], [n n 0 1 n 0 0 0], [n n 0 1 0 0 0 0], [n 1 0 1 0 0 0 0], [1 1 0 1 0 0 0 0] | [1 1 0 1 0 0 0 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "n",
+      "w",
+      "r",
+      "c",
+      "s",
+      "j",
+      "f",
+      "p"
+    ],
+    "dependency_order": [
+      "c",
+      "f",
+      "j",
+      "r",
+      "p",
+      "s",
+      "w",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: o = not n, f = val 0, q = not h, h = val f, e = not b, g = val e, b = val o, n = val q,\nvariables: o f q h e g b n\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 0 n n n n n n], [n 0 n 0 n n n n], [n 0 1 0 n n n n], [n 0 1 0 n n n 1], [0 0 1 0 n n n 1], [0 0 1 0 n n 0 1], [0 0 1 0 1 n 0 1], [0 0 1 0 1 1 0 1] | [0 0 1 0 1 1 0 1]",
+    "final_values": [
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "o",
+      "f",
+      "q",
+      "h",
+      "e",
+      "g",
+      "b",
+      "n"
+    ],
+    "dependency_order": [
+      "f",
+      "h",
+      "q",
+      "n",
+      "o",
+      "b",
+      "e",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: e = not o, c = val 1, t = val e, f = val t, d = val y, h = val d, y = val c, o = val h,\nvariables: e c t f d h y o\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n n n n 1 n], [n 1 n n 1 n 1 n], [n 1 n n 1 1 1 n], [n 1 n n 1 1 1 1], [0 1 n n 1 1 1 1], [0 1 0 n 1 1 1 1], [0 1 0 0 1 1 1 1] | [0 1 0 0 1 1 1 1]",
+    "final_values": [
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "e",
+      "c",
+      "t",
+      "f",
+      "d",
+      "h",
+      "y",
+      "o"
+    ],
+    "dependency_order": [
+      "c",
+      "y",
+      "d",
+      "h",
+      "o",
+      "e",
+      "t",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: l = val 1, w = not t, n = val s, i = val q, s = not i, q = not p, p = not w, t = val l,\nvariables: l w n i s q p t\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 n n n n n n 1], [1 0 n n n n n 1], [1 0 n n n n 1 1], [1 0 n n n 0 1 1], [1 0 n 0 n 0 1 1], [1 0 n 0 1 0 1 1], [1 0 1 0 1 0 1 1] | [1 0 1 0 1 0 1 1]",
+    "final_values": [
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "l",
+      "w",
+      "n",
+      "i",
+      "s",
+      "q",
+      "p",
+      "t"
+    ],
+    "dependency_order": [
+      "l",
+      "t",
+      "w",
+      "p",
+      "q",
+      "i",
+      "s",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: p = val q, s = not k, c = not i, g = val 1, k = not p, q = val g, f = not c, i = val s,\nvariables: p s c g k q f i\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [n n n 1 n 1 n n], [1 n n 1 n 1 n n], [1 n n 1 0 1 n n], [1 1 n 1 0 1 n n], [1 1 n 1 0 1 n 1], [1 1 0 1 0 1 n 1], [1 1 0 1 0 1 1 1] | [1 1 0 1 0 1 1 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "p",
+      "s",
+      "c",
+      "g",
+      "k",
+      "q",
+      "f",
+      "i"
+    ],
+    "dependency_order": [
+      "g",
+      "q",
+      "p",
+      "k",
+      "s",
+      "i",
+      "c",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: i = val c, b = not l, w = val i, g = not m, m = not w, c = val 1, l = val n, n = not g,\nvariables: i b w g m c l n\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n], [1 n n n n 1 n n], [1 n 1 n n 1 n n], [1 n 1 n 0 1 n n], [1 n 1 1 0 1 n n], [1 n 1 1 0 1 n 0], [1 n 1 1 0 1 0 0], [1 1 1 1 0 1 0 0] | [1 1 1 1 0 1 0 0]",
+    "final_values": [
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "i",
+      "b",
+      "w",
+      "g",
+      "m",
+      "c",
+      "l",
+      "n"
+    ],
+    "dependency_order": [
+      "c",
+      "i",
+      "w",
+      "m",
+      "g",
+      "n",
+      "l",
+      "b"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: c = val e, u = not w, w = not i, z = val u, f = not c, i = val 1, t = not z, e = not t,\nvariables: c u w z f i t e\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n], [n n 0 n n 1 n n], [n 1 0 n n 1 n n], [n 1 0 1 n 1 n n], [n 1 0 1 n 1 0 n], [n 1 0 1 n 1 0 1], [1 1 0 1 n 1 0 1], [1 1 0 1 0 1 0 1] | [1 1 0 1 0 1 0 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "c",
+      "u",
+      "w",
+      "z",
+      "f",
+      "i",
+      "t",
+      "e"
+    ],
+    "dependency_order": [
+      "i",
+      "w",
+      "u",
+      "z",
+      "t",
+      "e",
+      "c",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: t = not q, q = not i, e = not t, i = not z, o = not b, d = not e, b = val 1, z = not o,\nvariables: t q e i o d b z\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n], [n n n n 0 n 1 n], [n n n n 0 n 1 1], [n n n 0 0 n 1 1], [n 1 n 0 0 n 1 1], [0 1 n 0 0 n 1 1], [0 1 1 0 0 n 1 1], [0 1 1 0 0 0 1 1] | [0 1 1 0 0 0 1 1]",
+    "final_values": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "t",
+      "q",
+      "e",
+      "i",
+      "o",
+      "d",
+      "b",
+      "z"
+    ],
+    "dependency_order": [
+      "b",
+      "o",
+      "z",
+      "i",
+      "q",
+      "t",
+      "e",
+      "d"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: w = val c, q = not e, z = not q, j = not i, e = val 0, f = not j, i = val z, c = val f,\nvariables: w q z j e f i c\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n], [n 1 n n 0 n n n], [n 1 0 n 0 n n n], [n 1 0 n 0 n 0 n], [n 1 0 1 0 n 0 n], [n 1 0 1 0 0 0 n], [n 1 0 1 0 0 0 0], [0 1 0 1 0 0 0 0] | [0 1 0 1 0 0 0 0]",
+    "final_values": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "w",
+      "q",
+      "z",
+      "j",
+      "e",
+      "f",
+      "i",
+      "c"
+    ],
+    "dependency_order": [
+      "e",
+      "q",
+      "z",
+      "i",
+      "j",
+      "f",
+      "c",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: r = val 0, d = not f, f = not h, g = val e, h = val w, w = val g, p = val r, e = not p,\nvariables: r d f g h w p e\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[0 n n n n n n n], [0 n n n n n 0 n], [0 n n n n n 0 1], [0 n n 1 n n 0 1], [0 n n 1 n 1 0 1], [0 n n 1 1 1 0 1], [0 n 0 1 1 1 0 1], [0 1 0 1 1 1 0 1] | [0 1 0 1 1 1 0 1]",
+    "final_values": [
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "r",
+      "d",
+      "f",
+      "g",
+      "h",
+      "w",
+      "p",
+      "e"
+    ],
+    "dependency_order": [
+      "r",
+      "p",
+      "e",
+      "g",
+      "w",
+      "h",
+      "f",
+      "d"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: w = val 1, t = val y, g = val s, y = not f, f = not g, s = not h, i = val w, h = val i,\nvariables: w t g y f s i h\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 n n n n n 1 n], [1 n n n n n 1 1], [1 n n n n 0 1 1], [1 n 0 n n 0 1 1], [1 n 0 n 1 0 1 1], [1 n 0 0 1 0 1 1], [1 0 0 0 1 0 1 1] | [1 0 0 0 1 0 1 1]",
+    "final_values": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "w",
+      "t",
+      "g",
+      "y",
+      "f",
+      "s",
+      "i",
+      "h"
+    ],
+    "dependency_order": [
+      "w",
+      "i",
+      "h",
+      "s",
+      "g",
+      "f",
+      "y",
+      "t"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: y = val l, n = not s, c = val n, d = val v, v = val y, k = val c, s = val 0, l = not k,\nvariables: y n c d v k s l\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n], [n 1 n n n n 0 n], [n 1 1 n n n 0 n], [n 1 1 n n 1 0 n], [n 1 1 n n 1 0 0], [0 1 1 n n 1 0 0], [0 1 1 n 0 1 0 0], [0 1 1 0 0 1 0 0] | [0 1 1 0 0 1 0 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "y",
+      "n",
+      "c",
+      "d",
+      "v",
+      "k",
+      "s",
+      "l"
+    ],
+    "dependency_order": [
+      "s",
+      "n",
+      "c",
+      "k",
+      "l",
+      "y",
+      "v",
+      "d"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: s = val g, x = not v, v = not a, n = val 1, a = not s, g = not q, f = not n, q = val f,\nvariables: s x v n a g f q\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [n n n 1 n n 0 n], [n n n 1 n n 0 0], [n n n 1 n 1 0 0], [1 n n 1 n 1 0 0], [1 n n 1 0 1 0 0], [1 n 1 1 0 1 0 0], [1 0 1 1 0 1 0 0] | [1 0 1 1 0 1 0 0]",
+    "final_values": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "s",
+      "x",
+      "v",
+      "n",
+      "a",
+      "g",
+      "f",
+      "q"
+    ],
+    "dependency_order": [
+      "n",
+      "f",
+      "q",
+      "g",
+      "s",
+      "a",
+      "v",
+      "x"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: s = not n, c = not g, n = not w, h = val c, g = val 1, w = not h, z = val s, f = not z,\nvariables: s c n h g w z f\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 1 n n n], [n 0 n n 1 n n n], [n 0 n 0 1 n n n], [n 0 n 0 1 1 n n], [n 0 0 0 1 1 n n], [1 0 0 0 1 1 n n], [1 0 0 0 1 1 1 n], [1 0 0 0 1 1 1 0] | [1 0 0 0 1 1 1 0]",
+    "final_values": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "s",
+      "c",
+      "n",
+      "h",
+      "g",
+      "w",
+      "z",
+      "f"
+    ],
+    "dependency_order": [
+      "g",
+      "c",
+      "h",
+      "w",
+      "n",
+      "s",
+      "z",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: k = val t, t = val q, s = val e, g = not s, j = not k, q = val g, e = val l, l = val 1,\nvariables: k t s g j q e l\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 1], [n n n n n n 1 1], [n n 1 n n n 1 1], [n n 1 0 n n 1 1], [n n 1 0 n 0 1 1], [n 0 1 0 n 0 1 1], [0 0 1 0 n 0 1 1], [0 0 1 0 1 0 1 1] | [0 0 1 0 1 0 1 1]",
+    "final_values": [
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "k",
+      "t",
+      "s",
+      "g",
+      "j",
+      "q",
+      "e",
+      "l"
+    ],
+    "dependency_order": [
+      "l",
+      "e",
+      "s",
+      "g",
+      "q",
+      "t",
+      "k",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: y = not l, h = not y, z = val r, n = val 0, r = not e, e = val j, j = not h, l = not n,\nvariables: y h z n r e j l\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n], [n n n 0 n n n 1], [0 n n 0 n n n 1], [0 1 n 0 n n n 1], [0 1 n 0 n n 0 1], [0 1 n 0 n 0 0 1], [0 1 n 0 1 0 0 1], [0 1 1 0 1 0 0 1] | [0 1 1 0 1 0 0 1]",
+    "final_values": [
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "y",
+      "h",
+      "z",
+      "n",
+      "r",
+      "e",
+      "j",
+      "l"
+    ],
+    "dependency_order": [
+      "n",
+      "l",
+      "y",
+      "h",
+      "j",
+      "e",
+      "r",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: x = not v, t = val x, v = val u, q = val t, n = val 0, l = not q, b = not n, u = val b,\nvariables: x t v q n l b u\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n], [n n n n 0 n 1 n], [n n n n 0 n 1 1], [n n 1 n 0 n 1 1], [0 n 1 n 0 n 1 1], [0 0 1 n 0 n 1 1], [0 0 1 0 0 n 1 1], [0 0 1 0 0 1 1 1] | [0 0 1 0 0 1 1 1]",
+    "final_values": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "x",
+      "t",
+      "v",
+      "q",
+      "n",
+      "l",
+      "b",
+      "u"
+    ],
+    "dependency_order": [
+      "n",
+      "b",
+      "u",
+      "v",
+      "x",
+      "t",
+      "q",
+      "l"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: o = not a, r = val s, w = val 0, b = not o, s = not y, a = val z, y = not b, z = not w,\nvariables: o r w b s a y z\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 0 n n n n n], [n n 0 n n n n 1], [n n 0 n n 1 n 1], [0 n 0 n n 1 n 1], [0 n 0 1 n 1 n 1], [0 n 0 1 n 1 0 1], [0 n 0 1 1 1 0 1], [0 1 0 1 1 1 0 1] | [0 1 0 1 1 1 0 1]",
+    "final_values": [
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "o",
+      "r",
+      "w",
+      "b",
+      "s",
+      "a",
+      "y",
+      "z"
+    ],
+    "dependency_order": [
+      "w",
+      "z",
+      "a",
+      "o",
+      "b",
+      "y",
+      "s",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: k = not l, x = val 0, r = val a, l = val x, a = not k, w = val m, m = not r, n = val w,\nvariables: k x r l a w m n\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 0 n n n n n n], [n 0 n 0 n n n n], [1 0 n 0 n n n n], [1 0 n 0 0 n n n], [1 0 0 0 0 n n n], [1 0 0 0 0 n 1 n], [1 0 0 0 0 1 1 n], [1 0 0 0 0 1 1 1] | [1 0 0 0 0 1 1 1]",
+    "final_values": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "k",
+      "x",
+      "r",
+      "l",
+      "a",
+      "w",
+      "m",
+      "n"
+    ],
+    "dependency_order": [
+      "x",
+      "l",
+      "k",
+      "a",
+      "r",
+      "m",
+      "w",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: a = not d, n = val o, o = val a, d = val j, w = not h, h = not b, j = val 1, b = not n,\nvariables: a n o d w h j b\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n], [n n n 1 n n 1 n], [0 n n 1 n n 1 n], [0 n 0 1 n n 1 n], [0 0 0 1 n n 1 n], [0 0 0 1 n n 1 1], [0 0 0 1 n 0 1 1], [0 0 0 1 1 0 1 1] | [0 0 0 1 1 0 1 1]",
+    "final_values": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "a",
+      "n",
+      "o",
+      "d",
+      "w",
+      "h",
+      "j",
+      "b"
+    ],
+    "dependency_order": [
+      "j",
+      "d",
+      "a",
+      "o",
+      "n",
+      "b",
+      "h",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: m = not a, f = val 1, a = not d, s = not y, c = val s, y = val f, d = val t, t = val c,\nvariables: m f a s c y d t\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n], [n 1 n n n 1 n n], [n 1 n 0 n 1 n n], [n 1 n 0 0 1 n n], [n 1 n 0 0 1 n 0], [n 1 n 0 0 1 0 0], [n 1 1 0 0 1 0 0], [0 1 1 0 0 1 0 0] | [0 1 1 0 0 1 0 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "m",
+      "f",
+      "a",
+      "s",
+      "c",
+      "y",
+      "d",
+      "t"
+    ],
+    "dependency_order": [
+      "f",
+      "y",
+      "s",
+      "c",
+      "t",
+      "d",
+      "a",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: q = val 1, r = not m, y = not r, z = not o, m = not k, o = not y, a = not z, k = not q,\nvariables: q r y z m o a k\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 n n n n n n 0], [1 n n n 1 n n 0], [1 0 n n 1 n n 0], [1 0 1 n 1 n n 0], [1 0 1 n 1 0 n 0], [1 0 1 1 1 0 n 0], [1 0 1 1 1 0 0 0] | [1 0 1 1 1 0 0 0]",
+    "final_values": [
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "q",
+      "r",
+      "y",
+      "z",
+      "m",
+      "o",
+      "a",
+      "k"
+    ],
+    "dependency_order": [
+      "q",
+      "k",
+      "m",
+      "r",
+      "y",
+      "o",
+      "z",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: u = val 1, y = not j, c = val y, t = not c, j = val o, d = val t, g = not d, o = val u,\nvariables: u y c t j d g o\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n], [1 n n n n n n 1], [1 n n n 1 n n 1], [1 0 n n 1 n n 1], [1 0 0 n 1 n n 1], [1 0 0 1 1 n n 1], [1 0 0 1 1 1 n 1], [1 0 0 1 1 1 0 1] | [1 0 0 1 1 1 0 1]",
+    "final_values": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "u",
+      "y",
+      "c",
+      "t",
+      "j",
+      "d",
+      "g",
+      "o"
+    ],
+    "dependency_order": [
+      "u",
+      "o",
+      "j",
+      "y",
+      "c",
+      "t",
+      "d",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: f = val c, g = not o, c = not e, b = val i, e = not g, i = val 1, m = val f, o = val b,\nvariables: f g c b e i m o\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n], [n n n 1 n 1 n n], [n n n 1 n 1 n 1], [n 0 n 1 n 1 n 1], [n 0 n 1 1 1 n 1], [n 0 0 1 1 1 n 1], [0 0 0 1 1 1 n 1], [0 0 0 1 1 1 0 1] | [0 0 0 1 1 1 0 1]",
+    "final_values": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "f",
+      "g",
+      "c",
+      "b",
+      "e",
+      "i",
+      "m",
+      "o"
+    ],
+    "dependency_order": [
+      "i",
+      "b",
+      "o",
+      "g",
+      "e",
+      "c",
+      "f",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: f = not c, t = val f, u = val z, z = not b, c = val 1, b = not v, i = val u, v = not t,\nvariables: f t u z c b i v\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 1 n n n], [0 n n n 1 n n n], [0 0 n n 1 n n n], [0 0 n n 1 n n 1], [0 0 n n 1 0 n 1], [0 0 n 1 1 0 n 1], [0 0 1 1 1 0 n 1], [0 0 1 1 1 0 1 1] | [0 0 1 1 1 0 1 1]",
+    "final_values": [
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "f",
+      "t",
+      "u",
+      "z",
+      "c",
+      "b",
+      "i",
+      "v"
+    ],
+    "dependency_order": [
+      "c",
+      "f",
+      "t",
+      "v",
+      "b",
+      "z",
+      "u",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: s = val w, t = val a, j = not s, f = val j, c = val 1, i = val t, a = val c, w = val i,\nvariables: s t j f c i a w\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 1 n n n], [n n n n 1 n 1 n], [n 1 n n 1 n 1 n], [n 1 n n 1 1 1 n], [n 1 n n 1 1 1 1], [1 1 n n 1 1 1 1], [1 1 0 n 1 1 1 1], [1 1 0 0 1 1 1 1] | [1 1 0 0 1 1 1 1]",
+    "final_values": [
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "s",
+      "t",
+      "j",
+      "f",
+      "c",
+      "i",
+      "a",
+      "w"
+    ],
+    "dependency_order": [
+      "c",
+      "a",
+      "t",
+      "i",
+      "w",
+      "s",
+      "j",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: p = val 0, b = not d, v = val p, f = not b, s = val o, u = val s, o = val f, d = val v,\nvariables: p b v f s u o d\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[0 n n n n n n n], [0 n 0 n n n n n], [0 n 0 n n n n 0], [0 1 0 n n n n 0], [0 1 0 0 n n n 0], [0 1 0 0 n n 0 0], [0 1 0 0 0 n 0 0], [0 1 0 0 0 0 0 0] | [0 1 0 0 0 0 0 0]",
+    "final_values": [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "p",
+      "b",
+      "v",
+      "f",
+      "s",
+      "u",
+      "o",
+      "d"
+    ],
+    "dependency_order": [
+      "p",
+      "v",
+      "d",
+      "b",
+      "f",
+      "o",
+      "s",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nsequence: i = not k, k = not z, g = val o, f = val 1, j = val i, a = val f, o = not j, z = not a,\nvariables: i k g f j a o z\ninitial_trace: [n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n], [n n n 1 n 1 n n], [n n n 1 n 1 n 0], [n 1 n 1 n 1 n 0], [0 1 n 1 n 1 n 0], [0 1 n 1 0 1 n 0], [0 1 n 1 0 1 1 0], [0 1 1 1 0 1 1 0] | [0 1 1 1 0 1 1 0]",
+    "final_values": [
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "i",
+      "k",
+      "g",
+      "f",
+      "j",
+      "a",
+      "o",
+      "z"
+    ],
+    "dependency_order": [
+      "f",
+      "a",
+      "z",
+      "k",
+      "i",
+      "j",
+      "o",
+      "g"
+    ]
+  }
+]

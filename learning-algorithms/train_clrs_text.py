@@ -1,15 +1,17 @@
 import argparse
 import logging
+import math
 import os
 import wandb
 
-from src.custom.clrs_text_task_data_module import TextCLRSDataModule
+from src.custom.clrs_text_task_data_module import TextCLRSDataModule, build_causal_lm_instruction_batch
 from src.custom.clrs_text_task_graph_data_module import TextGraphCLRSDataModule
 
 from src.custom.multitask_model import MultitaskModel
 from src.custom.gradient_reweight_multitask_model import GradientNormReweightMultitaskModel
 from src.custom.noise_injection_multitask_model import NoiseInjectionMultitaskModel
 from src.custom.self_training_multitask_model import SelfTrainingMultitaskModel
+from src.custom.coconut_multitask_model import CoconutMultitaskModel
 from src.model.GraphLlama import GraphLlamaForCausalLM
 from src.model.gnn_models.config import load_cfg
 from src.model.projectors import create_intrinsic_model
@@ -116,6 +118,180 @@ def validate_quant_args(args):
         raise ValueError("--quant_modules must name at least one module in full QAT mode")
 
 
+def validate_implicit_cot_args(args):
+    if not args.implicit_cot:
+        return
+
+    if args.use_graph_llama:
+        raise ValueError("--implicit_cot is not yet supported with --use_graph_llama")
+
+    if args.steps_reduction_to_zero < 0:
+        raise ValueError("--steps_reduction_to_zero must be non-negative")
+
+
+def validate_coconut_args(args, model_type=None):
+    if not args.use_coconut:
+        return
+
+    if args.use_graph_llama:
+        raise ValueError("--use_coconut is not yet supported with --use_graph_llama")
+    if args.implicit_cot:
+        raise ValueError("--use_coconut is incompatible with --implicit_cot")
+    if args.use_reweight or args.use_noise_injection or args.use_self_training:
+        raise ValueError("--use_coconut is not yet compatible with reweight/noise/self-training trainer modes")
+    if args.train_adapter or args.use_qadapter:
+        raise ValueError("--use_coconut is not yet compatible with adapter training")
+    if args.coconut_steps_to_full_latent < 0:
+        raise ValueError("--coconut_steps_to_full_latent must be non-negative")
+    if args.coconut_latents_per_step < 0:
+        raise ValueError("--coconut_latents_per_step must be non-negative")
+    if args.coconut_eval_latent_thoughts < 0:
+        raise ValueError("--use_coconut requires --coconut_eval_latent_thoughts >= 0 for Coconut validation/generation")
+    if args.coconut_bot_token == args.coconut_eot_token:
+        raise ValueError("--coconut_bot_token and --coconut_eot_token must be different")
+    if model_type is not None and model_type != "decoder":
+        raise ValueError("--use_coconut only supports decoder-only causal language models")
+
+
+def configure_coconut_special_tokens(model, tokenizer, args):
+    if not args.use_coconut:
+        return
+
+    special_tokens = [args.coconut_bot_token, args.coconut_eot_token]
+    added = tokenizer.add_special_tokens({"additional_special_tokens": special_tokens})
+    if added > 0:
+        model.resize_token_embeddings(len(tokenizer))
+        print(f"[Coconut] Added {added} special tokens and resized embeddings to {len(tokenizer)}")
+    else:
+        print("[Coconut] Special tokens already registered")
+
+
+def coconut_modules_to_save(args):
+    return ["embed_tokens", "wte", "lm_head"] if args.use_coconut else []
+
+
+def build_implicit_cot_output(answer, reduction_fraction):
+    answer_parts = answer.split("|")
+    final_answer = answer_parts[-1].strip()
+    if len(answer_parts) == 1:
+        return final_answer
+
+    step_text = answer_parts[0].strip()
+    steps = [step.strip() for step in step_text.split(",") if step.strip()]
+    if len(steps) == 0:
+        return final_answer
+
+    num_steps_to_remove = int(math.floor(reduction_fraction * len(steps)))
+    num_steps_to_remove = min(max(num_steps_to_remove, 0), len(steps))
+    remaining_steps = steps[num_steps_to_remove:]
+    if len(remaining_steps) == 0:
+        return final_answer
+
+    return ", ".join(remaining_steps) + " | " + final_answer
+
+
+class ImplicitCoTCurriculumCallback(pl.Callback):
+    def __init__(
+        self,
+        tokenizer,
+        max_source_length,
+        max_target_length,
+        steps_reduction_to_zero,
+        total_optimizer_steps,
+        log_every_n_steps=50,
+    ):
+        super().__init__()
+        self.tokenizer = tokenizer
+        self.max_source_length = max_source_length
+        self.max_target_length = max_target_length
+        self.steps_reduction_to_zero = max(1, int(steps_reduction_to_zero))
+        self.total_optimizer_steps = int(total_optimizer_steps)
+        self.log_every_n_steps = max(1, int(log_every_n_steps))
+        self._last_printed_step = None
+
+    def _schedule(self, global_step):
+        if self.steps_reduction_to_zero <= 1:
+            progress = 1.0
+        else:
+            progress = min(global_step / float(self.steps_reduction_to_zero - 1), 1.0)
+        lambda_keep = 1.0 - progress
+        return lambda_keep, progress
+
+    def on_train_start(self, trainer, pl_module):
+        print(
+            "[ImplicitCoT] enabled: "
+            f"total_optimizer_steps={self.total_optimizer_steps}, "
+            f"steps_reduction_to_zero={self.steps_reduction_to_zero}"
+        )
+
+    def on_train_batch_start(self, trainer, pl_module, batch, batch_idx):
+        if "data" not in batch:
+            raise KeyError("Implicit CoT expected multitask batch with a `data` field.")
+
+        batch_data = batch["data"]
+        if "raw_inputs" not in batch_data or "raw_answers" not in batch_data:
+            raise KeyError(
+                "Implicit CoT requires `raw_inputs` and `raw_answers` from the text collator."
+            )
+
+        global_step = trainer.global_step
+        lambda_keep, reduction_fraction = self._schedule(global_step)
+        converted_batch = []
+        for input_text, answer_text in zip(batch_data["raw_inputs"], batch_data["raw_answers"]):
+            converted_batch.append({
+                "input": input_text,
+                "output": build_implicit_cot_output(answer_text, reduction_fraction),
+            })
+
+        rebuilt_batch = build_causal_lm_instruction_batch(
+            self.tokenizer,
+            converted_batch,
+            padding="max_length",
+            max_source_length=self.max_source_length,
+            max_target_length=self.max_target_length,
+            label_pad_token_id=-100,
+            return_tensors="pt",
+        )
+
+        device = batch_data["input_ids"].device
+        for key in ["input_ids", "attention_mask", "labels"]:
+            batch_data[key] = rebuilt_batch[key].to(device)
+        batch_data["raw_outputs"] = rebuilt_batch["raw_outputs"]
+
+        pl_module.log("implicit_cot_lambda", lambda_keep, on_step=True, on_epoch=False, prog_bar=False)
+        pl_module.log("implicit_cot_reduction_fraction", reduction_fraction, on_step=True, on_epoch=False, prog_bar=False)
+
+        should_print = (
+            global_step == 0
+            or global_step >= self.steps_reduction_to_zero
+            or global_step % self.log_every_n_steps == 0
+        )
+        if should_print and self._last_printed_step != global_step:
+            print(
+                "[ImplicitCoT] "
+                f"global_step={global_step}, lambda={lambda_keep:.4f}, "
+                f"reduction_fraction={reduction_fraction:.4f}"
+            )
+            self._last_printed_step = global_step
+
+
+def count_training_devices(devices):
+    if isinstance(devices, (list, tuple)):
+        return max(1, len(devices))
+    if isinstance(devices, int):
+        return max(1, devices)
+    return 1
+
+
+def calculate_total_optimizer_steps(data_module, args):
+    train_batches_per_epoch = len(data_module.train_dataloader())
+    num_devices = count_training_devices(args.devices)
+    train_batches_per_device = int(math.ceil(train_batches_per_epoch / float(num_devices)))
+    optimizer_steps_per_epoch = int(math.ceil(train_batches_per_device / float(max(1, args.accumulate))))
+    total_optimizer_steps = optimizer_steps_per_epoch * max(0, args.epochs)
+    return train_batches_per_epoch, train_batches_per_device, optimizer_steps_per_epoch, total_optimizer_steps
+
+
 def add_gaussian_noise_to_weights(model, std=0.01, only_lora=False):
     """
     Add Gaussian noise to trainable parameters of the model.
@@ -210,6 +386,8 @@ def initialize_model(args):
         append_eos = True
     else:
         raise NotImplementedError(args.model_key)
+
+    configure_coconut_special_tokens(model, tokenizer, args)
 
     if args.use_quant and args.quant_training_mode == "full":
         replaced = apply_quant_full_model_quantization(
@@ -312,7 +490,7 @@ def initialize_model(args):
                 target_modules=["c_attn", "c_proj", "c_fc"],
                 lora_dropout=0.1,
                 bias="lora_only",
-                modules_to_save=[],
+                modules_to_save=coconut_modules_to_save(args),
             )
         elif args.model_key == "EleutherAI/gpt-neox-20b":
             config = LoraConfig(
@@ -321,7 +499,7 @@ def initialize_model(args):
                 target_modules=["query_key_value"],
                 lora_dropout=0.1,
                 bias="lora_only",
-                modules_to_save=[],
+                modules_to_save=coconut_modules_to_save(args),
             )
         elif "flan" in args.model_key:
             config = LoraConfig(
@@ -330,7 +508,7 @@ def initialize_model(args):
                 target_modules=["q", "k", "v"],
                 lora_dropout=0.1,
                 bias="lora_only",
-                modules_to_save=[],
+                modules_to_save=coconut_modules_to_save(args),
             )
         else:
             config = LoraConfig(
@@ -339,7 +517,7 @@ def initialize_model(args):
                 target_modules=["q_proj", "k_proj", "v_proj"],
                 lora_dropout=0.1,
                 bias="lora_only",
-                modules_to_save=[],
+                modules_to_save=coconut_modules_to_save(args),
             )
         model = get_peft_model(model, config)
         if args.use_quant and args.quant_training_mode == "lora":
@@ -359,6 +537,14 @@ def initialize_model(args):
                     p.requires_grad = True
 
         model.print_trainable_parameters()
+
+    if args.use_forward_noise_injection:
+        from src.quantization import apply_noise_injection_to_lora, apply_noise_injection_to_all_trainable
+        if args.forward_noise_lora_only:
+            apply_noise_injection_to_lora(model, args.forward_noise_std)
+        else:
+            apply_noise_injection_to_all_trainable(model, args.forward_noise_std)
+        print(f"[NoiseInjection] Forward pass noise injection enabled (std={args.forward_noise_std})")
 
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -419,10 +605,22 @@ if __name__ == "__main__":
     parser.add_argument("--eval_step_num", type=int, default=0) # number of intermediate steps to evaluate (0 means only final, N means first N steps + final)
     parser.add_argument("--reduce_steps_ratio", type=float, default=1.0) # ratio to reduce the number of intermediate steps
     parser.add_argument("--reduce_steps_equally_spaced", action="store_true") # reduce intermediate steps using evenly spaced positions instead of random sampling
+    parser.add_argument("--implicit_cot", action="store_true") # gradually remove leading intermediate steps during training
+    parser.add_argument("--steps_reduction_to_zero", type=int, default=0) # optimizer steps used to reduce lambda from 1 to 0; 0 means full training run
+    parser.add_argument("--use_coconut", action="store_true") # train with Chain of Continuous Thought latent reasoning
+    parser.add_argument("--coconut_steps_to_full_latent", type=int, default=0) # optimizer steps used to replace all reasoning steps with latent thoughts; 0 means full training run
+    parser.add_argument("--coconut_latents_per_step", type=int, default=1) # continuous thoughts inserted per removed language reasoning step
+    parser.add_argument("--coconut_eval_latent_thoughts", type=int, default=-1) # explicit number of latent thoughts for Coconut generation
+    parser.add_argument("--coconut_bot_token", type=str, default="<bot>")
+    parser.add_argument("--coconut_eot_token", type=str, default="<eot>")
     parser.add_argument("--eval_test_during_fit", action="store_true") # evaluate test split during each fit validation epoch
 
     parser.add_argument("--add_weight_perturb", action="store_true") # add Gaussian noise to model weights
     parser.add_argument("--perturb_std", type=float, default=0.01) # standard deviation of Gaussian noise for weight perturbation
+
+    parser.add_argument("--use_forward_noise_injection", action="store_true")  # inject noise during forward pass
+    parser.add_argument("--forward_noise_std", type=float, default=0.01)  # std of forward noise
+    parser.add_argument("--forward_noise_lora_only", action="store_true")  # apply noise only to LoRA layers
 
     parser.add_argument("--use_graph_llama", action="store_true")
     parser.add_argument("--only_train_graph", action="store_true") # pretraining gnn 
@@ -473,6 +671,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     validate_quant_args(args)
+    validate_implicit_cot_args(args)
+    validate_coconut_args(args)
     args.enable_checkpointing = not args.disable_checkpointing
     print("arguments".upper().center(80, "-"))
     print(args)
@@ -486,6 +686,8 @@ if __name__ == "__main__":
                 (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
                 (f"_quant_{args.quant_training_mode}_{args.quant_w_bits}bit" if args.use_quant else "") + \
                 (f"_use_only_answer_output" if args.only_answer_output else "") + \
+                (f"_implicit_cot" if args.implicit_cot else "") + \
+                (f"_coconut_latent_{args.coconut_eval_latent_thoughts}" if args.use_coconut else "") + \
                 (f"_eq_steps" if args.reduce_steps_equally_spaced else "")
     file_dir = os.path.join("./results/", save_name)
     if not os.path.exists(file_dir):
@@ -499,6 +701,8 @@ if __name__ == "__main__":
                 (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
                 (f"_quant_{args.quant_training_mode}_{args.quant_w_bits}bit" if args.use_quant else "") + \
                 (f"_use_only_answer_output" if args.only_answer_output else "") + \
+                (f"_implicit_cot" if args.implicit_cot else "") + \
+                (f"_coconut_latent_{args.coconut_eval_latent_thoughts}" if args.use_coconut else "") + \
                 (f"_eq_steps" if args.reduce_steps_equally_spaced else "")
     # Remove leading underscore if present
     wandb_name_base = wandb_name_base.lstrip("_")
@@ -515,6 +719,7 @@ if __name__ == "__main__":
                 reinit=True,
             )
         model, tokenizer, hf_key, model_type, append_eos = initialize_model(args)
+        validate_coconut_args(args, model_type=model_type)
 
         batch_size = args.batch_size
         if args.inference_batch_size is None:
@@ -557,11 +762,49 @@ if __name__ == "__main__":
                     test_lengths=args.test_lengths,
                     use_few_shot=(args.few_shot_k > 0), 
                     few_shot_k=args.few_shot_k,
-                    only_answer_output=args.only_answer_output,
+                    only_answer_output=(args.only_answer_output or args.implicit_cot or args.use_coconut),
                     reduce_steps_ratio=args.reduce_steps_ratio,
                     reduce_steps_equally_spaced=args.reduce_steps_equally_spaced,
                     eval_test_during_fit=args.eval_test_during_fit)
         data_module.setup(stage="fit")
+        implicit_cot_total_optimizer_steps = None
+        if args.implicit_cot:
+            (
+                train_batches_per_epoch,
+                train_batches_per_device,
+                optimizer_steps_per_epoch,
+                implicit_cot_total_optimizer_steps,
+            ) = calculate_total_optimizer_steps(data_module, args)
+            if args.steps_reduction_to_zero == 0:
+                args.steps_reduction_to_zero = max(1, implicit_cot_total_optimizer_steps)
+            print(
+                "[ImplicitCoT] step accounting: "
+                f"train_batches_per_epoch={train_batches_per_epoch}, "
+                f"train_batches_per_device={train_batches_per_device}, "
+                f"optimizer_steps_per_epoch={optimizer_steps_per_epoch}, "
+                f"total_optimizer_steps={implicit_cot_total_optimizer_steps}, "
+                f"steps_reduction_to_zero={args.steps_reduction_to_zero}"
+            )
+        coconut_total_optimizer_steps = None
+        if args.use_coconut:
+            (
+                train_batches_per_epoch,
+                train_batches_per_device,
+                optimizer_steps_per_epoch,
+                coconut_total_optimizer_steps,
+            ) = calculate_total_optimizer_steps(data_module, args)
+            if args.coconut_steps_to_full_latent == 0:
+                args.coconut_steps_to_full_latent = max(1, coconut_total_optimizer_steps)
+            print(
+                "[Coconut] step accounting: "
+                f"train_batches_per_epoch={train_batches_per_epoch}, "
+                f"train_batches_per_device={train_batches_per_device}, "
+                f"optimizer_steps_per_epoch={optimizer_steps_per_epoch}, "
+                f"total_optimizer_steps={coconut_total_optimizer_steps}, "
+                f"coconut_steps_to_full_latent={args.coconut_steps_to_full_latent}, "
+                f"coconut_latents_per_step={args.coconut_latents_per_step}, "
+                f"coconut_eval_latent_thoughts={args.coconut_eval_latent_thoughts}"
+            )
         # for name, param in model.named_parameters():
         #     if param.requires_grad:
         #         print(name, param.shape)
@@ -569,7 +812,9 @@ if __name__ == "__main__":
         extended_task_names = [f"{task_name}" for task_name in args.task_names]
         
         # Select trainer class based on arguments
-        if args.use_self_training:
+        if args.use_coconut:
+            trainer_cls = CoconutMultitaskModel
+        elif args.use_self_training:
             trainer_cls = SelfTrainingMultitaskModel
         elif args.use_reweight:
             trainer_cls = GradientNormReweightMultitaskModel
@@ -609,6 +854,15 @@ if __name__ == "__main__":
                 "use_self_training": True,
                 "self_train_n_samples": args.self_train_n_samples,
                 "self_train_temperature": args.self_train_temperature,
+            })
+
+        if args.use_coconut:
+            trainer_kwargs.update({
+                "coconut_steps_to_full_latent": args.coconut_steps_to_full_latent,
+                "coconut_latents_per_step": args.coconut_latents_per_step,
+                "coconut_eval_latent_thoughts": args.coconut_eval_latent_thoughts,
+                "coconut_bot_token": args.coconut_bot_token,
+                "coconut_eot_token": args.coconut_eot_token,
             })
 
         # Add reweight flag only for SelfTrainingMultitaskModel (它的构造函数才有 use_reweight)
@@ -668,6 +922,15 @@ if __name__ == "__main__":
                         "use_self_training": True,
                         "self_train_n_samples": args.self_train_n_samples,
                         "self_train_temperature": args.self_train_temperature,
+                    })
+
+                if args.use_coconut:
+                    checkpoint_kwargs.update({
+                        "coconut_steps_to_full_latent": args.coconut_steps_to_full_latent,
+                        "coconut_latents_per_step": args.coconut_latents_per_step,
+                        "coconut_eval_latent_thoughts": args.coconut_eval_latent_thoughts,
+                        "coconut_bot_token": args.coconut_bot_token,
+                        "coconut_eot_token": args.coconut_eot_token,
                     })
 
                 # Add reweight flag only for SelfTrainingMultitaskModel
@@ -753,6 +1016,8 @@ if __name__ == "__main__":
                                         (f"_{args.minimum_samples}") + \
                                         (f"_len_{args.train_lengths}") + \
                                         (f"_use_only_answer_output" if args.only_answer_output else "") + \
+                                        (f"_implicit_cot" if args.implicit_cot else "") + \
+                                        (f"_coconut_latent_{args.coconut_eval_latent_thoughts}" if args.use_coconut else "") + \
                                         (f"_lora_r_{args.lora_rank}" if args.train_lora else "") + \
                                         (f"_quant_{args.quant_training_mode}_{args.quant_w_bits}bit" if args.use_quant else "") + \
                                         (f"_reweight_eta_{args.reweight_eta}" if args.use_reweight else "") + \
@@ -773,6 +1038,16 @@ if __name__ == "__main__":
             mode=monitor_mode,
         )
         callbacks = [checkpoint_callback]
+        if args.implicit_cot:
+            callbacks.append(
+                ImplicitCoTCurriculumCallback(
+                    tokenizer=tokenizer,
+                    max_source_length=args.max_length,
+                    max_target_length=args.max_output_length,
+                    steps_reduction_to_zero=args.steps_reduction_to_zero,
+                    total_optimizer_steps=implicit_cot_total_optimizer_steps,
+                )
+            )
         if args.use_quant and args.quant_reinitialize_steps > 0:
             callbacks.append(
                 QuantReinitializeCallback(
@@ -797,7 +1072,11 @@ if __name__ == "__main__":
                 os.makedirs(default_root_dir)
             model_path = default_root_dir + "/initial_weights.pt"
             state_dict = model.state_dict()
-            state_dict = {k: v.clone() for k, v in state_dict.items() if "lora" in k}
+            state_dict = {
+                k: v.clone()
+                for k, v in state_dict.items()
+                if ("lora" in k or (args.use_coconut and "modules_to_save" in k))
+            }
             torch.save(state_dict, model_path)
 
         start_time = time.time()
@@ -813,7 +1092,11 @@ if __name__ == "__main__":
                 from lightning_fabric.utilities.cloud_io import _load as pl_load
                 checkpoint = pl_load(checkpoint_callback.best_model_path, map_location=lm.device)
                 state_dict = checkpoint["state_dict"]
-                state_dict = {k[6:]: v for k, v in state_dict.items() if "lora" in k}
+                state_dict = {
+                    k[6:]: v
+                    for k, v in state_dict.items()
+                    if ("lora" in k or (args.use_coconut and "modules_to_save" in k))
+                }
                 torch.save(state_dict, checkpoint_callback.best_model_path.replace(".ckpt", ".pt"))
             elif args.train_lora and args.intrinsic_dim > 0:
                 from lightning_fabric.utilities.cloud_io import _load as pl_load
@@ -839,9 +1122,33 @@ if __name__ == "__main__":
                 args.use_3bit or args.use_2bit:                         
                 model, tokenizer, hf_key, model_type, append_eos = initialize_model(args)
                 model.load_state_dict(state_dict, strict=False)
-                lm = MultitaskModel(model, tokenizer, model_type, use_cpu_offload=False,
-                        lr=args.lr, weight_decay=args.weight_decay, max_length=args.max_length, max_output_length=args.max_output_length, use_wandb=args.use_wandb,
-                        optimizer=args.optimizer, generate_output=args.generate_output, task_names=extended_task_names, eval_clrs=args.eval_last_step, eval_step_num=args.eval_step_num)
+                eval_trainer_kwargs = {
+                    "model": model,
+                    "tokenizer": tokenizer,
+                    "model_type": model_type,
+                    "use_cpu_offload": False,
+                    "lr": args.lr,
+                    "weight_decay": args.weight_decay,
+                    "max_length": args.max_length,
+                    "max_output_length": args.max_output_length,
+                    "use_wandb": args.use_wandb,
+                    "optimizer": args.optimizer,
+                    "generate_output": args.generate_output,
+                    "task_names": extended_task_names,
+                    "eval_clrs": args.eval_last_step,
+                    "eval_step_num": args.eval_step_num,
+                }
+                if args.use_coconut:
+                    eval_trainer_kwargs.update({
+                        "coconut_steps_to_full_latent": args.coconut_steps_to_full_latent,
+                        "coconut_latents_per_step": args.coconut_latents_per_step,
+                        "coconut_eval_latent_thoughts": args.coconut_eval_latent_thoughts,
+                        "coconut_bot_token": args.coconut_bot_token,
+                        "coconut_eot_token": args.coconut_eot_token,
+                    })
+                    lm = CoconutMultitaskModel(**eval_trainer_kwargs)
+                else:
+                    lm = MultitaskModel(**eval_trainer_kwargs)
                 
                 if args.use_3bit or args.use_2bit:
                     trainer.validate_loop.trainer_fn = TrainerFn.FITTING

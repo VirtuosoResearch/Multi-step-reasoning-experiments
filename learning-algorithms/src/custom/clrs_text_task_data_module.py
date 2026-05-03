@@ -11,6 +11,81 @@ from datasets import concatenate_datasets, load_dataset
 import torch
 import numpy as np
 
+def build_causal_lm_instruction_batch(
+    tokenizer,
+    converted_batch,
+    padding=True,
+    max_source_length=None,
+    max_target_length=None,
+    label_pad_token_id=-100,
+    return_tensors="pt",
+):
+    # prepare input sources
+    sources = []; source_lengths = []
+    for instance in converted_batch:
+        source = instance["input"]
+        source = source.replace("\n", " ")
+        source = " ".join(source.split())
+        tokenized_source = tokenizer(source)["input_ids"]
+        if len(tokenized_source) <= max_source_length:
+            sources.append(source)
+        else:
+            sources.append(tokenizer.decode(tokenized_source[:max_source_length], skip_special_tokens=True))
+        source_lengths.append(min(len(tokenized_source), max_source_length))
+
+    labels = []; label_lengths = []
+    for instance in converted_batch:
+        label = instance["output"]
+        label = label.replace("\n", " ")
+        label = " ".join(label.split())
+        tokenized_label = tokenizer(label)["input_ids"]
+        if len(tokenized_label) <= max_target_length:
+            labels.append(label)
+        else:
+            labels.append(tokenizer.decode(tokenized_label[:max_target_length], skip_special_tokens=True))
+        label_lengths.append(min(len(tokenized_label), max_target_length))
+
+    inputs = [source + " " + label for source, label in zip(sources, labels)]
+
+    model_inputs = tokenizer(
+            text = inputs,
+            max_length=max_source_length + max_target_length,
+            padding=padding,
+            return_tensors=return_tensors,
+            truncation=True)
+
+    # Lightning calls `.to(device)` on BatchEncoding, which fails once we attach
+    # raw Python lists for logging. Convert to a plain dict so device transfer
+    # recurses over tensor fields and leaves string lists on CPU.
+    model_inputs = dict(model_inputs)
+
+    # prepare labels
+    model_inputs["labels"] = model_inputs["input_ids"].clone()
+    label_mask = model_inputs["attention_mask"].clone().bool()
+    model_inputs["labels"] = model_inputs["labels"].masked_fill(~label_mask, label_pad_token_id)
+    for i, length in enumerate(source_lengths):
+        model_inputs["labels"][i, :length] = label_pad_token_id
+
+    if "weights" in converted_batch[0]:
+        model_inputs["weights"] = torch.Tensor([instance["weights"] for instance in converted_batch])
+
+    if "sample_idx" in converted_batch[0]:
+        model_inputs["sample_idx"] = torch.tensor([instance["sample_idx"] for instance in converted_batch], dtype=torch.long)
+
+    if "residuals" in converted_batch[0]:
+        model_inputs["residuals"] = torch.Tensor([instance["residuals"] for instance in converted_batch])
+
+    if "length" in converted_batch[0]:
+        model_inputs["length"] = torch.tensor([int(instance["length"]) for instance in converted_batch], dtype=torch.long)
+
+    model_inputs["raw_inputs"] = [instance["input"] for instance in converted_batch]
+    if "answer" in converted_batch[0]:
+        model_inputs["raw_answers"] = [instance["answer"] for instance in converted_batch]
+    if "output" in converted_batch[0]:
+        model_inputs["raw_outputs"] = [instance["output"] for instance in converted_batch]
+
+    return model_inputs
+
 @dataclass
 class CasualLMInstructionCollator:
     tokenizer: PreTrainedTokenizerBase
@@ -26,62 +101,15 @@ class CasualLMInstructionCollator:
         if return_tensors is None:
                 return_tensors = self.return_tensors
 
-        converted_batch = batch
-
-        # prepare input sources
-        sources = []; source_lengths = []
-        for instance in converted_batch:
-            source = instance["input"]
-            source = source.replace("\n", " ")
-            source = " ".join(source.split())
-            tokenized_source = self.tokenizer(source)["input_ids"]
-            if len(tokenized_source) <= self.max_source_length:
-                sources.append(source)
-            else:
-                sources.append(self.tokenizer.decode(tokenized_source[:self.max_source_length], skip_special_tokens=True))
-            source_lengths.append(min(len(tokenized_source), self.max_source_length))
-
-        labels = []; label_lengths = []
-        for instance in converted_batch:
-            label = instance["output"]
-            label = label.replace("\n", " ")
-            label = " ".join(label.split())
-            tokenized_label = self.tokenizer(label)["input_ids"]
-            if len(tokenized_label) <= self.max_target_length:
-                labels.append(label)
-            else:
-                labels.append(self.tokenizer.decode(tokenized_label[:self.max_target_length], skip_special_tokens=True))
-            label_lengths.append(min(len(tokenized_label), self.max_target_length))
-
-        inputs = [source + " " + label for source, label in zip(sources, labels)]
-
-        model_inputs = self.tokenizer(
-                text = inputs, 
-                max_length=self.max_source_length + self.max_target_length, 
-                padding=self.padding,
-                return_tensors=self.return_tensors, 
-                truncation=True)
-        
-        # prepare labels
-        model_inputs["labels"] = model_inputs["input_ids"].clone()
-        label_mask = model_inputs["attention_mask"].clone().bool()
-        model_inputs["labels"] = model_inputs["labels"].masked_fill(~label_mask, self.label_pad_token_id)
-        for i, length in enumerate(source_lengths):
-            model_inputs["labels"][i, :length] = self.label_pad_token_id            
-
-        if "weights" in converted_batch[0]:
-            model_inputs["weights"] = torch.Tensor([instance["weights"] for instance in converted_batch])
-
-        if "sample_idx" in converted_batch[0]:
-            model_inputs["sample_idx"] = torch.tensor([instance["sample_idx"] for instance in converted_batch], dtype=torch.long)
-
-        if "residuals" in converted_batch[0]:
-            model_inputs["residuals"] = torch.Tensor([instance["residuals"] for instance in converted_batch])
-
-        if "length" in converted_batch[0]:
-            model_inputs["length"] = torch.tensor([int(instance["length"]) for instance in converted_batch], dtype=torch.long)
-        
-        return model_inputs
+        return build_causal_lm_instruction_batch(
+            self.tokenizer,
+            batch,
+            padding=self.padding,
+            max_source_length=self.max_source_length,
+            max_target_length=self.max_target_length,
+            label_pad_token_id=self.label_pad_token_id,
+            return_tensors=return_tensors,
+        )
 
 def get_length(question):
     start_index = question.find('A:')
@@ -129,7 +157,7 @@ class convert_format:
             return choices[selected_positions]
 
         return np.random.choice(choices, target_num_steps, replace=False)
-        
+
     def __call__(self, examples):
         examples["input"] = examples["question"][:]
         examples["only_answer"] = [answer.split("|")[-1].strip() for answer in examples["answer"]]
@@ -238,17 +266,25 @@ class TextCLRSDataModule(pl.LightningDataModule):
         self.task_to_collators = {}
         self.task_to_templates = {}
         for i, task_name in enumerate(self.task_names):
-            # Check if this is a local dataset task (lego or symmetry)
+            # Check if this is a local dataset task (lego, cyclic, or symmetry)
             is_local_dataset = (task_name == "lego" or task_name.startswith("lego_") or 
+                              task_name == "cyclic" or task_name.startswith("cyclic_") or
+                              task_name == "symmetric" or task_name.startswith("symmetric_") or
                               task_name == "symmetry" or task_name.startswith("symmetry_"))
             
             if is_local_dataset:
                 # Determine dataset directory and file prefix
+                # Map task names to dataset directory and file prefix
                 if task_name == "lego" or task_name.startswith("lego_"):
                     dataset_dir = "lego_dataset"
                     file_prefix = "lego"
                     file_suffix = "_progressive"  # lego uses _progressive suffix
-                elif task_name == "symmetry" or task_name.startswith("symmetry_"):
+                elif task_name == "cyclic" or task_name.startswith("cyclic_"):
+                    dataset_dir = "lego_dataset"  # cyclic examples are in lego_dataset
+                    file_prefix = "lego"
+                    file_suffix = "_progressive"
+                elif task_name == "symmetric" or task_name.startswith("symmetric_") or \
+                     task_name == "symmetry" or task_name.startswith("symmetry_"):
                     dataset_dir = "symmetry_dataset"
                     file_prefix = "symmetry"
                     file_suffix = ""  # symmetry doesn't use suffix
@@ -257,7 +293,7 @@ class TextCLRSDataModule(pl.LightningDataModule):
                 
                 # Load dataset from local JSON files
                 # Note: local datasets have fixed length for all samples, so we skip length filtering
-                train_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_train{file_suffix}.json")['train']
+                train_dataset = load_dataset("json", data_files=f"data/{dataset_dir}/{file_prefix}_train{file_suffix}.json")['train']
                 train_dataset = train_dataset.map(add_length(is_lego=True), batched=True)
                 # Skip length filtering for local datasets since all samples have the same length
                 # convert the input and output format
@@ -265,13 +301,13 @@ class TextCLRSDataModule(pl.LightningDataModule):
                 train_dataset = train_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio, reduce_steps_equally_spaced=self.reduce_steps_equally_spaced), batched=True, load_from_cache_file=False)
                 
                 # Load validation dataset
-                eval_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_val{file_suffix}.json")['train']
+                eval_dataset = load_dataset("json", data_files=f"data/{dataset_dir}/{file_prefix}_val{file_suffix}.json")['train']
                 eval_dataset = eval_dataset.map(add_length(is_lego=True), batched=True)
                 # Skip length filtering for local datasets since all samples have the same length
                 eval_dataset = eval_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio, reduce_steps_equally_spaced=self.reduce_steps_equally_spaced), batched=True, load_from_cache_file=False)
                 
                 # Load test dataset
-                predict_dataset = load_dataset("json", data_files=f"{dataset_dir}/{file_prefix}_test{file_suffix}.json")['train']
+                predict_dataset = load_dataset("json", data_files=f"data/{dataset_dir}/{file_prefix}_test{file_suffix}.json")['train']
                 predict_dataset = predict_dataset.map(add_length(is_lego=True), batched=True)
                 # Skip length filtering for local datasets since all samples have the same length
                 # convert the input and output format
@@ -450,4 +486,3 @@ class TextCLRSDataModule(pl.LightningDataModule):
             collate_fn=self.multitask_collator,
             num_workers=15
         )
-        

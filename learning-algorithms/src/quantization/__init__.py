@@ -5,6 +5,9 @@ from src.quantization.quant import (
     apply_quant_full_model_quantization,
     apply_quant_lora_quantization,
     normalize_quant_module_names,
+    NoiseInjectionLinear,
+    apply_noise_injection_to_lora,
+    apply_noise_injection_to_all_trainable,
 )
 
 __all__ = [
@@ -14,4 +17,7 @@ __all__ = [
     "apply_quant_full_model_quantization",
     "apply_quant_lora_quantization",
     "normalize_quant_module_names",
+    "NoiseInjectionLinear",
+    "apply_noise_injection_to_lora",
+    "apply_noise_injection_to_all_trainable",
 ]

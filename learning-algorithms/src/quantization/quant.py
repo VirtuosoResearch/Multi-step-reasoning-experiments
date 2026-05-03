@@ -376,6 +376,58 @@ class QuantizeLinear(nn.Linear):
         return nn.functional.linear(input_, weight, self.bias)
 
 
+class NoiseInjectionLinear(nn.Linear):
+    """Linear layer with Gaussian noise injection during forward pass for weight perturbation.
+    
+    Injects random Gaussian noise into weights at each forward pass during training.
+    Gradients are computed w.r.t. the noise-perturbed weights, allowing noise-based
+    regularization or robust training.
+    """
+
+    def __init__(
+        self,
+        in_features,
+        out_features,
+        bias=False,
+        noise_std=0.01,
+        device=None,
+        dtype=None,
+    ):
+        super().__init__(in_features, out_features, bias=bias, device=device, dtype=dtype)
+        self.noise_std = float(noise_std)
+
+    @classmethod
+    def from_linear(cls, linear: nn.Linear, noise_std: float = 0.01) -> "NoiseInjectionLinear":
+        """Convert a regular Linear layer to NoiseInjectionLinear."""
+        noise_linear = cls(
+            linear.in_features,
+            linear.out_features,
+            bias=linear.bias is not None,
+            noise_std=noise_std,
+            device=linear.weight.device,
+            dtype=linear.weight.dtype,
+        )
+        noise_linear.weight.data.copy_(linear.weight.data)
+        noise_linear.weight.requires_grad = linear.weight.requires_grad
+        if linear.bias is not None:
+            noise_linear.bias.data.copy_(linear.bias.data)
+            noise_linear.bias.requires_grad = linear.bias.requires_grad
+        return noise_linear
+
+    def forward(self, input_):
+        """Forward pass with noise injection.
+        
+        During training, adds Gaussian noise N(0, noise_std) to weights before the linear operation.
+        During evaluation, uses clean weights.
+        """
+        if self.training and self.noise_std > 0:
+            noise = torch.randn_like(self.weight) * self.noise_std
+            weight = self.weight + noise
+        else:
+            weight = self.weight
+        return nn.functional.linear(input_, weight, self.bias)
+
+
 def normalize_quant_module_names(module_names: Sequence[str]) -> List[str]:
     if module_names is None:
         return []
@@ -445,6 +497,73 @@ def apply_quant_lora_quantization(model: nn.Module, config: QuantConfig) -> int:
                 lora_layers[adapter_name] = quantized
                 replaced += 1
             print(f"Applied {config.w_bits}-bit quantization in {attr_name} of module {module._get_name()}")
+    return replaced
+
+
+def apply_noise_injection_to_lora(model: nn.Module, noise_std: float) -> int:
+    """Apply noise injection to LoRA layers only.
+    
+    Wraps lora_A and lora_B linear layers with NoiseInjectionLinear.
+    
+    Args:
+        model: The model containing LoRA layers
+        noise_std: Standard deviation of Gaussian noise to inject
+        
+    Returns:
+        Number of layers converted
+    """
+    replaced = 0
+    for module in model.modules():
+        for attr_name in ("lora_A", "lora_B"):
+            lora_layers = getattr(module, attr_name, None)
+            if lora_layers is None or not hasattr(lora_layers, "items"):
+                continue
+            for adapter_name, layer in list(lora_layers.items()):
+                if isinstance(layer, NoiseInjectionLinear):
+                    continue
+                if not isinstance(layer, nn.Linear):
+                    continue
+                noise_linear = NoiseInjectionLinear.from_linear(layer, noise_std)
+                lora_layers[adapter_name] = noise_linear
+                replaced += 1
+    print(f"Applied noise injection (std={noise_std}) to {replaced} LoRA layers")
+    return replaced
+
+
+def apply_noise_injection_to_all_trainable(model: nn.Module, noise_std: float) -> int:
+    """Apply noise injection to all trainable linear layers.
+    
+    Recursively wraps all trainable nn.Linear layers with NoiseInjectionLinear,
+    excluding LoRA layers which should be handled separately if needed.
+    
+    Args:
+        model: The model to apply noise injection to
+        noise_std: Standard deviation of Gaussian noise to inject
+        
+    Returns:
+        Number of layers converted
+    """
+    replaced = 0
+    
+    def replace_linears(module: nn.Module, prefix="") -> int:
+        count = 0
+        for child_name, child in list(module.named_children()):
+            full_name = f"{prefix}.{child_name}" if prefix else child_name
+            
+            if isinstance(child, NoiseInjectionLinear):
+                continue
+            elif isinstance(child, nn.Linear) and child.weight.requires_grad:
+                # Replace with NoiseInjectionLinear
+                noise_linear = NoiseInjectionLinear.from_linear(child, noise_std)
+                setattr(module, child_name, noise_linear)
+                count += 1
+            else:
+                # Recurse into child modules
+                count += replace_linears(child, full_name)
+        return count
+    
+    replaced = replace_linears(model)
+    print(f"Applied noise injection (std={noise_std}) to {replaced} trainable linear layers")
     return replaced
 
 
