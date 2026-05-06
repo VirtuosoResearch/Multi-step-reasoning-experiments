@@ -145,6 +145,8 @@ def validate_coconut_args(args, model_type=None):
         raise ValueError("--coconut_steps_to_full_latent must be non-negative")
     if args.coconut_latents_per_step < 0:
         raise ValueError("--coconut_latents_per_step must be non-negative")
+    if args.coconut_max_train_latent_thoughts < -1:
+        raise ValueError("--coconut_max_train_latent_thoughts must be -1 for no cap, or non-negative")
     if args.coconut_eval_latent_thoughts < 0:
         raise ValueError("--use_coconut requires --coconut_eval_latent_thoughts >= 0 for Coconut validation/generation")
     if args.coconut_bot_token == args.coconut_eot_token:
@@ -157,6 +159,14 @@ def configure_coconut_special_tokens(model, tokenizer, args):
     if not args.use_coconut:
         return
 
+    if args.coconut_gradient_checkpointing and hasattr(model, "gradient_checkpointing_enable"):
+        model.gradient_checkpointing_enable()
+        if hasattr(model, "enable_input_require_grads"):
+            model.enable_input_require_grads()
+        if hasattr(model, "config"):
+            model.config.use_cache = False
+        print("[Coconut] Gradient checkpointing enabled")
+
     special_tokens = [args.coconut_bot_token, args.coconut_eot_token]
     added = tokenizer.add_special_tokens({"additional_special_tokens": special_tokens})
     if added > 0:
@@ -168,6 +178,74 @@ def configure_coconut_special_tokens(model, tokenizer, args):
 
 def coconut_modules_to_save(args):
     return ["embed_tokens", "wte", "lm_head"] if args.use_coconut else []
+
+
+COCONUT_TOKEN_IDS_STATE_KEY = "__coconut_special_token_ids__"
+COCONUT_TOKEN_ROWS_SUFFIX = ".__coconut_special_token_rows__"
+
+
+def coconut_special_token_ids(tokenizer, args):
+    return torch.tensor(
+        [
+            tokenizer.convert_tokens_to_ids(args.coconut_bot_token),
+            tokenizer.convert_tokens_to_ids(args.coconut_eot_token),
+        ],
+        dtype=torch.long,
+    )
+
+
+def extract_lora_state_dict(state_dict, args, tokenizer):
+    if not args.use_coconut:
+        return {
+            k: v.clone()
+            for k, v in state_dict.items()
+            if "lora" in k
+        }
+
+    special_token_ids = coconut_special_token_ids(tokenizer, args)
+    compact_state_dict = {COCONUT_TOKEN_IDS_STATE_KEY: special_token_ids.clone()}
+    max_token_id = int(special_token_ids.max().item())
+
+    for key, value in state_dict.items():
+        if "lora" in key:
+            compact_state_dict[key] = value.clone()
+        elif "modules_to_save" in key and torch.is_tensor(value) and value.ndim >= 2 and value.shape[0] > max_token_id:
+            rows = value.detach().index_select(0, special_token_ids.to(value.device)).cpu().clone()
+            compact_state_dict[key + COCONUT_TOKEN_ROWS_SUFFIX] = rows
+
+    return compact_state_dict
+
+
+def expand_coconut_special_token_rows(state_dict, model):
+    if COCONUT_TOKEN_IDS_STATE_KEY not in state_dict:
+        return state_dict
+
+    special_token_ids = state_dict[COCONUT_TOKEN_IDS_STATE_KEY].long()
+    current_state_dict = model.state_dict()
+    expanded_state_dict = {
+        key: value
+        for key, value in state_dict.items()
+        if key != COCONUT_TOKEN_IDS_STATE_KEY and not key.endswith(COCONUT_TOKEN_ROWS_SUFFIX)
+    }
+
+    for row_key, rows in state_dict.items():
+        if not row_key.endswith(COCONUT_TOKEN_ROWS_SUFFIX):
+            continue
+
+        full_key = row_key[:-len(COCONUT_TOKEN_ROWS_SUFFIX)]
+        if full_key not in current_state_dict:
+            print(f"[Coconut] WARNING: compact token-row key {full_key} not found in current model; skipping")
+            continue
+
+        full_value = current_state_dict[full_key].detach().clone()
+        full_value.index_copy_(
+            0,
+            special_token_ids.to(full_value.device),
+            rows.to(device=full_value.device, dtype=full_value.dtype),
+        )
+        expanded_state_dict[full_key] = full_value
+
+    return expanded_state_dict
 
 
 def build_implicit_cot_output(answer, reduction_fraction):
@@ -610,7 +688,9 @@ if __name__ == "__main__":
     parser.add_argument("--use_coconut", action="store_true") # train with Chain of Continuous Thought latent reasoning
     parser.add_argument("--coconut_steps_to_full_latent", type=int, default=0) # optimizer steps used to replace all reasoning steps with latent thoughts; 0 means full training run
     parser.add_argument("--coconut_latents_per_step", type=int, default=1) # continuous thoughts inserted per removed language reasoning step
+    parser.add_argument("--coconut_max_train_latent_thoughts", type=int, default=-1) # cap training latent thoughts per sample; -1 means no cap
     parser.add_argument("--coconut_eval_latent_thoughts", type=int, default=-1) # explicit number of latent thoughts for Coconut generation
+    parser.add_argument("--coconut_gradient_checkpointing", action="store_true") # reduce Coconut activation memory at the cost of speed
     parser.add_argument("--coconut_bot_token", type=str, default="<bot>")
     parser.add_argument("--coconut_eot_token", type=str, default="<eot>")
     parser.add_argument("--eval_test_during_fit", action="store_true") # evaluate test split during each fit validation epoch
@@ -803,6 +883,7 @@ if __name__ == "__main__":
                 f"total_optimizer_steps={coconut_total_optimizer_steps}, "
                 f"coconut_steps_to_full_latent={args.coconut_steps_to_full_latent}, "
                 f"coconut_latents_per_step={args.coconut_latents_per_step}, "
+                f"coconut_max_train_latent_thoughts={args.coconut_max_train_latent_thoughts}, "
                 f"coconut_eval_latent_thoughts={args.coconut_eval_latent_thoughts}"
             )
         # for name, param in model.named_parameters():
@@ -860,6 +941,7 @@ if __name__ == "__main__":
             trainer_kwargs.update({
                 "coconut_steps_to_full_latent": args.coconut_steps_to_full_latent,
                 "coconut_latents_per_step": args.coconut_latents_per_step,
+                "coconut_max_train_latent_thoughts": args.coconut_max_train_latent_thoughts,
                 "coconut_eval_latent_thoughts": args.coconut_eval_latent_thoughts,
                 "coconut_bot_token": args.coconut_bot_token,
                 "coconut_eot_token": args.coconut_eot_token,
@@ -928,6 +1010,7 @@ if __name__ == "__main__":
                     checkpoint_kwargs.update({
                         "coconut_steps_to_full_latent": args.coconut_steps_to_full_latent,
                         "coconut_latents_per_step": args.coconut_latents_per_step,
+                        "coconut_max_train_latent_thoughts": args.coconut_max_train_latent_thoughts,
                         "coconut_eval_latent_thoughts": args.coconut_eval_latent_thoughts,
                         "coconut_bot_token": args.coconut_bot_token,
                         "coconut_eot_token": args.coconut_eot_token,
@@ -953,7 +1036,10 @@ if __name__ == "__main__":
                 if args.use_graph_llama:
                     print(model.model.load_state_dict(torch.load(load_model_dir), strict=False))
                 else:
-                    print(model.load_state_dict(torch.load(load_model_dir), strict=False))
+                    loaded_state_dict = torch.load(load_model_dir)
+                    if args.use_coconut:
+                        loaded_state_dict = expand_coconut_special_token_rows(loaded_state_dict, model)
+                    print(model.load_state_dict(loaded_state_dict, strict=False))
                 print(f"Loaded model from {load_model_dir}")
                 # Add Gaussian noise to model weights if requested
                 if args.add_weight_perturb:
@@ -1072,11 +1158,7 @@ if __name__ == "__main__":
                 os.makedirs(default_root_dir)
             model_path = default_root_dir + "/initial_weights.pt"
             state_dict = model.state_dict()
-            state_dict = {
-                k: v.clone()
-                for k, v in state_dict.items()
-                if ("lora" in k or (args.use_coconut and "modules_to_save" in k))
-            }
+            state_dict = extract_lora_state_dict(state_dict, args, tokenizer)
             torch.save(state_dict, model_path)
 
         start_time = time.time()
@@ -1092,11 +1174,11 @@ if __name__ == "__main__":
                 from lightning_fabric.utilities.cloud_io import _load as pl_load
                 checkpoint = pl_load(checkpoint_callback.best_model_path, map_location=lm.device)
                 state_dict = checkpoint["state_dict"]
-                state_dict = {
-                    k[6:]: v
-                    for k, v in state_dict.items()
-                    if ("lora" in k or (args.use_coconut and "modules_to_save" in k))
-                }
+                state_dict = extract_lora_state_dict(
+                    {k[6:]: v for k, v in state_dict.items()},
+                    args,
+                    tokenizer,
+                )
                 torch.save(state_dict, checkpoint_callback.best_model_path.replace(".ckpt", ".pt"))
             elif args.train_lora and args.intrinsic_dim > 0:
                 from lightning_fabric.utilities.cloud_io import _load as pl_load
@@ -1142,6 +1224,7 @@ if __name__ == "__main__":
                     eval_trainer_kwargs.update({
                         "coconut_steps_to_full_latent": args.coconut_steps_to_full_latent,
                         "coconut_latents_per_step": args.coconut_latents_per_step,
+                        "coconut_max_train_latent_thoughts": args.coconut_max_train_latent_thoughts,
                         "coconut_eval_latent_thoughts": args.coconut_eval_latent_thoughts,
                         "coconut_bot_token": args.coconut_bot_token,
                         "coconut_eot_token": args.coconut_eot_token,

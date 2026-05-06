@@ -77,7 +77,10 @@ def split_generated_answer(answer: str) -> Tuple[List[str], str, str]:
     pieces = [s.strip() for s in answer.split(",") if s.strip()]
     if not pieces:
         return [], "", ""
-    return pieces[:-1], pieces[-1], answer
+    prefix = ", ".join(pieces[:-1])
+    if prefix:
+        prefix += ", "
+    return pieces[:-1], pieces[-1], prefix
 
 
 def generated_prefix_for_step(generated_steps: Sequence[str], target_step: int, total_steps: int) -> str:
@@ -206,6 +209,123 @@ def selected_target_log_probs(model, enc: StepEncoding, max_target_tokens: int =
     return log_probs[torch.arange(target_ids.numel(), device=enc.input_ids.device), target_ids]
 
 
+def capped_target_ids(enc: StepEncoding, max_target_tokens: int) -> torch.Tensor:
+    if max_target_tokens > 0:
+        return enc.target_ids[:max_target_tokens]
+    return enc.target_ids
+
+
+def cap_step_span(span: Tuple[int, int], max_target_tokens: int) -> Tuple[int, int]:
+    start, end = span
+    if max_target_tokens <= 0:
+        return start, end
+    return start, min(end, start + max_target_tokens)
+
+
+def jacobian_output_vector(
+    model,
+    input_embeddings: torch.nn.Module,
+    enc: StepEncoding,
+    embeds: torch.Tensor,
+    max_target_tokens: int,
+    jacobian_output: str,
+) -> torch.Tensor:
+    """Continuous step map used as the Jacobian output.
+
+    selected_logprob is the original diagnostic map. expected_embedding maps
+    the next-step distribution back into token-embedding space, so rho composes
+    embedding-space perturbations with embedding-space outputs.
+    """
+    target_ids = capped_target_ids(enc, max_target_tokens)
+    if target_ids.numel() == 0:
+        return torch.empty(0, device=embeds.device)
+
+    outputs = model(inputs_embeds=embeds, attention_mask=enc.attention_mask.detach())
+    positions = torch.arange(
+        enc.target_start - 1,
+        enc.target_start - 1 + target_ids.numel(),
+        device=embeds.device,
+    )
+    logits = outputs.logits[0, positions, :].float()
+
+    if jacobian_output == "selected_logprob":
+        log_probs = F.log_softmax(logits, dim=-1)
+        return log_probs[torch.arange(target_ids.numel(), device=embeds.device), target_ids]
+
+    if jacobian_output == "expected_embedding":
+        probs = F.softmax(logits, dim=-1)
+        return (probs @ input_embeddings.weight.float()).reshape(-1)
+
+    raise ValueError(f"Unknown jacobian_output: {jacobian_output}")
+
+
+@torch.no_grad()
+def expected_embedding_vector(
+    model,
+    input_embeddings: torch.nn.Module,
+    enc: Optional[StepEncoding],
+    max_target_tokens: int,
+) -> Optional[torch.Tensor]:
+    if enc is None:
+        return None
+    target_ids = capped_target_ids(enc, max_target_tokens)
+    if target_ids.numel() == 0:
+        return None
+    embeds = input_embeddings(enc.input_ids).detach()
+    return jacobian_output_vector(
+        model,
+        input_embeddings,
+        enc,
+        embeds,
+        max_target_tokens=max_target_tokens,
+        jacobian_output="expected_embedding",
+    ).float().detach()
+
+
+@torch.no_grad()
+def expected_embedding_delta_norm(
+    model,
+    input_embeddings: torch.nn.Module,
+    enc_a: Optional[StepEncoding],
+    enc_b: Optional[StepEncoding],
+    max_target_tokens: int,
+) -> float:
+    vec_a = expected_embedding_vector(model, input_embeddings, enc_a, max_target_tokens)
+    vec_b = expected_embedding_vector(model, input_embeddings, enc_b, max_target_tokens)
+    if vec_a is None or vec_b is None or vec_a.numel() != vec_b.numel():
+        return float("nan")
+    return float((vec_a - vec_b).float().norm().detach().cpu())
+
+
+def empirical_lipschitz_constant(loss_a: float, loss_b: float, delta_norm: float) -> float:
+    if not (np.isfinite(loss_a) and np.isfinite(loss_b) and np.isfinite(delta_norm)):
+        return float("nan")
+    if delta_norm < EPS:
+        return 0.0 if abs(loss_b - loss_a) < EPS else float("nan")
+    return abs(loss_b - loss_a) / delta_norm
+
+
+@torch.no_grad()
+def expected_embedding_step_error(
+    model,
+    input_embeddings: torch.nn.Module,
+    enc: Optional[StepEncoding],
+    max_target_tokens: int,
+) -> Optional[float]:
+    if enc is None:
+        return None
+    target_ids = capped_target_ids(enc, max_target_tokens)
+    if target_ids.numel() == 0:
+        return None
+
+    pred_vec = expected_embedding_vector(model, input_embeddings, enc, max_target_tokens)
+    if pred_vec is None:
+        return None
+    pred = pred_vec.view(target_ids.numel(), -1)
+    gold = input_embeddings(target_ids).float()
+    return float((pred.float() - gold).norm().detach().cpu())
+
+
 @torch.no_grad()
 def step_ce_loss(model, enc: Optional[StepEncoding]) -> Optional[float]:
     if enc is None or enc.target_ids.numel() == 0:
@@ -227,6 +347,69 @@ def step_ce_loss(model, enc: Optional[StepEncoding]) -> Optional[float]:
         reduction="none",
     )
     return float(losses[mask.view(-1)].mean().detach().cpu())
+
+
+def step_ce_loss_from_embeds(model, enc: StepEncoding, embeds: torch.Tensor) -> torch.Tensor:
+    outputs = model(inputs_embeds=embeds, attention_mask=enc.attention_mask)
+    logits = outputs.logits[:, :-1, :].contiguous()
+    labels = enc.input_ids[:, 1:].contiguous()
+
+    valid_start = enc.target_start - 1
+    valid_end = valid_start + enc.target_ids.numel()
+    mask = torch.zeros_like(labels, dtype=torch.bool)
+    mask[:, valid_start:valid_end] = True
+    losses = F.cross_entropy(
+        logits.view(-1, logits.size(-1)).float(),
+        labels.view(-1),
+        reduction="none",
+    )
+    return losses[mask.view(-1)].mean()
+
+
+@torch.no_grad()
+def estimate_ce_embedding_lipschitz_by_noise(
+    model,
+    input_embeddings: torch.nn.Module,
+    enc: Optional[StepEncoding],
+    span: Optional[Tuple[int, int]],
+    num_checks: int,
+    epsilon: float,
+) -> Dict[str, float]:
+    if enc is None or span is None or num_checks <= 0 or epsilon <= 0:
+        return {"ce_lipschitz_noise_max": float("nan"), "ce_lipschitz_noise_mean": float("nan")}
+
+    start, end = span
+    if end <= start:
+        return {"ce_lipschitz_noise_max": float("nan"), "ce_lipschitz_noise_mean": float("nan")}
+
+    base_embeds = input_embeddings(enc.input_ids).detach()
+    base_span = base_embeds[:, start:end, :]
+    ratios: List[float] = []
+    with attention_kernel_context("math"):
+        for _ in range(num_checks):
+            direction = _normalize_like(torch.randn_like(base_span))
+            perturb = epsilon * direction.float()
+            perturb_norm = perturb.norm()
+            if not torch.isfinite(perturb_norm) or perturb_norm.item() < EPS:
+                continue
+
+            embeds_plus = base_embeds.clone()
+            embeds_minus = base_embeds.clone()
+            embeds_plus[:, start:end, :] = (base_span.float() + perturb).to(dtype=base_embeds.dtype)
+            embeds_minus[:, start:end, :] = (base_span.float() - perturb).to(dtype=base_embeds.dtype)
+
+            loss_plus = step_ce_loss_from_embeds(model, enc, embeds_plus)
+            loss_minus = step_ce_loss_from_embeds(model, enc, embeds_minus)
+            ratio = (loss_plus.float() - loss_minus.float()).abs() / (2.0 * perturb_norm)
+            if torch.isfinite(ratio):
+                ratios.append(float(ratio.detach().cpu()))
+
+    if not ratios:
+        return {"ce_lipschitz_noise_max": float("nan"), "ce_lipschitz_noise_mean": float("nan")}
+    return {
+        "ce_lipschitz_noise_max": max(ratios),
+        "ce_lipschitz_noise_mean": float(np.mean(ratios)),
+    }
 
 
 def teacher_forced_step_losses(model, tokenizer, seq: StepSequence, device: torch.device) -> List[Optional[float]]:
@@ -303,8 +486,9 @@ def estimate_jacobian_spectral_norm_jvp(
     span: Tuple[int, int],
     power_iters: int,
     max_target_tokens: int,
+    jacobian_output: str,
 ) -> float:
-    """Estimate ||d log p(y_t) / d emb(y_j)||_2 with JVP/VJP power iteration."""
+    """Estimate the spectral norm of the selected step map with JVP/VJP power iteration."""
     start, end = span
     if end <= start:
         return 0.0
@@ -317,20 +501,14 @@ def estimate_jacobian_spectral_norm_jvp(
     def fn(x: torch.Tensor) -> torch.Tensor:
         embeds = base_embeds.clone()
         embeds[:, start:end, :] = x.view(span_shape).to(dtype=embeds.dtype)
-        outputs = model(inputs_embeds=embeds, attention_mask=base_attention)
-        target_ids = enc.target_ids
-        if max_target_tokens > 0:
-            target_ids = target_ids[:max_target_tokens]
-        if target_ids.numel() == 0:
-            return torch.empty(0, device=embeds.device)
-        positions = torch.arange(
-            enc.target_start - 1,
-            enc.target_start - 1 + target_ids.numel(),
-            device=embeds.device,
+        return jacobian_output_vector(
+            model,
+            input_embeddings,
+            enc,
+            embeds,
+            max_target_tokens=max_target_tokens,
+            jacobian_output=jacobian_output,
         )
-        logits = outputs.logits[0, positions, :].float()
-        log_probs = F.log_softmax(logits, dim=-1)
-        return log_probs[torch.arange(target_ids.numel(), device=embeds.device), target_ids]
 
     if fn(x0).numel() == 0:
         return 0.0
@@ -367,15 +545,17 @@ def estimate_jacobian_spectral_norm_rowgrad(
     span: Tuple[int, int],
     power_iters: int,
     max_target_tokens: int,
+    jacobian_output: str,
 ) -> float:
-    """Compute ||d log p(y_t) / d emb(y_j)||_2 for selected target-token log-probs.
+    """Compute the selected Jacobian rows with first-order reverse-mode gradients.
 
-    The selected-output dimension is small because it is capped by
-    max_target_tokens, so we can form the Jacobian rows with first-order
-    reverse-mode gradients and take their exact spectral norm. This avoids JVP
-    through fused attention kernels, whose higher-order derivatives are not
-    implemented in some PyTorch/CUDA combinations.
+    This is exact but only practical for low-dimensional outputs. For
+    expected_embedding, prefer the JVP method because the output dimension is
+    max_target_tokens * hidden_size.
     """
+    if jacobian_output == "expected_embedding":
+        raise ValueError("--jacobian_method rowgrad is too expensive for --jacobian_output expected_embedding; use --jacobian_method jvp")
+
     start, end = span
     if end <= start:
         return 0.0
@@ -387,21 +567,14 @@ def estimate_jacobian_spectral_norm_rowgrad(
 
     embeds = base_embeds.clone()
     embeds[:, start:end, :] = x_req.view(span_shape).to(dtype=embeds.dtype)
-    outputs = model(inputs_embeds=embeds, attention_mask=base_attention)
-    target_ids = enc.target_ids
-    if max_target_tokens > 0:
-        target_ids = target_ids[:max_target_tokens]
-    if target_ids.numel() == 0:
-        return 0.0
-
-    positions = torch.arange(
-        enc.target_start - 1,
-        enc.target_start - 1 + target_ids.numel(),
-        device=embeds.device,
+    selected = jacobian_output_vector(
+        model,
+        input_embeddings,
+        enc,
+        embeds,
+        max_target_tokens=max_target_tokens,
+        jacobian_output=jacobian_output,
     )
-    logits = outputs.logits[0, positions, :].float()
-    log_probs = F.log_softmax(logits, dim=-1)
-    selected = log_probs[torch.arange(target_ids.numel(), device=embeds.device), target_ids]
     if selected.numel() == 0:
         return 0.0
 
@@ -433,6 +606,7 @@ def estimate_jacobian_spectral_norm(
     power_iters: int,
     max_target_tokens: int,
     method: str,
+    jacobian_output: str,
 ) -> float:
     if method == "jvp":
         return estimate_jacobian_spectral_norm_jvp(
@@ -442,6 +616,7 @@ def estimate_jacobian_spectral_norm(
             span,
             power_iters=power_iters,
             max_target_tokens=max_target_tokens,
+            jacobian_output=jacobian_output,
         )
     if method == "rowgrad":
         return estimate_jacobian_spectral_norm_rowgrad(
@@ -451,6 +626,7 @@ def estimate_jacobian_spectral_norm(
             span,
             power_iters=power_iters,
             max_target_tokens=max_target_tokens,
+            jacobian_output=jacobian_output,
         )
     raise ValueError(f"Unknown Jacobian method: {method}")
 
@@ -462,6 +638,7 @@ def finite_difference_directional_check(
     span: Tuple[int, int],
     max_target_tokens: int,
     epsilon: float,
+    jacobian_output: str,
 ) -> Dict[str, float]:
     start, end = span
     base_embeds = input_embeddings(enc.input_ids).detach()
@@ -472,33 +649,45 @@ def finite_difference_directional_check(
     def fn(x: torch.Tensor) -> torch.Tensor:
         embeds = base_embeds.clone()
         embeds[:, start:end, :] = x.view(span_shape).to(dtype=embeds.dtype)
-        outputs = model(inputs_embeds=embeds, attention_mask=base_attention)
-        target_ids = enc.target_ids
-        if max_target_tokens > 0:
-            target_ids = target_ids[:max_target_tokens]
-        positions = torch.arange(
-            enc.target_start - 1,
-            enc.target_start - 1 + target_ids.numel(),
-            device=embeds.device,
+        return jacobian_output_vector(
+            model,
+            input_embeddings,
+            enc,
+            embeds,
+            max_target_tokens=max_target_tokens,
+            jacobian_output=jacobian_output,
         )
-        logits = outputs.logits[0, positions, :].float()
-        log_probs = F.log_softmax(logits, dim=-1)
-        return log_probs[torch.arange(target_ids.numel(), device=embeds.device), target_ids]
 
     direction = _normalize_like(torch.randn_like(x0))
-    x_req = x0.detach().clone().requires_grad_(True)
-    y = fn(x_req)
-    jvp_rows = []
-    for row_idx in range(y.numel()):
-        (grad_row,) = torch.autograd.grad(
-            y[row_idx],
-            x_req,
-            retain_graph=row_idx < y.numel() - 1,
+    try:
+        _, jvp = torch.autograd.functional.jvp(
+            fn,
+            (x0,),
+            (direction,),
             create_graph=False,
-            allow_unused=False,
+            strict=False,
         )
-        jvp_rows.append((grad_row.float() * direction.float()).sum())
-    jvp = torch.stack(jvp_rows) if jvp_rows else torch.empty(0, device=x0.device)
+    except RuntimeError:
+        x_req = x0.detach().clone().requires_grad_(True)
+        y = fn(x_req)
+        if y.numel() > 512:
+            return {
+                "jvp_directional_norm": float("nan"),
+                "finite_difference_directional_norm": float("nan"),
+                "relative_norm_error": float("nan"),
+                "directional_cosine": float("nan"),
+            }
+        jvp_rows = []
+        for row_idx in range(y.numel()):
+            (grad_row,) = torch.autograd.grad(
+                y[row_idx],
+                x_req,
+                retain_graph=row_idx < y.numel() - 1,
+                create_graph=False,
+                allow_unused=False,
+            )
+            jvp_rows.append((grad_row.float() * direction.float()).sum())
+        jvp = torch.stack(jvp_rows) if jvp_rows else torch.empty(0, device=x0.device)
     with torch.no_grad():
         fd = (fn(x0 + epsilon * direction) - fn(x0 - epsilon * direction)) / (2.0 * epsilon)
 
@@ -796,10 +985,27 @@ def evaluate(args) -> None:
             with torch.no_grad():
                 step_losses = teacher_forced_step_losses(model, tokenizer, seq, device)
             teacher_final_loss = metric_float(step_losses[-1])
-            train_errors = [
-                math.sqrt(max(loss, 0.0)) if loss is not None and np.isfinite(loss) else float("nan")
-                for loss in step_losses
-            ]
+            if args.jacobian_output == "expected_embedding":
+                train_error_type = "expected_embedding_l2"
+                train_errors = []
+                for target_step in range(1, total_steps + 1):
+                    enc = build_step_encoding(tokenizer, seq.source, seq.steps, target_step, device)
+                    train_errors.append(
+                        metric_float(
+                            expected_embedding_step_error(
+                                model,
+                                input_embeddings,
+                                enc,
+                                args.max_target_tokens_for_jacobian,
+                            )
+                        )
+                    )
+            else:
+                train_error_type = "sqrt_ce_diagnostic"
+                train_errors = [
+                    math.sqrt(max(loss, 0.0)) if loss is not None and np.isfinite(loss) else float("nan")
+                    for loss in step_losses
+                ]
 
             generated_answer = generate_answer(
                 model,
@@ -811,6 +1017,7 @@ def evaluate(args) -> None:
             generated_steps, pred_final, generated_prefix = split_generated_answer(generated_answer)
             generated_sequence_steps = list(generated_steps) + ([pred_final] if pred_final else [])
             gold_final = seq.steps[-1]
+            teacher_final_enc = build_step_encoding(tokenizer, seq.source, seq.steps, total_steps, device)
             generated_final_enc = build_free_prefix_encoding(
                 tokenizer,
                 seq.source,
@@ -819,11 +1026,46 @@ def evaluate(args) -> None:
                 device,
             )
             generated_final_loss = metric_float(step_ce_loss(model, generated_final_enc))
+            final_conditioning_step = total_steps - 1 if total_steps > 1 else 0
+            final_ce_lipschitz_span = None
+            if teacher_final_enc is not None and final_conditioning_step in teacher_final_enc.spans:
+                final_ce_lipschitz_span = teacher_final_enc.spans[final_conditioning_step]
+                if args.jacobian_output == "expected_embedding" and final_conditioning_step > 0:
+                    final_ce_lipschitz_span = cap_step_span(
+                        final_ce_lipschitz_span,
+                        args.max_target_tokens_for_jacobian,
+                    )
+            final_ce_lipschitz_noise = estimate_ce_embedding_lipschitz_by_noise(
+                model,
+                input_embeddings,
+                teacher_final_enc,
+                final_ce_lipschitz_span,
+                args.ce_lipschitz_noise_checks,
+                args.ce_lipschitz_noise_epsilon,
+            )
+            final_expected_embedding_delta_norm = expected_embedding_delta_norm(
+                model,
+                input_embeddings,
+                teacher_final_enc,
+                generated_final_enc,
+                args.max_target_tokens_for_jacobian,
+            )
+            final_loss_gap = (
+                generated_final_loss - teacher_final_loss
+                if np.isfinite(generated_final_loss) and np.isfinite(teacher_final_loss)
+                else float("nan")
+            )
+            empirical_lipschitz_C = empirical_lipschitz_constant(
+                teacher_final_loss,
+                generated_final_loss,
+                final_expected_embedding_delta_norm,
+            )
             final_metrics = compute_accuracy([pred_final], [[gold_final]])
             generated_final_correct = final_metrics["accuracy"] / 100.0
             generated_edit_distance = final_metrics["edit_distance"]
 
             for target_step in range(1, total_steps + 1):
+                step_teacher_enc = build_step_encoding(tokenizer, seq.source, seq.steps, target_step, device)
                 step_generated_prefix = generated_prefix_for_step(
                     generated_sequence_steps,
                     target_step,
@@ -837,6 +1079,41 @@ def evaluate(args) -> None:
                     device,
                 )
                 generated_step_loss = metric_float(step_ce_loss(model, step_generated_enc))
+                teacher_step_loss = metric_float(step_losses[target_step - 1])
+                step_loss_gap = (
+                    generated_step_loss - teacher_step_loss
+                    if np.isfinite(generated_step_loss) and np.isfinite(teacher_step_loss)
+                    else float("nan")
+                )
+                step_expected_embedding_delta_norm = expected_embedding_delta_norm(
+                    model,
+                    input_embeddings,
+                    step_teacher_enc,
+                    step_generated_enc,
+                    args.max_target_tokens_for_jacobian,
+                )
+                step_empirical_lipschitz_C = empirical_lipschitz_constant(
+                    teacher_step_loss,
+                    generated_step_loss,
+                    step_expected_embedding_delta_norm,
+                )
+                step_conditioning_step = target_step - 1 if target_step > 1 else 0
+                step_ce_lipschitz_span = None
+                if step_teacher_enc is not None and step_conditioning_step in step_teacher_enc.spans:
+                    step_ce_lipschitz_span = step_teacher_enc.spans[step_conditioning_step]
+                    if args.jacobian_output == "expected_embedding" and step_conditioning_step > 0:
+                        step_ce_lipschitz_span = cap_step_span(
+                            step_ce_lipschitz_span,
+                            args.max_target_tokens_for_jacobian,
+                        )
+                step_ce_lipschitz_noise = estimate_ce_embedding_lipschitz_by_noise(
+                    model,
+                    input_embeddings,
+                    step_teacher_enc,
+                    step_ce_lipschitz_span,
+                    args.ce_lipschitz_noise_checks,
+                    args.ce_lipschitz_noise_epsilon,
+                )
                 generated_step_pred = (
                     generated_sequence_steps[target_step - 1]
                     if target_step - 1 < len(generated_sequence_steps)
@@ -850,18 +1127,19 @@ def evaluate(args) -> None:
                     {
                         "task": task_name,
                         "checkpoint": checkpoint_path or "",
+                        "jacobian_output": args.jacobian_output,
                         "split": args.split,
                         "length": length,
                         "sample_idx": sample_idx,
                         "t": target_step,
                         "num_steps": total_steps,
-                        "teacher_step_loss": metric_float(step_losses[target_step - 1]),
+                        "teacher_step_loss": teacher_step_loss,
                         "generated_prefix_step_loss": generated_step_loss,
-                        "step_loss_gap": (
-                            generated_step_loss - metric_float(step_losses[target_step - 1])
-                            if np.isfinite(generated_step_loss) and np.isfinite(metric_float(step_losses[target_step - 1]))
-                            else float("nan")
-                        ),
+                        "step_loss_gap": step_loss_gap,
+                        "expected_embedding_delta_norm": step_expected_embedding_delta_norm,
+                        "empirical_lipschitz_C": step_empirical_lipschitz_C,
+                        "ce_lipschitz_noise_max": step_ce_lipschitz_noise["ce_lipschitz_noise_max"],
+                        "ce_lipschitz_noise_mean": step_ce_lipschitz_noise["ce_lipschitz_noise_mean"],
                         "generated_step_correct": generated_step_metrics["accuracy"] / 100.0,
                         "generated_step_edit_distance": generated_step_metrics["edit_distance"],
                         "gold_step": seq.steps[target_step - 1],
@@ -884,28 +1162,34 @@ def evaluate(args) -> None:
                     if enc is None or source_step not in enc.spans:
                         jac_norm = 0.0
                     else:
+                        span = enc.spans[source_step]
+                        if args.jacobian_output == "expected_embedding" and source_step > 0:
+                            span = cap_step_span(span, args.max_target_tokens_for_jacobian)
                         jac_norm = estimate_jacobian_spectral_norm(
                             model,
                             input_embeddings,
                             enc,
-                            enc.spans[source_step],
+                            span,
                             power_iters=args.power_iters,
                             max_target_tokens=args.max_target_tokens_for_jacobian,
                             method=args.jacobian_method,
+                            jacobian_output=args.jacobian_output,
                         )
                         if finite_difference_count < args.finite_difference_checks:
                             check = finite_difference_directional_check(
                                 model,
                                 input_embeddings,
                                 enc,
-                                enc.spans[source_step],
+                                span,
                                 max_target_tokens=args.max_target_tokens_for_jacobian,
                                 epsilon=args.finite_difference_epsilon,
+                                jacobian_output=args.jacobian_output,
                             )
                             finite_difference_rows.append(
                                 {
                                     "task": task_name,
                                     "checkpoint": checkpoint_path or "",
+                                    "jacobian_output": args.jacobian_output,
                                     "split": args.split,
                                     "length": length,
                                     "sample_idx": sample_idx,
@@ -929,29 +1213,44 @@ def evaluate(args) -> None:
             input_jac_norm = float(np.nanmean(input_jac_norms)) if input_jac_norms else float("nan")
             log_input_jac_norm = math.log(max(input_jac_norm, EPS)) if np.isfinite(input_jac_norm) else float("nan")
 
-            if args.full_jacobian:
-                bound_terms = [
-                    rho.get((total_steps, i), 0.0) * train_errors[i - 1]
-                    for i in range(1, total_steps)
-                    if np.isfinite(train_errors[i - 1])
-                ]
+            if args.jacobian_output == "expected_embedding":
+                if args.full_jacobian:
+                    bound_terms = [
+                        rho.get((total_steps, i), 0.0) * train_errors[i - 1]
+                        for i in range(1, total_steps)
+                        if np.isfinite(train_errors[i - 1])
+                    ]
+                else:
+                    bound_terms = [
+                        math.exp(local_logs[i]) * train_errors[i - 1]
+                        for i in range(1, total_steps)
+                        if np.isfinite(train_errors[i - 1]) and np.isfinite(local_logs[i])
+                    ]
+                bound_proxy = float(np.sum(bound_terms)) if bound_terms else float("nan")
+                log_bound_proxy = math.log(max(bound_proxy, EPS)) if np.isfinite(bound_proxy) else float("nan")
+                if (
+                    not np.isfinite(bound_proxy)
+                    and total_steps == 1
+                    and len(train_errors) > 0
+                    and np.isfinite(input_jac_norm)
+                    and np.isfinite(train_errors[0])
+                ):
+                    bound_proxy = input_jac_norm * train_errors[0]
+                    log_bound_proxy = math.log(max(bound_proxy, EPS))
             else:
-                bound_terms = [
-                    math.exp(local_logs[i]) * train_errors[i - 1]
-                    for i in range(1, total_steps)
-                    if np.isfinite(train_errors[i - 1]) and np.isfinite(local_logs[i])
-                ]
-            bound_proxy = float(np.sum(bound_terms)) if bound_terms else float("nan")
-            log_bound_proxy = math.log(max(bound_proxy, EPS)) if np.isfinite(bound_proxy) else float("nan")
-            if (
-                not np.isfinite(bound_proxy)
-                and total_steps == 1
-                and len(train_errors) > 0
-                and np.isfinite(input_jac_norm)
-                and np.isfinite(train_errors[0])
-            ):
-                bound_proxy = input_jac_norm * train_errors[0]
-                log_bound_proxy = math.log(max(bound_proxy, EPS))
+                bound_proxy = float("nan")
+                log_bound_proxy = float("nan")
+            bound_proxy_valid = bool(args.jacobian_output == "expected_embedding" and np.isfinite(bound_proxy))
+            calibrated_bound_proxy = (
+                empirical_lipschitz_C * bound_proxy
+                if np.isfinite(empirical_lipschitz_C) and np.isfinite(bound_proxy)
+                else float("nan")
+            )
+            noise_calibrated_bound_proxy = (
+                final_ce_lipschitz_noise["ce_lipschitz_noise_max"] * bound_proxy
+                if np.isfinite(final_ce_lipschitz_noise["ce_lipschitz_noise_max"]) and np.isfinite(bound_proxy)
+                else float("nan")
+            )
 
             for prefix_t in range(1, total_steps + 1):
                 adjacent_log_rho_t_1 = prefix_logs.get(prefix_t, float("nan"))
@@ -964,6 +1263,7 @@ def evaluate(args) -> None:
                     {
                         "task": task_name,
                         "checkpoint": checkpoint_path or "",
+                        "jacobian_output": args.jacobian_output,
                         "split": args.split,
                         "length": length,
                         "sample_idx": sample_idx,
@@ -982,6 +1282,7 @@ def evaluate(args) -> None:
                     {
                         "task": task_name,
                         "checkpoint": checkpoint_path or "",
+                        "jacobian_output": args.jacobian_output,
                         "split": args.split,
                         "length": length,
                         "sample_idx": sample_idx,
@@ -992,6 +1293,8 @@ def evaluate(args) -> None:
                         "rho_T_i": rho.get((total_steps, source_step), float("nan")),
                         "local_log_amp_i": local_logs.get(source_step, float("nan")),
                         "step_loss_i": metric_float(step_losses[source_step - 1]) if source_step > 0 else float("nan"),
+                        "train_error_i": train_errors[source_step - 1] if source_step > 0 else float("nan"),
+                        "train_error_type": train_error_type,
                         "teacher_final_loss": teacher_final_loss,
                         "generated_final_loss": generated_final_loss,
                         "generated_final_correct": generated_final_correct,
@@ -1003,23 +1306,29 @@ def evaluate(args) -> None:
                 {
                     "task": task_name,
                     "checkpoint": checkpoint_path or "",
+                    "jacobian_output": args.jacobian_output,
                     "split": args.split,
                     "length": length,
                     "sample_idx": sample_idx,
                     "num_steps": total_steps,
                     "teacher_final_loss": teacher_final_loss,
                     "generated_final_loss": generated_final_loss,
-                    "loss_gap": (
-                        generated_final_loss - teacher_final_loss
-                        if np.isfinite(generated_final_loss) and np.isfinite(teacher_final_loss)
-                        else float("nan")
-                    ),
+                    "loss_gap": final_loss_gap,
                     "generated_final_correct": generated_final_correct,
                     "generated_edit_distance": generated_edit_distance,
                     "bound_proxy": bound_proxy,
                     "log_bound_proxy": log_bound_proxy,
+                    "bound_proxy_valid": bound_proxy_valid,
+                    "calibrated_bound_proxy": calibrated_bound_proxy,
+                    "noise_calibrated_bound_proxy": noise_calibrated_bound_proxy,
+                    "final_expected_embedding_delta_norm": final_expected_embedding_delta_norm,
+                    "empirical_lipschitz_C": empirical_lipschitz_C,
+                    "ce_lipschitz_noise_max": final_ce_lipschitz_noise["ce_lipschitz_noise_max"],
+                    "ce_lipschitz_noise_mean": final_ce_lipschitz_noise["ce_lipschitz_noise_mean"],
                     "max_local_log_amp": max(local_logs.values()) if local_logs else float("nan"),
                     "mean_adjacent_jac_norm": float(np.nanmean(adjacent_norms)) if adjacent_norms else float("nan"),
+                    "mean_train_error": float(np.nanmean(train_errors)) if train_errors else float("nan"),
+                    "train_error_type": train_error_type,
                     "input_jac_norm": input_jac_norm,
                     "log_input_jac_norm": log_input_jac_norm,
                     "raw_gold_answer": seq.raw_answer,
@@ -1043,6 +1352,7 @@ def evaluate(args) -> None:
         [
             "task",
             "checkpoint",
+            "jacobian_output",
             "split",
             "length",
             "sample_idx",
@@ -1053,6 +1363,8 @@ def evaluate(args) -> None:
             "rho_T_i",
             "local_log_amp_i",
             "step_loss_i",
+            "train_error_i",
+            "train_error_type",
             "teacher_final_loss",
             "generated_final_loss",
             "generated_final_correct",
@@ -1065,6 +1377,7 @@ def evaluate(args) -> None:
         [
             "task",
             "checkpoint",
+            "jacobian_output",
             "split",
             "length",
             "sample_idx",
@@ -1083,6 +1396,7 @@ def evaluate(args) -> None:
         [
             "task",
             "checkpoint",
+            "jacobian_output",
             "split",
             "length",
             "sample_idx",
@@ -1091,6 +1405,10 @@ def evaluate(args) -> None:
             "teacher_step_loss",
             "generated_prefix_step_loss",
             "step_loss_gap",
+            "expected_embedding_delta_norm",
+            "empirical_lipschitz_C",
+            "ce_lipschitz_noise_max",
+            "ce_lipschitz_noise_mean",
             "generated_step_correct",
             "generated_step_edit_distance",
             "gold_step",
@@ -1103,6 +1421,7 @@ def evaluate(args) -> None:
         [
             "task",
             "checkpoint",
+            "jacobian_output",
             "split",
             "length",
             "sample_idx",
@@ -1114,8 +1433,17 @@ def evaluate(args) -> None:
             "generated_edit_distance",
             "bound_proxy",
             "log_bound_proxy",
+            "bound_proxy_valid",
+            "calibrated_bound_proxy",
+            "noise_calibrated_bound_proxy",
+            "final_expected_embedding_delta_norm",
+            "empirical_lipschitz_C",
+            "ce_lipschitz_noise_max",
+            "ce_lipschitz_noise_mean",
             "max_local_log_amp",
             "mean_adjacent_jac_norm",
+            "mean_train_error",
+            "train_error_type",
             "input_jac_norm",
             "log_input_jac_norm",
             "gold_final",
@@ -1132,6 +1460,7 @@ def evaluate(args) -> None:
             [
                 "task",
                 "checkpoint",
+                "jacobian_output",
                 "split",
                 "length",
                 "sample_idx",
@@ -1179,11 +1508,24 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--power_iters", type=int, default=5)
     parser.add_argument("--max_target_tokens_for_jacobian", type=int, default=8)
     parser.add_argument("--jacobian_method", type=str, choices=["jvp", "rowgrad"], default="jvp")
+    parser.add_argument(
+        "--jacobian_output",
+        type=str,
+        choices=["selected_logprob", "expected_embedding"],
+        default="selected_logprob",
+        help=(
+            "selected_logprob reproduces the original log-probability diagnostic. "
+            "expected_embedding maps each predicted step to expected token embeddings, "
+            "so recursive rho composes maps in the same embedding space."
+        ),
+    )
     parser.add_argument("--attention_backend", type=str, choices=["math", "auto"], default="math")
     parser.add_argument("--include_input_jacobian", action="store_true")
     parser.add_argument("--full_jacobian", action="store_true")
     parser.add_argument("--finite_difference_checks", type=int, default=0)
     parser.add_argument("--finite_difference_epsilon", type=float, default=1e-3)
+    parser.add_argument("--ce_lipschitz_noise_checks", type=int, default=0)
+    parser.add_argument("--ce_lipschitz_noise_epsilon", type=float, default=1e-3)
     parser.add_argument("--generation_max_new_tokens", type=int, default=0)
     parser.add_argument("--output_dir", type=str, required=True)
 
@@ -1220,6 +1562,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--quant_trainable_noise_scale", action="store_true")
     parser.add_argument("--quant_reinitialize_steps", type=int, default=0)
     parser.add_argument("--quant_reinitialize_alpha", type=float, default=0.2)
+    
+    # just to keep the command consistent
+    parser.add_argument("--use_coconut", action="store_true") # train with Chain of Continuous Thought latent reasoning
+    parser.add_argument("--coconut_steps_to_full_latent", type=int, default=0) # optimizer steps used to replace all reasoning steps with latent thoughts; 0 means full training run
+    parser.add_argument("--coconut_latents_per_step", type=int, default=1) # continuous thoughts inserted per removed language reasoning step
+    parser.add_argument("--coconut_max_train_latent_thoughts", type=int, default=-1) # cap training latent thoughts per sample; -1 means no cap
+    parser.add_argument("--coconut_eval_latent_thoughts", type=int, default=-1) # explicit number of latent thoughts for Coconut generation
+    parser.add_argument("--coconut_gradient_checkpointing", action="store_true") # reduce Coconut activation memory at the cost of speed
+    parser.add_argument("--coconut_bot_token", type=str, default="<bot>")
+    parser.add_argument("--coconut_eot_token", type=str, default="<eot>")
+    parser.add_argument("--eval_test_during_fit", action="store_true") # evaluate test split during each fit validation epoch
+    parser.add_argument("--use_forward_noise_injection", action="store_true")  # inject noise during forward pass
+    parser.add_argument("--forward_noise_std", type=float, default=0.01)  # std of forward noise
+    parser.add_argument("--forward_noise_lora_only", action="store_true")  # apply noise only to LoRA layers
 
     return parser
 

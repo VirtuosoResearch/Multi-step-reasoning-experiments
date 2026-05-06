@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 import pandas as pd
+import os
 from torch.utils.data import DataLoader, SequentialSampler, IterableDataset
 from transformers import DataCollatorForLanguageModeling
 from transformers.data.data_collator import *
@@ -138,6 +139,52 @@ class add_length:
         else:
             examples["length"] = [get_length(q) for q in examples['question']]
         return examples
+
+def require_nonempty_local_split(dataset, task_name, split_name, requested_lengths):
+    if len(dataset) > 0:
+        return
+
+    requested_lengths = list(requested_lengths)
+    if task_name == "cyclic" or task_name.startswith("cyclic_") or \
+       task_name == "symmetric" or task_name.startswith("symmetric_"):
+        suggestion = (
+            "Generate the requested LEGO lengths first, for example: "
+            f"python data/generate_group_lego_datasets.py --tasks {task_name.split('_')[0]} "
+            f"--lengths {' '.join(str(length) for length in requested_lengths)}"
+        )
+    else:
+        suggestion = "Check that the local JSON files contain the requested lengths."
+
+    raise ValueError(
+        f"Local dataset task '{task_name}' has no {split_name} examples for "
+        f"requested length(s) {requested_lengths}. {suggestion}"
+    )
+
+def local_split_data_files(dataset_dir, file_prefix, split, file_suffix, requested_lengths):
+    base_path = f"data/{dataset_dir}/{file_prefix}_{split}{file_suffix}.json"
+    length_paths = [
+        f"data/{dataset_dir}/{file_prefix}_{split}{file_suffix}_length_{int(length)}.json"
+        for length in requested_lengths
+    ]
+    existing_length_paths = [path for path in length_paths if os.path.exists(path)]
+
+    if len(existing_length_paths) == len(length_paths):
+        return length_paths[0] if len(length_paths) == 1 else length_paths
+
+    if len(existing_length_paths) > 0:
+        missing_paths = sorted(set(length_paths) - set(existing_length_paths))
+        raise FileNotFoundError(
+            f"Found some length-specific local dataset files for {file_prefix} {split}, "
+            f"but these requested files are missing: {missing_paths}"
+        )
+
+    if os.path.exists(base_path):
+        return base_path
+
+    raise FileNotFoundError(
+        f"No local dataset file found for {file_prefix} {split}. Expected either "
+        f"length-specific files like {length_paths[0]} or aggregate file {base_path}."
+    )
 
 class convert_format:
 
@@ -280,11 +327,14 @@ class TextCLRSDataModule(pl.LightningDataModule):
                     file_prefix = "lego"
                     file_suffix = "_progressive"  # lego uses _progressive suffix
                 elif task_name == "cyclic" or task_name.startswith("cyclic_"):
-                    dataset_dir = "lego_dataset"  # cyclic examples are in lego_dataset
-                    file_prefix = "lego"
-                    file_suffix = "_progressive"
-                elif task_name == "symmetric" or task_name.startswith("symmetric_") or \
-                     task_name == "symmetry" or task_name.startswith("symmetry_"):
+                    dataset_dir = "cyclic_lego_dataset"
+                    file_prefix = "cyclic"
+                    file_suffix = ""
+                elif task_name == "symmetric" or task_name.startswith("symmetric_"):
+                    dataset_dir = "symmetric_lego_dataset"
+                    file_prefix = "symmetric"
+                    file_suffix = ""
+                elif task_name == "symmetry" or task_name.startswith("symmetry_"):
                     dataset_dir = "symmetry_dataset"
                     file_prefix = "symmetry"
                     file_suffix = ""  # symmetry doesn't use suffix
@@ -292,24 +342,35 @@ class TextCLRSDataModule(pl.LightningDataModule):
                     raise ValueError(f"Unknown local dataset task: {task_name}")
                 
                 # Load dataset from local JSON files
-                # Note: local datasets have fixed length for all samples, so we skip length filtering
-                train_dataset = load_dataset("json", data_files=f"data/{dataset_dir}/{file_prefix}_train{file_suffix}.json")['train']
+                train_files = local_split_data_files(
+                    dataset_dir, file_prefix, "train", file_suffix, self.train_lengths
+                )
+                train_dataset = load_dataset("json", data_files=train_files)['train']
                 train_dataset = train_dataset.map(add_length(is_lego=True), batched=True)
-                # Skip length filtering for local datasets since all samples have the same length
+                train_dataset = train_dataset.filter(lambda x: x['length'] in self.train_lengths)
+                require_nonempty_local_split(train_dataset, task_name, "train", self.train_lengths)
                 # convert the input and output format
                 sample_steps = 10 if task_name in ["mst_kruskal", "floyd_warshall"] else 20
                 train_dataset = train_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio, reduce_steps_equally_spaced=self.reduce_steps_equally_spaced), batched=True, load_from_cache_file=False)
                 
                 # Load validation dataset
-                eval_dataset = load_dataset("json", data_files=f"data/{dataset_dir}/{file_prefix}_val{file_suffix}.json")['train']
+                eval_files = local_split_data_files(
+                    dataset_dir, file_prefix, "val", file_suffix, self.train_lengths
+                )
+                eval_dataset = load_dataset("json", data_files=eval_files)['train']
                 eval_dataset = eval_dataset.map(add_length(is_lego=True), batched=True)
-                # Skip length filtering for local datasets since all samples have the same length
+                eval_dataset = eval_dataset.filter(lambda x: x['length'] in self.train_lengths)
+                require_nonempty_local_split(eval_dataset, task_name, "validation", self.train_lengths)
                 eval_dataset = eval_dataset.map(convert_format(only_answer_output=self.only_answer_output, sample_steps=sample_steps, reduce_steps_ratio=self.reduce_steps_ratio, reduce_steps_equally_spaced=self.reduce_steps_equally_spaced), batched=True, load_from_cache_file=False)
                 
                 # Load test dataset
-                predict_dataset = load_dataset("json", data_files=f"data/{dataset_dir}/{file_prefix}_test{file_suffix}.json")['train']
+                test_files = local_split_data_files(
+                    dataset_dir, file_prefix, "test", file_suffix, self.test_lengths
+                )
+                predict_dataset = load_dataset("json", data_files=test_files)['train']
                 predict_dataset = predict_dataset.map(add_length(is_lego=True), batched=True)
-                # Skip length filtering for local datasets since all samples have the same length
+                predict_dataset = predict_dataset.filter(lambda x: x['length'] in self.test_lengths)
+                require_nonempty_local_split(predict_dataset, task_name, "test", self.test_lengths)
                 # convert the input and output format
                 if self.use_few_shot:
                     predict_dataset = predict_dataset.map(convert_few_shot_format(train_dataset, only_answer_output=self.only_answer_output, k=self.few_shot_k), batched=True, load_from_cache_file=False)

@@ -4,7 +4,7 @@ from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-1.5B", trust_remote_code=True)
 data_module =TextCLRSDataModule(
-    task_names=["bfs"],
+    task_names=["dfs"],
     tokenizer=tokenizer,
     batch_size=8,
     inference_batch_size=8,
@@ -15,8 +15,8 @@ data_module =TextCLRSDataModule(
     downsample_ratio=1,
     minimum_samples=10000,
     minimum_samples_validation=10000,
-    train_lengths=[10],
-    test_lengths=[10],
+    train_lengths=[11],
+    test_lengths=[11],
     use_few_shot=False, 
     few_shot_k=0,
     only_answer_output=False,
@@ -53,3 +53,22 @@ print(max_input_length, max_output_length)
 # bellman_ford 458 197
 # dijkstra 456 219
 # %%
+# length = 19
+# mst_prim 1348 1070
+
+# length = 15
+# mst_prim 903 660
+# bellman_ford 904 330
+# dijkstra 902 668
+# bfs 519 357
+# dfs 512 790
+
+# length = 12
+# mst_prim 615 403
+
+# length = 11
+# mst_prim 555 355
+# bellman_ford 556 225
+# dijkstra 554 362
+# bfs 295 223
+# dfs 288 549

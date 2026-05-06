@@ -1,0 +1,4002 @@
+[
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ah = shift(m) 2 mod 6, h = shift(ah) 3 mod 6, i = shift(y) 1 mod 6, t = shift(f) 4 mod 6, ac = val 4, y = shift(h) 4 mod 6, f = shift(ac) 2 mod 6, a = shift(al) 2 mod 6, al = shift(i) 0 mod 6, m = shift(t) 4 mod 6,\nvariables: ah h i t ac y f a al m\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 4 n n n n n], [n n n n 4 n 0 n n n], [n n n 4 4 n 0 n n n], [n n n 4 4 n 0 n n 2], [4 n n 4 4 n 0 n n 2], [4 1 n 4 4 n 0 n n 2], [4 1 n 4 4 5 0 n n 2], [4 1 0 4 4 5 0 n n 2], [4 1 0 4 4 5 0 n 0 2], [4 1 0 4 4 5 0 2 0 2] | [4 1 0 4 4 5 0 2 0 2]",
+    "final_values": [
+      4,
+      1,
+      0,
+      4,
+      4,
+      5,
+      0,
+      2,
+      0,
+      2
+    ],
+    "sequence_order": [
+      "ah",
+      "h",
+      "i",
+      "t",
+      "ac",
+      "y",
+      "f",
+      "a",
+      "al",
+      "m"
+    ],
+    "dependency_order": [
+      "ac",
+      "f",
+      "t",
+      "m",
+      "ah",
+      "h",
+      "y",
+      "i",
+      "al",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: n = shift(ad) 1 mod 6, ag = shift(n) 5 mod 6, t = shift(am) 3 mod 6, ae = shift(a) 0 mod 6, r = shift(q) 3 mod 6, s = val 2, ad = shift(t) 2 mod 6, q = shift(ag) 3 mod 6, a = shift(r) 1 mod 6, am = shift(s) 5 mod 6,\nvariables: n ag t ae r s ad q a am\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 2 n n n n], [n n n n n 2 n n n 1], [n n 4 n n 2 n n n 1], [n n 4 n n 2 0 n n 1], [1 n 4 n n 2 0 n n 1], [1 0 4 n n 2 0 n n 1], [1 0 4 n n 2 0 3 n 1], [1 0 4 n 0 2 0 3 n 1], [1 0 4 n 0 2 0 3 1 1], [1 0 4 1 0 2 0 3 1 1] | [1 0 4 1 0 2 0 3 1 1]",
+    "final_values": [
+      1,
+      0,
+      4,
+      1,
+      0,
+      2,
+      0,
+      3,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "n",
+      "ag",
+      "t",
+      "ae",
+      "r",
+      "s",
+      "ad",
+      "q",
+      "a",
+      "am"
+    ],
+    "dependency_order": [
+      "s",
+      "am",
+      "t",
+      "ad",
+      "n",
+      "ag",
+      "q",
+      "r",
+      "a",
+      "ae"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ai = shift(e) 1 mod 6, d = shift(t) 2 mod 6, t = val 2, e = shift(ac) 1 mod 6, z = shift(r) 2 mod 6, r = shift(ai) 3 mod 6, ae = shift(k) 4 mod 6, k = shift(z) 4 mod 6, ac = shift(ah) 2 mod 6, ah = shift(d) 2 mod 6,\nvariables: ai d t e z r ae k ac ah\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 2 n n n n n n n], [n 4 2 n n n n n n n], [n 4 2 n n n n n n 0], [n 4 2 n n n n n 2 0], [n 4 2 3 n n n n 2 0], [4 4 2 3 n n n n 2 0], [4 4 2 3 n 1 n n 2 0], [4 4 2 3 3 1 n n 2 0], [4 4 2 3 3 1 n 1 2 0], [4 4 2 3 3 1 5 1 2 0] | [4 4 2 3 3 1 5 1 2 0]",
+    "final_values": [
+      4,
+      4,
+      2,
+      3,
+      3,
+      1,
+      5,
+      1,
+      2,
+      0
+    ],
+    "sequence_order": [
+      "ai",
+      "d",
+      "t",
+      "e",
+      "z",
+      "r",
+      "ae",
+      "k",
+      "ac",
+      "ah"
+    ],
+    "dependency_order": [
+      "t",
+      "d",
+      "ah",
+      "ac",
+      "e",
+      "ai",
+      "r",
+      "z",
+      "k",
+      "ae"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ae = shift(r) 2 mod 6, y = shift(ae) 2 mod 6, ab = shift(w) 4 mod 6, af = shift(ag) 4 mod 6, v = shift(f) 2 mod 6, w = shift(aj) 4 mod 6, f = shift(y) 5 mod 6, r = val 3, aj = shift(v) 0 mod 6, ag = shift(ab) 0 mod 6,\nvariables: ae y ab af v w f r aj ag\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 3 n n], [5 n n n n n n 3 n n], [5 1 n n n n n 3 n n], [5 1 n n n n 0 3 n n], [5 1 n n 2 n 0 3 n n], [5 1 n n 2 n 0 3 2 n], [5 1 n n 2 0 0 3 2 n], [5 1 4 n 2 0 0 3 2 n], [5 1 4 n 2 0 0 3 2 4], [5 1 4 2 2 0 0 3 2 4] | [5 1 4 2 2 0 0 3 2 4]",
+    "final_values": [
+      5,
+      1,
+      4,
+      2,
+      2,
+      0,
+      0,
+      3,
+      2,
+      4
+    ],
+    "sequence_order": [
+      "ae",
+      "y",
+      "ab",
+      "af",
+      "v",
+      "w",
+      "f",
+      "r",
+      "aj",
+      "ag"
+    ],
+    "dependency_order": [
+      "r",
+      "ae",
+      "y",
+      "f",
+      "v",
+      "aj",
+      "w",
+      "ab",
+      "ag",
+      "af"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ab = shift(m) 3 mod 6, s = shift(ad) 0 mod 6, k = val 4, x = shift(g) 3 mod 6, m = shift(k) 3 mod 6, f = shift(w) 0 mod 6, ad = shift(aj) 1 mod 6, w = shift(ab) 1 mod 6, g = shift(s) 4 mod 6, aj = shift(f) 2 mod 6,\nvariables: ab s k x m f ad w g aj\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 4 n n n n n n n], [n n 4 n 1 n n n n n], [4 n 4 n 1 n n n n n], [4 n 4 n 1 n n 5 n n], [4 n 4 n 1 5 n 5 n n], [4 n 4 n 1 5 n 5 n 1], [4 n 4 n 1 5 2 5 n 1], [4 2 4 n 1 5 2 5 n 1], [4 2 4 n 1 5 2 5 0 1], [4 2 4 3 1 5 2 5 0 1] | [4 2 4 3 1 5 2 5 0 1]",
+    "final_values": [
+      4,
+      2,
+      4,
+      3,
+      1,
+      5,
+      2,
+      5,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "ab",
+      "s",
+      "k",
+      "x",
+      "m",
+      "f",
+      "ad",
+      "w",
+      "g",
+      "aj"
+    ],
+    "dependency_order": [
+      "k",
+      "m",
+      "ab",
+      "w",
+      "f",
+      "aj",
+      "ad",
+      "s",
+      "g",
+      "x"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: d = val 5, n = shift(w) 2 mod 6, ad = shift(a) 1 mod 6, ah = shift(e) 5 mod 6, ag = shift(q) 1 mod 6, w = shift(ad) 4 mod 6, aa = shift(d) 4 mod 6, e = shift(aa) 5 mod 6, q = shift(ah) 3 mod 6, a = shift(ag) 1 mod 6,\nvariables: d n ad ah ag w aa e q a\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[5 n n n n n n n n n], [5 n n n n n 3 n n n], [5 n n n n n 3 2 n n], [5 n n 1 n n 3 2 n n], [5 n n 1 n n 3 2 4 n], [5 n n 1 5 n 3 2 4 n], [5 n n 1 5 n 3 2 4 0], [5 n 1 1 5 n 3 2 4 0], [5 n 1 1 5 5 3 2 4 0], [5 1 1 1 5 5 3 2 4 0] | [5 1 1 1 5 5 3 2 4 0]",
+    "final_values": [
+      5,
+      1,
+      1,
+      1,
+      5,
+      5,
+      3,
+      2,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "d",
+      "n",
+      "ad",
+      "ah",
+      "ag",
+      "w",
+      "aa",
+      "e",
+      "q",
+      "a"
+    ],
+    "dependency_order": [
+      "d",
+      "aa",
+      "e",
+      "ah",
+      "q",
+      "ag",
+      "a",
+      "ad",
+      "w",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: e = shift(n) 3 mod 6, u = shift(j) 3 mod 6, c = shift(u) 5 mod 6, j = shift(x) 4 mod 6, al = shift(i) 5 mod 6, x = shift(p) 5 mod 6, p = shift(al) 5 mod 6, l = shift(e) 4 mod 6, i = val 3, n = shift(c) 2 mod 6,\nvariables: e u c j al x p l i n\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 3 n], [n n n n 2 n n n 3 n], [n n n n 2 n 1 n 3 n], [n n n n 2 0 1 n 3 n], [n n n 4 2 0 1 n 3 n], [n 1 n 4 2 0 1 n 3 n], [n 1 0 4 2 0 1 n 3 n], [n 1 0 4 2 0 1 n 3 2], [5 1 0 4 2 0 1 n 3 2], [5 1 0 4 2 0 1 3 3 2] | [5 1 0 4 2 0 1 3 3 2]",
+    "final_values": [
+      5,
+      1,
+      0,
+      4,
+      2,
+      0,
+      1,
+      3,
+      3,
+      2
+    ],
+    "sequence_order": [
+      "e",
+      "u",
+      "c",
+      "j",
+      "al",
+      "x",
+      "p",
+      "l",
+      "i",
+      "n"
+    ],
+    "dependency_order": [
+      "i",
+      "al",
+      "p",
+      "x",
+      "j",
+      "u",
+      "c",
+      "n",
+      "e",
+      "l"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: b = shift(al) 0 mod 6, c = shift(s) 1 mod 6, m = shift(ah) 5 mod 6, ac = shift(g) 0 mod 6, al = shift(d) 0 mod 6, s = shift(o) 0 mod 6, g = shift(c) 2 mod 6, ah = shift(ac) 3 mod 6, d = val 5, o = shift(b) 0 mod 6,\nvariables: b c m ac al s g ah d o\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 5 n], [n n n n 5 n n n 5 n], [5 n n n 5 n n n 5 n], [5 n n n 5 n n n 5 5], [5 n n n 5 5 n n 5 5], [5 0 n n 5 5 n n 5 5], [5 0 n n 5 5 2 n 5 5], [5 0 n 2 5 5 2 n 5 5], [5 0 n 2 5 5 2 5 5 5], [5 0 4 2 5 5 2 5 5 5] | [5 0 4 2 5 5 2 5 5 5]",
+    "final_values": [
+      5,
+      0,
+      4,
+      2,
+      5,
+      5,
+      2,
+      5,
+      5,
+      5
+    ],
+    "sequence_order": [
+      "b",
+      "c",
+      "m",
+      "ac",
+      "al",
+      "s",
+      "g",
+      "ah",
+      "d",
+      "o"
+    ],
+    "dependency_order": [
+      "d",
+      "al",
+      "b",
+      "o",
+      "s",
+      "c",
+      "g",
+      "ac",
+      "ah",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: x = shift(ac) 0 mod 6, af = shift(ab) 2 mod 6, ab = val 3, v = shift(i) 4 mod 6, t = shift(af) 5 mod 6, i = shift(w) 5 mod 6, ac = shift(t) 3 mod 6, j = shift(v) 0 mod 6, w = shift(d) 3 mod 6, d = shift(x) 3 mod 6,\nvariables: x af ab v t i ac j w d\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 3 n n n n n n n], [n 5 3 n n n n n n n], [n 5 3 n 4 n n n n n], [n 5 3 n 4 n 1 n n n], [1 5 3 n 4 n 1 n n n], [1 5 3 n 4 n 1 n n 4], [1 5 3 n 4 n 1 n 1 4], [1 5 3 n 4 0 1 n 1 4], [1 5 3 4 4 0 1 n 1 4], [1 5 3 4 4 0 1 4 1 4] | [1 5 3 4 4 0 1 4 1 4]",
+    "final_values": [
+      1,
+      5,
+      3,
+      4,
+      4,
+      0,
+      1,
+      4,
+      1,
+      4
+    ],
+    "sequence_order": [
+      "x",
+      "af",
+      "ab",
+      "v",
+      "t",
+      "i",
+      "ac",
+      "j",
+      "w",
+      "d"
+    ],
+    "dependency_order": [
+      "ab",
+      "af",
+      "t",
+      "ac",
+      "x",
+      "d",
+      "w",
+      "i",
+      "v",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: c = shift(e) 0 mod 6, e = shift(y) 1 mod 6, y = shift(af) 2 mod 6, af = shift(t) 0 mod 6, ag = shift(m) 2 mod 6, m = shift(c) 5 mod 6, f = val 0, b = shift(f) 3 mod 6, t = shift(ai) 4 mod 6, ai = shift(b) 1 mod 6,\nvariables: c e y af ag m f b t ai\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n n n], [n n n n n n 0 3 n n], [n n n n n n 0 3 n 4], [n n n n n n 0 3 2 4], [n n n 2 n n 0 3 2 4], [n n 4 2 n n 0 3 2 4], [n 5 4 2 n n 0 3 2 4], [5 5 4 2 n n 0 3 2 4], [5 5 4 2 n 4 0 3 2 4], [5 5 4 2 0 4 0 3 2 4] | [5 5 4 2 0 4 0 3 2 4]",
+    "final_values": [
+      5,
+      5,
+      4,
+      2,
+      0,
+      4,
+      0,
+      3,
+      2,
+      4
+    ],
+    "sequence_order": [
+      "c",
+      "e",
+      "y",
+      "af",
+      "ag",
+      "m",
+      "f",
+      "b",
+      "t",
+      "ai"
+    ],
+    "dependency_order": [
+      "f",
+      "b",
+      "ai",
+      "t",
+      "af",
+      "y",
+      "e",
+      "c",
+      "m",
+      "ag"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: h = shift(o) 0 mod 6, m = shift(ai) 3 mod 6, ab = shift(i) 5 mod 6, ad = shift(r) 0 mod 6, o = shift(m) 3 mod 6, ai = shift(ad) 0 mod 6, al = shift(l) 4 mod 6, i = shift(h) 1 mod 6, r = shift(al) 5 mod 6, l = val 4,\nvariables: h m ab ad o ai al i r l\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 4], [n n n n n n 2 n n 4], [n n n n n n 2 n 1 4], [n n n 1 n n 2 n 1 4], [n n n 1 n 1 2 n 1 4], [n 4 n 1 n 1 2 n 1 4], [n 4 n 1 1 1 2 n 1 4], [1 4 n 1 1 1 2 n 1 4], [1 4 n 1 1 1 2 2 1 4], [1 4 1 1 1 1 2 2 1 4] | [1 4 1 1 1 1 2 2 1 4]",
+    "final_values": [
+      1,
+      4,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      4
+    ],
+    "sequence_order": [
+      "h",
+      "m",
+      "ab",
+      "ad",
+      "o",
+      "ai",
+      "al",
+      "i",
+      "r",
+      "l"
+    ],
+    "dependency_order": [
+      "l",
+      "al",
+      "r",
+      "ad",
+      "ai",
+      "m",
+      "o",
+      "h",
+      "i",
+      "ab"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: aa = shift(t) 5 mod 6, ag = shift(ab) 4 mod 6, m = shift(ag) 3 mod 6, p = shift(ak) 3 mod 6, c = shift(aa) 5 mod 6, ab = shift(p) 0 mod 6, al = val 0, ak = shift(c) 2 mod 6, i = shift(al) 3 mod 6, t = shift(i) 5 mod 6,\nvariables: aa ag m p c ab al ak i t\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n n n], [n n n n n n 0 n 3 n], [n n n n n n 0 n 3 2], [1 n n n n n 0 n 3 2], [1 n n n 0 n 0 n 3 2], [1 n n n 0 n 0 2 3 2], [1 n n 5 0 n 0 2 3 2], [1 n n 5 0 5 0 2 3 2], [1 3 n 5 0 5 0 2 3 2], [1 3 0 5 0 5 0 2 3 2] | [1 3 0 5 0 5 0 2 3 2]",
+    "final_values": [
+      1,
+      3,
+      0,
+      5,
+      0,
+      5,
+      0,
+      2,
+      3,
+      2
+    ],
+    "sequence_order": [
+      "aa",
+      "ag",
+      "m",
+      "p",
+      "c",
+      "ab",
+      "al",
+      "ak",
+      "i",
+      "t"
+    ],
+    "dependency_order": [
+      "al",
+      "i",
+      "t",
+      "aa",
+      "c",
+      "ak",
+      "p",
+      "ab",
+      "ag",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: af = shift(x) 1 mod 6, am = val 4, ae = shift(j) 5 mod 6, g = shift(ae) 3 mod 6, j = shift(al) 4 mod 6, s = shift(an) 1 mod 6, an = shift(am) 3 mod 6, al = shift(af) 1 mod 6, x = shift(d) 4 mod 6, d = shift(s) 0 mod 6,\nvariables: af am ae g j s an al x d\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 4 n n n n n n n n], [n 4 n n n n 1 n n n], [n 4 n n n 2 1 n n n], [n 4 n n n 2 1 n n 2], [n 4 n n n 2 1 n 0 2], [1 4 n n n 2 1 n 0 2], [1 4 n n n 2 1 2 0 2], [1 4 n n 0 2 1 2 0 2], [1 4 5 n 0 2 1 2 0 2], [1 4 5 2 0 2 1 2 0 2] | [1 4 5 2 0 2 1 2 0 2]",
+    "final_values": [
+      1,
+      4,
+      5,
+      2,
+      0,
+      2,
+      1,
+      2,
+      0,
+      2
+    ],
+    "sequence_order": [
+      "af",
+      "am",
+      "ae",
+      "g",
+      "j",
+      "s",
+      "an",
+      "al",
+      "x",
+      "d"
+    ],
+    "dependency_order": [
+      "am",
+      "an",
+      "s",
+      "d",
+      "x",
+      "af",
+      "al",
+      "j",
+      "ae",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ah = shift(an) 5 mod 6, ag = val 1, an = shift(o) 5 mod 6, al = shift(p) 1 mod 6, p = shift(af) 0 mod 6, j = shift(al) 5 mod 6, af = shift(am) 1 mod 6, o = shift(y) 3 mod 6, y = shift(j) 3 mod 6, am = shift(ag) 3 mod 6,\nvariables: ah ag an al p j af o y am\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n n n], [n 1 n n n n n n n 4], [n 1 n n n n 5 n n 4], [n 1 n n 5 n 5 n n 4], [n 1 n 0 5 n 5 n n 4], [n 1 n 0 5 5 5 n n 4], [n 1 n 0 5 5 5 n 2 4], [n 1 n 0 5 5 5 5 2 4], [n 1 4 0 5 5 5 5 2 4], [3 1 4 0 5 5 5 5 2 4] | [3 1 4 0 5 5 5 5 2 4]",
+    "final_values": [
+      3,
+      1,
+      4,
+      0,
+      5,
+      5,
+      5,
+      5,
+      2,
+      4
+    ],
+    "sequence_order": [
+      "ah",
+      "ag",
+      "an",
+      "al",
+      "p",
+      "j",
+      "af",
+      "o",
+      "y",
+      "am"
+    ],
+    "dependency_order": [
+      "ag",
+      "am",
+      "af",
+      "p",
+      "al",
+      "j",
+      "y",
+      "o",
+      "an",
+      "ah"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ab = shift(k) 4 mod 6, am = shift(ah) 3 mod 6, aa = shift(s) 0 mod 6, l = shift(aa) 5 mod 6, ae = val 3, m = shift(am) 4 mod 6, s = shift(ae) 1 mod 6, ah = shift(l) 5 mod 6, k = shift(m) 0 mod 6, i = shift(ab) 3 mod 6,\nvariables: ab am aa l ae m s ah k i\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 3 n n n n n], [n n n n 3 n 4 n n n], [n n 4 n 3 n 4 n n n], [n n 4 3 3 n 4 n n n], [n n 4 3 3 n 4 2 n n], [n 5 4 3 3 n 4 2 n n], [n 5 4 3 3 3 4 2 n n], [n 5 4 3 3 3 4 2 3 n], [1 5 4 3 3 3 4 2 3 n], [1 5 4 3 3 3 4 2 3 4] | [1 5 4 3 3 3 4 2 3 4]",
+    "final_values": [
+      1,
+      5,
+      4,
+      3,
+      3,
+      3,
+      4,
+      2,
+      3,
+      4
+    ],
+    "sequence_order": [
+      "ab",
+      "am",
+      "aa",
+      "l",
+      "ae",
+      "m",
+      "s",
+      "ah",
+      "k",
+      "i"
+    ],
+    "dependency_order": [
+      "ae",
+      "s",
+      "aa",
+      "l",
+      "ah",
+      "am",
+      "m",
+      "k",
+      "ab",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: w = shift(l) 4 mod 6, am = shift(x) 2 mod 6, x = shift(ak) 2 mod 6, q = shift(j) 3 mod 6, al = shift(w) 0 mod 6, ag = shift(am) 1 mod 6, l = val 4, j = shift(ai) 4 mod 6, ai = shift(al) 1 mod 6, ak = shift(q) 5 mod 6,\nvariables: w am x q al ag l j ai ak\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 4 n n n], [2 n n n n n 4 n n n], [2 n n n 2 n 4 n n n], [2 n n n 2 n 4 n 3 n], [2 n n n 2 n 4 1 3 n], [2 n n 4 2 n 4 1 3 n], [2 n n 4 2 n 4 1 3 3], [2 n 5 4 2 n 4 1 3 3], [2 1 5 4 2 n 4 1 3 3], [2 1 5 4 2 2 4 1 3 3] | [2 1 5 4 2 2 4 1 3 3]",
+    "final_values": [
+      2,
+      1,
+      5,
+      4,
+      2,
+      2,
+      4,
+      1,
+      3,
+      3
+    ],
+    "sequence_order": [
+      "w",
+      "am",
+      "x",
+      "q",
+      "al",
+      "ag",
+      "l",
+      "j",
+      "ai",
+      "ak"
+    ],
+    "dependency_order": [
+      "l",
+      "w",
+      "al",
+      "ai",
+      "j",
+      "q",
+      "ak",
+      "x",
+      "am",
+      "ag"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: n = val 2, q = shift(ac) 1 mod 6, aj = shift(d) 0 mod 6, i = shift(w) 0 mod 6, w = shift(aj) 5 mod 6, ak = shift(i) 3 mod 6, d = shift(n) 2 mod 6, ac = shift(ae) 3 mod 6, ae = shift(ak) 2 mod 6, k = shift(q) 3 mod 6,\nvariables: n q aj i w ak d ac ae k\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[2 n n n n n n n n n], [2 n n n n n 4 n n n], [2 n 4 n n n 4 n n n], [2 n 4 n 3 n 4 n n n], [2 n 4 3 3 n 4 n n n], [2 n 4 3 3 0 4 n n n], [2 n 4 3 3 0 4 n 2 n], [2 n 4 3 3 0 4 5 2 n], [2 0 4 3 3 0 4 5 2 n], [2 0 4 3 3 0 4 5 2 3] | [2 0 4 3 3 0 4 5 2 3]",
+    "final_values": [
+      2,
+      0,
+      4,
+      3,
+      3,
+      0,
+      4,
+      5,
+      2,
+      3
+    ],
+    "sequence_order": [
+      "n",
+      "q",
+      "aj",
+      "i",
+      "w",
+      "ak",
+      "d",
+      "ac",
+      "ae",
+      "k"
+    ],
+    "dependency_order": [
+      "n",
+      "d",
+      "aj",
+      "w",
+      "i",
+      "ak",
+      "ae",
+      "ac",
+      "q",
+      "k"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ak = shift(w) 3 mod 6, q = shift(ak) 4 mod 6, ai = shift(m) 0 mod 6, f = shift(i) 5 mod 6, m = shift(b) 0 mod 6, i = shift(an) 1 mod 6, y = val 4, an = shift(y) 3 mod 6, b = shift(q) 5 mod 6, w = shift(f) 3 mod 6,\nvariables: ak q ai f m i y an b w\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 4 n n n], [n n n n n n 4 1 n n], [n n n n n 2 4 1 n n], [n n n 1 n 2 4 1 n n], [n n n 1 n 2 4 1 n 4], [1 n n 1 n 2 4 1 n 4], [1 5 n 1 n 2 4 1 n 4], [1 5 n 1 n 2 4 1 4 4], [1 5 n 1 4 2 4 1 4 4], [1 5 4 1 4 2 4 1 4 4] | [1 5 4 1 4 2 4 1 4 4]",
+    "final_values": [
+      1,
+      5,
+      4,
+      1,
+      4,
+      2,
+      4,
+      1,
+      4,
+      4
+    ],
+    "sequence_order": [
+      "ak",
+      "q",
+      "ai",
+      "f",
+      "m",
+      "i",
+      "y",
+      "an",
+      "b",
+      "w"
+    ],
+    "dependency_order": [
+      "y",
+      "an",
+      "i",
+      "f",
+      "w",
+      "ak",
+      "q",
+      "b",
+      "m",
+      "ai"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: v = shift(s) 3 mod 6, aj = val 4, w = shift(l) 0 mod 6, s = shift(u) 1 mod 6, u = shift(aj) 2 mod 6, o = shift(am) 0 mod 6, ah = shift(o) 3 mod 6, g = shift(w) 1 mod 6, l = shift(ah) 1 mod 6, am = shift(v) 1 mod 6,\nvariables: v aj w s u o ah g l am\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 4 n n n n n n n n], [n 4 n n 0 n n n n n], [n 4 n 1 0 n n n n n], [4 4 n 1 0 n n n n n], [4 4 n 1 0 n n n n 5], [4 4 n 1 0 5 n n n 5], [4 4 n 1 0 5 2 n n 5], [4 4 n 1 0 5 2 n 3 5], [4 4 3 1 0 5 2 n 3 5], [4 4 3 1 0 5 2 4 3 5] | [4 4 3 1 0 5 2 4 3 5]",
+    "final_values": [
+      4,
+      4,
+      3,
+      1,
+      0,
+      5,
+      2,
+      4,
+      3,
+      5
+    ],
+    "sequence_order": [
+      "v",
+      "aj",
+      "w",
+      "s",
+      "u",
+      "o",
+      "ah",
+      "g",
+      "l",
+      "am"
+    ],
+    "dependency_order": [
+      "aj",
+      "u",
+      "s",
+      "v",
+      "am",
+      "o",
+      "ah",
+      "l",
+      "w",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: a = shift(i) 2 mod 6, t = shift(s) 0 mod 6, o = shift(h) 5 mod 6, i = shift(d) 0 mod 6, s = shift(u) 5 mod 6, d = shift(o) 0 mod 6, al = val 0, h = shift(t) 5 mod 6, u = shift(y) 4 mod 6, y = shift(al) 0 mod 6,\nvariables: a t o i s d al h u y\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n n n], [n n n n n n 0 n n 0], [n n n n n n 0 n 4 0], [n n n n 3 n 0 n 4 0], [n 3 n n 3 n 0 n 4 0], [n 3 n n 3 n 0 2 4 0], [n 3 1 n 3 n 0 2 4 0], [n 3 1 n 3 1 0 2 4 0], [n 3 1 1 3 1 0 2 4 0], [3 3 1 1 3 1 0 2 4 0] | [3 3 1 1 3 1 0 2 4 0]",
+    "final_values": [
+      3,
+      3,
+      1,
+      1,
+      3,
+      1,
+      0,
+      2,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "a",
+      "t",
+      "o",
+      "i",
+      "s",
+      "d",
+      "al",
+      "h",
+      "u",
+      "y"
+    ],
+    "dependency_order": [
+      "al",
+      "y",
+      "u",
+      "s",
+      "t",
+      "h",
+      "o",
+      "d",
+      "i",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ac = shift(k) 2 mod 6, e = shift(ac) 5 mod 6, q = shift(y) 0 mod 6, k = shift(q) 0 mod 6, v = val 0, y = shift(s) 4 mod 6, r = shift(w) 2 mod 6, w = shift(e) 4 mod 6, m = shift(v) 3 mod 6, s = shift(m) 1 mod 6,\nvariables: ac e q k v y r w m s\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n n n], [n n n n 0 n n n 3 n], [n n n n 0 n n n 3 4], [n n n n 0 2 n n 3 4], [n n 2 n 0 2 n n 3 4], [n n 2 2 0 2 n n 3 4], [4 n 2 2 0 2 n n 3 4], [4 3 2 2 0 2 n n 3 4], [4 3 2 2 0 2 n 1 3 4], [4 3 2 2 0 2 3 1 3 4] | [4 3 2 2 0 2 3 1 3 4]",
+    "final_values": [
+      4,
+      3,
+      2,
+      2,
+      0,
+      2,
+      3,
+      1,
+      3,
+      4
+    ],
+    "sequence_order": [
+      "ac",
+      "e",
+      "q",
+      "k",
+      "v",
+      "y",
+      "r",
+      "w",
+      "m",
+      "s"
+    ],
+    "dependency_order": [
+      "v",
+      "m",
+      "s",
+      "y",
+      "q",
+      "k",
+      "ac",
+      "e",
+      "w",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: a = shift(l) 0 mod 6, aa = shift(p) 1 mod 6, p = shift(a) 3 mod 6, al = shift(af) 0 mod 6, z = shift(aa) 4 mod 6, l = val 4, r = shift(ah) 0 mod 6, af = shift(z) 3 mod 6, ah = shift(al) 0 mod 6, d = shift(r) 4 mod 6,\nvariables: a aa p al z l r af ah d\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 4 n n n n], [4 n n n n 4 n n n n], [4 n 1 n n 4 n n n n], [4 2 1 n n 4 n n n n], [4 2 1 n 0 4 n n n n], [4 2 1 n 0 4 n 3 n n], [4 2 1 3 0 4 n 3 n n], [4 2 1 3 0 4 n 3 3 n], [4 2 1 3 0 4 3 3 3 n], [4 2 1 3 0 4 3 3 3 1] | [4 2 1 3 0 4 3 3 3 1]",
+    "final_values": [
+      4,
+      2,
+      1,
+      3,
+      0,
+      4,
+      3,
+      3,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "a",
+      "aa",
+      "p",
+      "al",
+      "z",
+      "l",
+      "r",
+      "af",
+      "ah",
+      "d"
+    ],
+    "dependency_order": [
+      "l",
+      "a",
+      "p",
+      "aa",
+      "z",
+      "af",
+      "al",
+      "ah",
+      "r",
+      "d"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: j = shift(e) 0 mod 6, af = shift(h) 5 mod 6, o = shift(af) 1 mod 6, ac = shift(ae) 1 mod 6, f = shift(o) 5 mod 6, d = shift(g) 1 mod 6, h = val 0, ae = shift(d) 5 mod 6, e = shift(f) 1 mod 6, g = shift(j) 4 mod 6,\nvariables: j af o ac f d h ae e g\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n n n], [n 5 n n n n 0 n n n], [n 5 0 n n n 0 n n n], [n 5 0 n 5 n 0 n n n], [n 5 0 n 5 n 0 n 0 n], [0 5 0 n 5 n 0 n 0 n], [0 5 0 n 5 n 0 n 0 4], [0 5 0 n 5 5 0 n 0 4], [0 5 0 n 5 5 0 4 0 4], [0 5 0 5 5 5 0 4 0 4] | [0 5 0 5 5 5 0 4 0 4]",
+    "final_values": [
+      0,
+      5,
+      0,
+      5,
+      5,
+      5,
+      0,
+      4,
+      0,
+      4
+    ],
+    "sequence_order": [
+      "j",
+      "af",
+      "o",
+      "ac",
+      "f",
+      "d",
+      "h",
+      "ae",
+      "e",
+      "g"
+    ],
+    "dependency_order": [
+      "h",
+      "af",
+      "o",
+      "f",
+      "e",
+      "j",
+      "g",
+      "d",
+      "ae",
+      "ac"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: x = shift(a) 2 mod 6, g = shift(ad) 2 mod 6, h = shift(af) 5 mod 6, af = shift(am) 0 mod 6, a = shift(w) 5 mod 6, o = val 1, w = shift(h) 5 mod 6, ad = shift(q) 5 mod 6, q = shift(o) 2 mod 6, am = shift(g) 0 mod 6,\nvariables: x g h af a o w ad q am\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n n n], [n n n n n 1 n n 3 n], [n n n n n 1 n 2 3 n], [n 4 n n n 1 n 2 3 n], [n 4 n n n 1 n 2 3 4], [n 4 n 4 n 1 n 2 3 4], [n 4 3 4 n 1 n 2 3 4], [n 4 3 4 n 1 2 2 3 4], [n 4 3 4 1 1 2 2 3 4], [3 4 3 4 1 1 2 2 3 4] | [3 4 3 4 1 1 2 2 3 4]",
+    "final_values": [
+      3,
+      4,
+      3,
+      4,
+      1,
+      1,
+      2,
+      2,
+      3,
+      4
+    ],
+    "sequence_order": [
+      "x",
+      "g",
+      "h",
+      "af",
+      "a",
+      "o",
+      "w",
+      "ad",
+      "q",
+      "am"
+    ],
+    "dependency_order": [
+      "o",
+      "q",
+      "ad",
+      "g",
+      "am",
+      "af",
+      "h",
+      "w",
+      "a",
+      "x"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: aj = shift(ad) 0 mod 6, q = shift(aa) 3 mod 6, x = shift(q) 3 mod 6, w = shift(i) 0 mod 6, f = val 3, ag = shift(x) 5 mod 6, v = shift(aj) 4 mod 6, i = shift(ag) 4 mod 6, aa = shift(v) 3 mod 6, ad = shift(f) 5 mod 6,\nvariables: aj q x w f ag v i aa ad\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 3 n n n n n], [n n n n 3 n n n n 2], [2 n n n 3 n n n n 2], [2 n n n 3 n 0 n n 2], [2 n n n 3 n 0 n 3 2], [2 0 n n 3 n 0 n 3 2], [2 0 3 n 3 n 0 n 3 2], [2 0 3 n 3 2 0 n 3 2], [2 0 3 n 3 2 0 0 3 2], [2 0 3 0 3 2 0 0 3 2] | [2 0 3 0 3 2 0 0 3 2]",
+    "final_values": [
+      2,
+      0,
+      3,
+      0,
+      3,
+      2,
+      0,
+      0,
+      3,
+      2
+    ],
+    "sequence_order": [
+      "aj",
+      "q",
+      "x",
+      "w",
+      "f",
+      "ag",
+      "v",
+      "i",
+      "aa",
+      "ad"
+    ],
+    "dependency_order": [
+      "f",
+      "ad",
+      "aj",
+      "v",
+      "aa",
+      "q",
+      "x",
+      "ag",
+      "i",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: h = val 3, m = shift(ae) 4 mod 6, k = shift(x) 0 mod 6, aa = shift(k) 5 mod 6, w = shift(l) 2 mod 6, x = shift(w) 4 mod 6, l = shift(h) 5 mod 6, u = shift(e) 4 mod 6, ae = shift(aa) 0 mod 6, e = shift(m) 2 mod 6,\nvariables: h m k aa w x l u ae e\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[3 n n n n n n n n n], [3 n n n n n 2 n n n], [3 n n n 4 n 2 n n n], [3 n n n 4 2 2 n n n], [3 n 2 n 4 2 2 n n n], [3 n 2 1 4 2 2 n n n], [3 n 2 1 4 2 2 n 1 n], [3 5 2 1 4 2 2 n 1 n], [3 5 2 1 4 2 2 n 1 1], [3 5 2 1 4 2 2 5 1 1] | [3 5 2 1 4 2 2 5 1 1]",
+    "final_values": [
+      3,
+      5,
+      2,
+      1,
+      4,
+      2,
+      2,
+      5,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "h",
+      "m",
+      "k",
+      "aa",
+      "w",
+      "x",
+      "l",
+      "u",
+      "ae",
+      "e"
+    ],
+    "dependency_order": [
+      "h",
+      "l",
+      "w",
+      "x",
+      "k",
+      "aa",
+      "ae",
+      "m",
+      "e",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: b = shift(e) 1 mod 6, e = shift(an) 1 mod 6, r = shift(am) 5 mod 6, an = shift(s) 0 mod 6, am = shift(ak) 0 mod 6, l = shift(b) 2 mod 6, p = shift(i) 2 mod 6, i = shift(r) 4 mod 6, s = shift(p) 1 mod 6, ak = val 5,\nvariables: b e r an am l p i s ak\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 5], [n n n n 5 n n n n 5], [n n 4 n 5 n n n n 5], [n n 4 n 5 n n 2 n 5], [n n 4 n 5 n 4 2 n 5], [n n 4 n 5 n 4 2 5 5], [n n 4 5 5 n 4 2 5 5], [n 0 4 5 5 n 4 2 5 5], [1 0 4 5 5 n 4 2 5 5], [1 0 4 5 5 3 4 2 5 5] | [1 0 4 5 5 3 4 2 5 5]",
+    "final_values": [
+      1,
+      0,
+      4,
+      5,
+      5,
+      3,
+      4,
+      2,
+      5,
+      5
+    ],
+    "sequence_order": [
+      "b",
+      "e",
+      "r",
+      "an",
+      "am",
+      "l",
+      "p",
+      "i",
+      "s",
+      "ak"
+    ],
+    "dependency_order": [
+      "ak",
+      "am",
+      "r",
+      "i",
+      "p",
+      "s",
+      "an",
+      "e",
+      "b",
+      "l"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: v = shift(ag) 5 mod 6, aj = val 5, c = shift(e) 0 mod 6, ag = shift(ae) 1 mod 6, e = shift(aj) 1 mod 6, ae = shift(l) 3 mod 6, z = shift(v) 1 mod 6, q = shift(c) 5 mod 6, ac = shift(z) 0 mod 6, l = shift(q) 5 mod 6,\nvariables: v aj c ag e ae z q ac l\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 5 n n n n n n n n], [n 5 n n 0 n n n n n], [n 5 0 n 0 n n n n n], [n 5 0 n 0 n n 5 n n], [n 5 0 n 0 n n 5 n 4], [n 5 0 n 0 1 n 5 n 4], [n 5 0 2 0 1 n 5 n 4], [1 5 0 2 0 1 n 5 n 4], [1 5 0 2 0 1 2 5 n 4], [1 5 0 2 0 1 2 5 2 4] | [1 5 0 2 0 1 2 5 2 4]",
+    "final_values": [
+      1,
+      5,
+      0,
+      2,
+      0,
+      1,
+      2,
+      5,
+      2,
+      4
+    ],
+    "sequence_order": [
+      "v",
+      "aj",
+      "c",
+      "ag",
+      "e",
+      "ae",
+      "z",
+      "q",
+      "ac",
+      "l"
+    ],
+    "dependency_order": [
+      "aj",
+      "e",
+      "c",
+      "q",
+      "l",
+      "ae",
+      "ag",
+      "v",
+      "z",
+      "ac"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ak = shift(x) 2 mod 6, ag = shift(k) 5 mod 6, x = shift(f) 4 mod 6, o = shift(a) 5 mod 6, a = val 0, j = shift(ak) 2 mod 6, aj = shift(ag) 4 mod 6, g = shift(j) 4 mod 6, k = shift(g) 0 mod 6, f = shift(o) 4 mod 6,\nvariables: ak ag x o a j aj g k f\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n n n], [n n n 5 0 n n n n n], [n n n 5 0 n n n n 3], [n n 1 5 0 n n n n 3], [3 n 1 5 0 n n n n 3], [3 n 1 5 0 5 n n n 3], [3 n 1 5 0 5 n 3 n 3], [3 n 1 5 0 5 n 3 3 3], [3 2 1 5 0 5 n 3 3 3], [3 2 1 5 0 5 0 3 3 3] | [3 2 1 5 0 5 0 3 3 3]",
+    "final_values": [
+      3,
+      2,
+      1,
+      5,
+      0,
+      5,
+      0,
+      3,
+      3,
+      3
+    ],
+    "sequence_order": [
+      "ak",
+      "ag",
+      "x",
+      "o",
+      "a",
+      "j",
+      "aj",
+      "g",
+      "k",
+      "f"
+    ],
+    "dependency_order": [
+      "a",
+      "o",
+      "f",
+      "x",
+      "ak",
+      "j",
+      "g",
+      "k",
+      "ag",
+      "aj"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: am = shift(h) 0 mod 6, ai = shift(b) 5 mod 6, l = shift(f) 0 mod 6, aa = shift(v) 0 mod 6, af = shift(aa) 2 mod 6, h = shift(ai) 3 mod 6, v = shift(l) 3 mod 6, b = shift(af) 2 mod 6, f = shift(e) 5 mod 6, e = val 4,\nvariables: am ai l aa af h v b f e\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 4], [n n n n n n n n 3 4], [n n 3 n n n n n 3 4], [n n 3 n n n 0 n 3 4], [n n 3 0 n n 0 n 3 4], [n n 3 0 2 n 0 n 3 4], [n n 3 0 2 n 0 4 3 4], [n 3 3 0 2 n 0 4 3 4], [n 3 3 0 2 0 0 4 3 4], [0 3 3 0 2 0 0 4 3 4] | [0 3 3 0 2 0 0 4 3 4]",
+    "final_values": [
+      0,
+      3,
+      3,
+      0,
+      2,
+      0,
+      0,
+      4,
+      3,
+      4
+    ],
+    "sequence_order": [
+      "am",
+      "ai",
+      "l",
+      "aa",
+      "af",
+      "h",
+      "v",
+      "b",
+      "f",
+      "e"
+    ],
+    "dependency_order": [
+      "e",
+      "f",
+      "l",
+      "v",
+      "aa",
+      "af",
+      "b",
+      "ai",
+      "h",
+      "am"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ae = shift(s) 0 mod 6, ak = shift(ag) 0 mod 6, r = shift(o) 1 mod 6, p = shift(ae) 2 mod 6, o = shift(u) 5 mod 6, s = shift(i) 5 mod 6, ag = shift(p) 3 mod 6, q = shift(ak) 4 mod 6, i = shift(r) 4 mod 6, u = val 0,\nvariables: ae ak r p o s ag q i u\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 0], [n n n n 5 n n n n 0], [n n 0 n 5 n n n n 0], [n n 0 n 5 n n n 4 0], [n n 0 n 5 3 n n 4 0], [3 n 0 n 5 3 n n 4 0], [3 n 0 5 5 3 n n 4 0], [3 n 0 5 5 3 2 n 4 0], [3 2 0 5 5 3 2 n 4 0], [3 2 0 5 5 3 2 0 4 0] | [3 2 0 5 5 3 2 0 4 0]",
+    "final_values": [
+      3,
+      2,
+      0,
+      5,
+      5,
+      3,
+      2,
+      0,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "ae",
+      "ak",
+      "r",
+      "p",
+      "o",
+      "s",
+      "ag",
+      "q",
+      "i",
+      "u"
+    ],
+    "dependency_order": [
+      "u",
+      "o",
+      "r",
+      "i",
+      "s",
+      "ae",
+      "p",
+      "ag",
+      "ak",
+      "q"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ah = shift(y) 1 mod 6, p = shift(s) 1 mod 6, o = shift(an) 0 mod 6, am = val 4, y = shift(o) 0 mod 6, t = shift(am) 4 mod 6, an = shift(w) 2 mod 6, w = shift(k) 4 mod 6, s = shift(ah) 3 mod 6, k = shift(t) 5 mod 6,\nvariables: ah p o am y t an w s k\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 4 n n n n n n], [n n n 4 n 2 n n n n], [n n n 4 n 2 n n n 1], [n n n 4 n 2 n 5 n 1], [n n n 4 n 2 1 5 n 1], [n n 1 4 n 2 1 5 n 1], [n n 1 4 1 2 1 5 n 1], [2 n 1 4 1 2 1 5 n 1], [2 n 1 4 1 2 1 5 5 1], [2 0 1 4 1 2 1 5 5 1] | [2 0 1 4 1 2 1 5 5 1]",
+    "final_values": [
+      2,
+      0,
+      1,
+      4,
+      1,
+      2,
+      1,
+      5,
+      5,
+      1
+    ],
+    "sequence_order": [
+      "ah",
+      "p",
+      "o",
+      "am",
+      "y",
+      "t",
+      "an",
+      "w",
+      "s",
+      "k"
+    ],
+    "dependency_order": [
+      "am",
+      "t",
+      "k",
+      "w",
+      "an",
+      "o",
+      "y",
+      "ah",
+      "s",
+      "p"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: q = shift(v) 3 mod 6, k = shift(ah) 2 mod 6, i = shift(d) 4 mod 6, an = shift(aj) 2 mod 6, ah = shift(i) 3 mod 6, b = shift(j) 5 mod 6, aj = val 2, j = shift(an) 3 mod 6, v = shift(k) 4 mod 6, d = shift(b) 2 mod 6,\nvariables: q k i an ah b aj j v d\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 2 n n n], [n n n 4 n n 2 n n n], [n n n 4 n n 2 1 n n], [n n n 4 n 0 2 1 n n], [n n n 4 n 0 2 1 n 2], [n n 0 4 n 0 2 1 n 2], [n n 0 4 3 0 2 1 n 2], [n 5 0 4 3 0 2 1 n 2], [n 5 0 4 3 0 2 1 3 2], [0 5 0 4 3 0 2 1 3 2] | [0 5 0 4 3 0 2 1 3 2]",
+    "final_values": [
+      0,
+      5,
+      0,
+      4,
+      3,
+      0,
+      2,
+      1,
+      3,
+      2
+    ],
+    "sequence_order": [
+      "q",
+      "k",
+      "i",
+      "an",
+      "ah",
+      "b",
+      "aj",
+      "j",
+      "v",
+      "d"
+    ],
+    "dependency_order": [
+      "aj",
+      "an",
+      "j",
+      "b",
+      "d",
+      "i",
+      "ah",
+      "k",
+      "v",
+      "q"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: v = shift(ab) 2 mod 6, aa = shift(v) 0 mod 6, ab = shift(f) 4 mod 6, f = shift(n) 3 mod 6, ah = shift(z) 5 mod 6, d = shift(ah) 0 mod 6, z = shift(w) 2 mod 6, w = val 0, n = shift(d) 1 mod 6, c = shift(aa) 2 mod 6,\nvariables: v aa ab f ah d z w n c\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0 n n], [n n n n n n 2 0 n n], [n n n n 1 n 2 0 n n], [n n n n 1 1 2 0 n n], [n n n n 1 1 2 0 2 n], [n n n 5 1 1 2 0 2 n], [n n 3 5 1 1 2 0 2 n], [5 n 3 5 1 1 2 0 2 n], [5 5 3 5 1 1 2 0 2 n], [5 5 3 5 1 1 2 0 2 1] | [5 5 3 5 1 1 2 0 2 1]",
+    "final_values": [
+      5,
+      5,
+      3,
+      5,
+      1,
+      1,
+      2,
+      0,
+      2,
+      1
+    ],
+    "sequence_order": [
+      "v",
+      "aa",
+      "ab",
+      "f",
+      "ah",
+      "d",
+      "z",
+      "w",
+      "n",
+      "c"
+    ],
+    "dependency_order": [
+      "w",
+      "z",
+      "ah",
+      "d",
+      "n",
+      "f",
+      "ab",
+      "v",
+      "aa",
+      "c"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: s = shift(v) 4 mod 6, ak = shift(r) 5 mod 6, ai = val 5, v = shift(e) 5 mod 6, c = shift(ai) 1 mod 6, ad = shift(s) 1 mod 6, k = shift(ad) 5 mod 6, g = shift(c) 1 mod 6, e = shift(g) 4 mod 6, r = shift(k) 4 mod 6,\nvariables: s ak ai v c ad k g e r\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 5 n n n n n n n], [n n 5 n 0 n n n n n], [n n 5 n 0 n n 1 n n], [n n 5 n 0 n n 1 5 n], [n n 5 4 0 n n 1 5 n], [2 n 5 4 0 n n 1 5 n], [2 n 5 4 0 3 n 1 5 n], [2 n 5 4 0 3 2 1 5 n], [2 n 5 4 0 3 2 1 5 0], [2 5 5 4 0 3 2 1 5 0] | [2 5 5 4 0 3 2 1 5 0]",
+    "final_values": [
+      2,
+      5,
+      5,
+      4,
+      0,
+      3,
+      2,
+      1,
+      5,
+      0
+    ],
+    "sequence_order": [
+      "s",
+      "ak",
+      "ai",
+      "v",
+      "c",
+      "ad",
+      "k",
+      "g",
+      "e",
+      "r"
+    ],
+    "dependency_order": [
+      "ai",
+      "c",
+      "g",
+      "e",
+      "v",
+      "s",
+      "ad",
+      "k",
+      "r",
+      "ak"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: r = shift(al) 0 mod 6, h = val 3, al = shift(k) 5 mod 6, ac = shift(e) 0 mod 6, aa = shift(b) 4 mod 6, e = shift(c) 4 mod 6, b = shift(ad) 3 mod 6, c = shift(r) 3 mod 6, k = shift(aa) 0 mod 6, ad = shift(h) 4 mod 6,\nvariables: r h al ac aa e b c k ad\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 3 n n n n n n n n], [n 3 n n n n n n n 1], [n 3 n n n n 4 n n 1], [n 3 n n 2 n 4 n n 1], [n 3 n n 2 n 4 n 2 1], [n 3 1 n 2 n 4 n 2 1], [1 3 1 n 2 n 4 n 2 1], [1 3 1 n 2 n 4 4 2 1], [1 3 1 n 2 2 4 4 2 1], [1 3 1 2 2 2 4 4 2 1] | [1 3 1 2 2 2 4 4 2 1]",
+    "final_values": [
+      1,
+      3,
+      1,
+      2,
+      2,
+      2,
+      4,
+      4,
+      2,
+      1
+    ],
+    "sequence_order": [
+      "r",
+      "h",
+      "al",
+      "ac",
+      "aa",
+      "e",
+      "b",
+      "c",
+      "k",
+      "ad"
+    ],
+    "dependency_order": [
+      "h",
+      "ad",
+      "b",
+      "aa",
+      "k",
+      "al",
+      "r",
+      "c",
+      "e",
+      "ac"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ab = shift(z) 3 mod 6, e = shift(d) 5 mod 6, x = shift(m) 3 mod 6, aj = shift(ak) 5 mod 6, ak = shift(ah) 0 mod 6, d = shift(t) 5 mod 6, m = shift(ab) 2 mod 6, t = shift(aj) 2 mod 6, ah = shift(x) 1 mod 6, z = val 3,\nvariables: ab e x aj ak d m t ah z\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 3], [0 n n n n n n n n 3], [0 n n n n n 2 n n 3], [0 n 5 n n n 2 n n 3], [0 n 5 n n n 2 n 0 3], [0 n 5 n 0 n 2 n 0 3], [0 n 5 5 0 n 2 n 0 3], [0 n 5 5 0 n 2 1 0 3], [0 n 5 5 0 0 2 1 0 3], [0 5 5 5 0 0 2 1 0 3] | [0 5 5 5 0 0 2 1 0 3]",
+    "final_values": [
+      0,
+      5,
+      5,
+      5,
+      0,
+      0,
+      2,
+      1,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "ab",
+      "e",
+      "x",
+      "aj",
+      "ak",
+      "d",
+      "m",
+      "t",
+      "ah",
+      "z"
+    ],
+    "dependency_order": [
+      "z",
+      "ab",
+      "m",
+      "x",
+      "ah",
+      "ak",
+      "aj",
+      "t",
+      "d",
+      "e"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: an = shift(g) 2 mod 6, c = shift(ai) 2 mod 6, g = shift(s) 5 mod 6, s = shift(k) 0 mod 6, p = shift(q) 0 mod 6, q = shift(c) 1 mod 6, k = val 0, ae = shift(p) 1 mod 6, ai = shift(aj) 0 mod 6, aj = shift(an) 4 mod 6,\nvariables: an c g s p q k ae ai aj\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n n n], [n n n 0 n n 0 n n n], [n n 5 0 n n 0 n n n], [1 n 5 0 n n 0 n n n], [1 n 5 0 n n 0 n n 5], [1 n 5 0 n n 0 n 5 5], [1 1 5 0 n n 0 n 5 5], [1 1 5 0 n 2 0 n 5 5], [1 1 5 0 2 2 0 n 5 5], [1 1 5 0 2 2 0 3 5 5] | [1 1 5 0 2 2 0 3 5 5]",
+    "final_values": [
+      1,
+      1,
+      5,
+      0,
+      2,
+      2,
+      0,
+      3,
+      5,
+      5
+    ],
+    "sequence_order": [
+      "an",
+      "c",
+      "g",
+      "s",
+      "p",
+      "q",
+      "k",
+      "ae",
+      "ai",
+      "aj"
+    ],
+    "dependency_order": [
+      "k",
+      "s",
+      "g",
+      "an",
+      "aj",
+      "ai",
+      "c",
+      "q",
+      "p",
+      "ae"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ag = shift(ah) 3 mod 6, g = shift(u) 5 mod 6, e = shift(an) 5 mod 6, t = val 1, u = shift(aa) 3 mod 6, an = shift(p) 2 mod 6, m = shift(t) 3 mod 6, ah = shift(g) 4 mod 6, p = shift(m) 2 mod 6, aa = shift(e) 0 mod 6,\nvariables: ag g e t u an m ah p aa\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n n n], [n n n 1 n n 4 n n n], [n n n 1 n n 4 n 0 n], [n n n 1 n 2 4 n 0 n], [n n 1 1 n 2 4 n 0 n], [n n 1 1 n 2 4 n 0 1], [n n 1 1 4 2 4 n 0 1], [n 3 1 1 4 2 4 n 0 1], [n 3 1 1 4 2 4 1 0 1], [4 3 1 1 4 2 4 1 0 1] | [4 3 1 1 4 2 4 1 0 1]",
+    "final_values": [
+      4,
+      3,
+      1,
+      1,
+      4,
+      2,
+      4,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "ag",
+      "g",
+      "e",
+      "t",
+      "u",
+      "an",
+      "m",
+      "ah",
+      "p",
+      "aa"
+    ],
+    "dependency_order": [
+      "t",
+      "m",
+      "p",
+      "an",
+      "e",
+      "aa",
+      "u",
+      "g",
+      "ah",
+      "ag"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ab = shift(ae) 5 mod 6, an = shift(y) 4 mod 6, ae = shift(d) 4 mod 6, z = val 0, d = shift(an) 0 mod 6, s = shift(n) 5 mod 6, n = shift(c) 0 mod 6, c = shift(ab) 5 mod 6, p = shift(s) 3 mod 6, y = shift(z) 4 mod 6,\nvariables: ab an ae z d s n c p y\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n n n], [n n n 0 n n n n n 4], [n 2 n 0 n n n n n 4], [n 2 n 0 2 n n n n 4], [n 2 0 0 2 n n n n 4], [5 2 0 0 2 n n n n 4], [5 2 0 0 2 n n 4 n 4], [5 2 0 0 2 n 4 4 n 4], [5 2 0 0 2 3 4 4 n 4], [5 2 0 0 2 3 4 4 0 4] | [5 2 0 0 2 3 4 4 0 4]",
+    "final_values": [
+      5,
+      2,
+      0,
+      0,
+      2,
+      3,
+      4,
+      4,
+      0,
+      4
+    ],
+    "sequence_order": [
+      "ab",
+      "an",
+      "ae",
+      "z",
+      "d",
+      "s",
+      "n",
+      "c",
+      "p",
+      "y"
+    ],
+    "dependency_order": [
+      "z",
+      "y",
+      "an",
+      "d",
+      "ae",
+      "ab",
+      "c",
+      "n",
+      "s",
+      "p"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: y = shift(ac) 0 mod 6, ac = shift(n) 4 mod 6, w = shift(t) 3 mod 6, t = shift(x) 2 mod 6, n = val 2, l = shift(y) 4 mod 6, j = shift(ak) 4 mod 6, ak = shift(w) 0 mod 6, x = shift(ah) 4 mod 6, ah = shift(l) 1 mod 6,\nvariables: y ac w t n l j ak x ah\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 2 n n n n n], [n 0 n n 2 n n n n n], [0 0 n n 2 n n n n n], [0 0 n n 2 4 n n n n], [0 0 n n 2 4 n n n 5], [0 0 n n 2 4 n n 3 5], [0 0 n 5 2 4 n n 3 5], [0 0 2 5 2 4 n n 3 5], [0 0 2 5 2 4 n 2 3 5], [0 0 2 5 2 4 0 2 3 5] | [0 0 2 5 2 4 0 2 3 5]",
+    "final_values": [
+      0,
+      0,
+      2,
+      5,
+      2,
+      4,
+      0,
+      2,
+      3,
+      5
+    ],
+    "sequence_order": [
+      "y",
+      "ac",
+      "w",
+      "t",
+      "n",
+      "l",
+      "j",
+      "ak",
+      "x",
+      "ah"
+    ],
+    "dependency_order": [
+      "n",
+      "ac",
+      "y",
+      "l",
+      "ah",
+      "x",
+      "t",
+      "w",
+      "ak",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: r = shift(f) 5 mod 6, f = shift(i) 3 mod 6, i = shift(z) 4 mod 6, am = val 5, n = shift(o) 5 mod 6, s = shift(am) 3 mod 6, ag = shift(r) 2 mod 6, j = shift(ag) 2 mod 6, z = shift(s) 1 mod 6, o = shift(j) 3 mod 6,\nvariables: r f i am n s ag j z o\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 5 n n n n n n], [n n n 5 n 2 n n n n], [n n n 5 n 2 n n 3 n], [n n 1 5 n 2 n n 3 n], [n 4 1 5 n 2 n n 3 n], [3 4 1 5 n 2 n n 3 n], [3 4 1 5 n 2 5 n 3 n], [3 4 1 5 n 2 5 1 3 n], [3 4 1 5 n 2 5 1 3 4], [3 4 1 5 3 2 5 1 3 4] | [3 4 1 5 3 2 5 1 3 4]",
+    "final_values": [
+      3,
+      4,
+      1,
+      5,
+      3,
+      2,
+      5,
+      1,
+      3,
+      4
+    ],
+    "sequence_order": [
+      "r",
+      "f",
+      "i",
+      "am",
+      "n",
+      "s",
+      "ag",
+      "j",
+      "z",
+      "o"
+    ],
+    "dependency_order": [
+      "am",
+      "s",
+      "z",
+      "i",
+      "f",
+      "r",
+      "ag",
+      "j",
+      "o",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: a = shift(ak) 0 mod 6, h = shift(a) 5 mod 6, w = shift(af) 4 mod 6, o = val 2, q = shift(h) 4 mod 6, af = shift(ad) 0 mod 6, ab = shift(q) 3 mod 6, ad = shift(o) 2 mod 6, ak = shift(ah) 4 mod 6, ah = shift(w) 0 mod 6,\nvariables: a h w o q af ab ad ak ah\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 2 n n n n n n], [n n n 2 n n n 4 n n], [n n n 2 n 4 n 4 n n], [n n 2 2 n 4 n 4 n n], [n n 2 2 n 4 n 4 n 2], [n n 2 2 n 4 n 4 0 2], [0 n 2 2 n 4 n 4 0 2], [0 5 2 2 n 4 n 4 0 2], [0 5 2 2 3 4 n 4 0 2], [0 5 2 2 3 4 0 4 0 2] | [0 5 2 2 3 4 0 4 0 2]",
+    "final_values": [
+      0,
+      5,
+      2,
+      2,
+      3,
+      4,
+      0,
+      4,
+      0,
+      2
+    ],
+    "sequence_order": [
+      "a",
+      "h",
+      "w",
+      "o",
+      "q",
+      "af",
+      "ab",
+      "ad",
+      "ak",
+      "ah"
+    ],
+    "dependency_order": [
+      "o",
+      "ad",
+      "af",
+      "w",
+      "ah",
+      "ak",
+      "a",
+      "h",
+      "q",
+      "ab"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ac = shift(l) 3 mod 6, v = shift(t) 4 mod 6, ah = shift(ab) 0 mod 6, t = shift(ah) 5 mod 6, z = shift(ac) 5 mod 6, ab = shift(g) 5 mod 6, al = shift(v) 2 mod 6, ae = val 2, l = shift(ae) 2 mod 6, g = shift(z) 0 mod 6,\nvariables: ac v ah t z ab al ae l g\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 2 n n], [n n n n n n n 2 4 n], [1 n n n n n n 2 4 n], [1 n n n 0 n n 2 4 n], [1 n n n 0 n n 2 4 0], [1 n n n 0 5 n 2 4 0], [1 n 5 n 0 5 n 2 4 0], [1 n 5 4 0 5 n 2 4 0], [1 2 5 4 0 5 n 2 4 0], [1 2 5 4 0 5 4 2 4 0] | [1 2 5 4 0 5 4 2 4 0]",
+    "final_values": [
+      1,
+      2,
+      5,
+      4,
+      0,
+      5,
+      4,
+      2,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "ac",
+      "v",
+      "ah",
+      "t",
+      "z",
+      "ab",
+      "al",
+      "ae",
+      "l",
+      "g"
+    ],
+    "dependency_order": [
+      "ae",
+      "l",
+      "ac",
+      "z",
+      "g",
+      "ab",
+      "ah",
+      "t",
+      "v",
+      "al"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: aa = shift(b) 0 mod 6, ai = shift(s) 1 mod 6, b = shift(h) 0 mod 6, r = shift(ab) 3 mod 6, ab = shift(d) 0 mod 6, h = shift(q) 4 mod 6, s = shift(aa) 2 mod 6, x = shift(r) 3 mod 6, q = shift(x) 2 mod 6, d = val 0,\nvariables: aa ai b r ab h s x q d\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 0], [n n n n 0 n n n n 0], [n n n 3 0 n n n n 0], [n n n 3 0 n n 0 n 0], [n n n 3 0 n n 0 2 0], [n n n 3 0 0 n 0 2 0], [n n 0 3 0 0 n 0 2 0], [0 n 0 3 0 0 n 0 2 0], [0 n 0 3 0 0 2 0 2 0], [0 3 0 3 0 0 2 0 2 0] | [0 3 0 3 0 0 2 0 2 0]",
+    "final_values": [
+      0,
+      3,
+      0,
+      3,
+      0,
+      0,
+      2,
+      0,
+      2,
+      0
+    ],
+    "sequence_order": [
+      "aa",
+      "ai",
+      "b",
+      "r",
+      "ab",
+      "h",
+      "s",
+      "x",
+      "q",
+      "d"
+    ],
+    "dependency_order": [
+      "d",
+      "ab",
+      "r",
+      "x",
+      "q",
+      "h",
+      "b",
+      "aa",
+      "s",
+      "ai"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: l = shift(a) 1 mod 6, j = shift(an) 3 mod 6, i = shift(q) 4 mod 6, r = shift(v) 1 mod 6, v = shift(ad) 3 mod 6, ad = shift(i) 5 mod 6, a = shift(g) 1 mod 6, an = val 0, g = shift(j) 1 mod 6, q = shift(l) 0 mod 6,\nvariables: l j i r v ad a an g q\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0 n n], [n 3 n n n n n 0 n n], [n 3 n n n n n 0 4 n], [n 3 n n n n 5 0 4 n], [0 3 n n n n 5 0 4 n], [0 3 n n n n 5 0 4 0], [0 3 4 n n n 5 0 4 0], [0 3 4 n n 3 5 0 4 0], [0 3 4 n 0 3 5 0 4 0], [0 3 4 1 0 3 5 0 4 0] | [0 3 4 1 0 3 5 0 4 0]",
+    "final_values": [
+      0,
+      3,
+      4,
+      1,
+      0,
+      3,
+      5,
+      0,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "l",
+      "j",
+      "i",
+      "r",
+      "v",
+      "ad",
+      "a",
+      "an",
+      "g",
+      "q"
+    ],
+    "dependency_order": [
+      "an",
+      "j",
+      "g",
+      "a",
+      "l",
+      "q",
+      "i",
+      "ad",
+      "v",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: x = shift(a) 5 mod 6, h = shift(aa) 0 mod 6, j = val 0, aj = shift(al) 1 mod 6, aa = shift(q) 0 mod 6, ad = shift(x) 3 mod 6, q = shift(j) 5 mod 6, al = shift(b) 4 mod 6, a = shift(h) 3 mod 6, b = shift(ad) 0 mod 6,\nvariables: x h j aj aa ad q al a b\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 0 n n n n n n n], [n n 0 n n n 5 n n n], [n n 0 n 5 n 5 n n n], [n 5 0 n 5 n 5 n n n], [n 5 0 n 5 n 5 n 2 n], [1 5 0 n 5 n 5 n 2 n], [1 5 0 n 5 4 5 n 2 n], [1 5 0 n 5 4 5 n 2 4], [1 5 0 n 5 4 5 2 2 4], [1 5 0 3 5 4 5 2 2 4] | [1 5 0 3 5 4 5 2 2 4]",
+    "final_values": [
+      1,
+      5,
+      0,
+      3,
+      5,
+      4,
+      5,
+      2,
+      2,
+      4
+    ],
+    "sequence_order": [
+      "x",
+      "h",
+      "j",
+      "aj",
+      "aa",
+      "ad",
+      "q",
+      "al",
+      "a",
+      "b"
+    ],
+    "dependency_order": [
+      "j",
+      "q",
+      "aa",
+      "h",
+      "a",
+      "x",
+      "ad",
+      "b",
+      "al",
+      "aj"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: j = shift(aa) 1 mod 6, b = shift(ad) 3 mod 6, u = shift(i) 2 mod 6, e = shift(j) 1 mod 6, ad = shift(u) 4 mod 6, m = shift(b) 3 mod 6, w = shift(l) 3 mod 6, i = shift(e) 1 mod 6, aa = shift(w) 0 mod 6, l = val 4,\nvariables: j b u e ad m w i aa l\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 4], [n n n n n n 1 n n 4], [n n n n n n 1 n 1 4], [2 n n n n n 1 n 1 4], [2 n n 3 n n 1 n 1 4], [2 n n 3 n n 1 4 1 4], [2 n 0 3 n n 1 4 1 4], [2 n 0 3 4 n 1 4 1 4], [2 1 0 3 4 n 1 4 1 4], [2 1 0 3 4 4 1 4 1 4] | [2 1 0 3 4 4 1 4 1 4]",
+    "final_values": [
+      2,
+      1,
+      0,
+      3,
+      4,
+      4,
+      1,
+      4,
+      1,
+      4
+    ],
+    "sequence_order": [
+      "j",
+      "b",
+      "u",
+      "e",
+      "ad",
+      "m",
+      "w",
+      "i",
+      "aa",
+      "l"
+    ],
+    "dependency_order": [
+      "l",
+      "w",
+      "aa",
+      "j",
+      "e",
+      "i",
+      "u",
+      "ad",
+      "b",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ah = shift(am) 2 mod 6, ab = val 4, t = shift(ak) 1 mod 6, am = shift(d) 3 mod 6, ak = shift(e) 4 mod 6, ae = shift(t) 1 mod 6, b = shift(ah) 3 mod 6, e = shift(ab) 5 mod 6, z = shift(b) 1 mod 6, d = shift(ae) 0 mod 6,\nvariables: ah ab t am ak ae b e z d\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 4 n n n n n n n n], [n 4 n n n n n 3 n n], [n 4 n n 1 n n 3 n n], [n 4 2 n 1 n n 3 n n], [n 4 2 n 1 3 n 3 n n], [n 4 2 n 1 3 n 3 n 3], [n 4 2 0 1 3 n 3 n 3], [2 4 2 0 1 3 n 3 n 3], [2 4 2 0 1 3 5 3 n 3], [2 4 2 0 1 3 5 3 0 3] | [2 4 2 0 1 3 5 3 0 3]",
+    "final_values": [
+      2,
+      4,
+      2,
+      0,
+      1,
+      3,
+      5,
+      3,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "ah",
+      "ab",
+      "t",
+      "am",
+      "ak",
+      "ae",
+      "b",
+      "e",
+      "z",
+      "d"
+    ],
+    "dependency_order": [
+      "ab",
+      "e",
+      "ak",
+      "t",
+      "ae",
+      "d",
+      "am",
+      "ah",
+      "b",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: h = shift(ab) 0 mod 6, an = shift(n) 3 mod 6, a = shift(r) 0 mod 6, af = shift(an) 0 mod 6, r = shift(af) 3 mod 6, ab = shift(ai) 4 mod 6, o = val 2, ai = shift(o) 1 mod 6, n = shift(h) 5 mod 6, z = shift(a) 5 mod 6,\nvariables: h an a af r ab o ai n z\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 2 n n n], [n n n n n n 2 3 n n], [n n n n n 1 2 3 n n], [1 n n n n 1 2 3 n n], [1 n n n n 1 2 3 0 n], [1 3 n n n 1 2 3 0 n], [1 3 n 3 n 1 2 3 0 n], [1 3 n 3 0 1 2 3 0 n], [1 3 0 3 0 1 2 3 0 n], [1 3 0 3 0 1 2 3 0 5] | [1 3 0 3 0 1 2 3 0 5]",
+    "final_values": [
+      1,
+      3,
+      0,
+      3,
+      0,
+      1,
+      2,
+      3,
+      0,
+      5
+    ],
+    "sequence_order": [
+      "h",
+      "an",
+      "a",
+      "af",
+      "r",
+      "ab",
+      "o",
+      "ai",
+      "n",
+      "z"
+    ],
+    "dependency_order": [
+      "o",
+      "ai",
+      "ab",
+      "h",
+      "n",
+      "an",
+      "af",
+      "r",
+      "a",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: w = shift(k) 4 mod 6, i = shift(w) 0 mod 6, an = shift(h) 3 mod 6, k = shift(ai) 0 mod 6, aa = shift(j) 1 mod 6, h = shift(aj) 4 mod 6, j = shift(an) 2 mod 6, aj = val 2, ai = shift(d) 3 mod 6, d = shift(aa) 0 mod 6,\nvariables: w i an k aa h j aj ai d\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 2 n n], [n n n n n 0 n 2 n n], [n n 3 n n 0 n 2 n n], [n n 3 n n 0 5 2 n n], [n n 3 n 0 0 5 2 n n], [n n 3 n 0 0 5 2 n 0], [n n 3 n 0 0 5 2 3 0], [n n 3 3 0 0 5 2 3 0], [1 n 3 3 0 0 5 2 3 0], [1 1 3 3 0 0 5 2 3 0] | [1 1 3 3 0 0 5 2 3 0]",
+    "final_values": [
+      1,
+      1,
+      3,
+      3,
+      0,
+      0,
+      5,
+      2,
+      3,
+      0
+    ],
+    "sequence_order": [
+      "w",
+      "i",
+      "an",
+      "k",
+      "aa",
+      "h",
+      "j",
+      "aj",
+      "ai",
+      "d"
+    ],
+    "dependency_order": [
+      "aj",
+      "h",
+      "an",
+      "j",
+      "aa",
+      "d",
+      "ai",
+      "k",
+      "w",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: w = shift(f) 3 mod 6, ac = val 2, ai = shift(aa) 2 mod 6, q = shift(i) 5 mod 6, x = shift(ai) 5 mod 6, aa = shift(ac) 3 mod 6, f = shift(x) 4 mod 6, ag = shift(m) 1 mod 6, m = shift(w) 5 mod 6, i = shift(ag) 2 mod 6,\nvariables: w ac ai q x aa f ag m i\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 2 n n n n n n n n], [n 2 n n n 5 n n n n], [n 2 1 n n 5 n n n n], [n 2 1 n 0 5 n n n n], [n 2 1 n 0 5 4 n n n], [1 2 1 n 0 5 4 n n n], [1 2 1 n 0 5 4 n 0 n], [1 2 1 n 0 5 4 1 0 n], [1 2 1 n 0 5 4 1 0 3], [1 2 1 2 0 5 4 1 0 3] | [1 2 1 2 0 5 4 1 0 3]",
+    "final_values": [
+      1,
+      2,
+      1,
+      2,
+      0,
+      5,
+      4,
+      1,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "w",
+      "ac",
+      "ai",
+      "q",
+      "x",
+      "aa",
+      "f",
+      "ag",
+      "m",
+      "i"
+    ],
+    "dependency_order": [
+      "ac",
+      "aa",
+      "ai",
+      "x",
+      "f",
+      "w",
+      "m",
+      "ag",
+      "i",
+      "q"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: b = shift(ad) 4 mod 6, j = shift(ah) 4 mod 6, s = shift(e) 5 mod 6, ae = shift(b) 2 mod 6, e = val 1, al = shift(o) 3 mod 6, ad = shift(j) 2 mod 6, ah = shift(al) 3 mod 6, o = shift(d) 0 mod 6, d = shift(s) 1 mod 6,\nvariables: b j s ae e al ad ah o d\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 1 n n n n n], [n n 0 n 1 n n n n n], [n n 0 n 1 n n n n 1], [n n 0 n 1 n n n 1 1], [n n 0 n 1 4 n n 1 1], [n n 0 n 1 4 n 1 1 1], [n 5 0 n 1 4 n 1 1 1], [n 5 0 n 1 4 1 1 1 1], [5 5 0 n 1 4 1 1 1 1], [5 5 0 1 1 4 1 1 1 1] | [5 5 0 1 1 4 1 1 1 1]",
+    "final_values": [
+      5,
+      5,
+      0,
+      1,
+      1,
+      4,
+      1,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "b",
+      "j",
+      "s",
+      "ae",
+      "e",
+      "al",
+      "ad",
+      "ah",
+      "o",
+      "d"
+    ],
+    "dependency_order": [
+      "e",
+      "s",
+      "d",
+      "o",
+      "al",
+      "ah",
+      "j",
+      "ad",
+      "b",
+      "ae"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: m = shift(ae) 4 mod 6, i = val 1, b = shift(m) 3 mod 6, ae = shift(p) 0 mod 6, p = shift(i) 1 mod 6, l = shift(e) 3 mod 6, t = shift(f) 1 mod 6, f = shift(l) 3 mod 6, am = shift(t) 5 mod 6, e = shift(b) 3 mod 6,\nvariables: m i b ae p l t f am e\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n n n], [n 1 n n 2 n n n n n], [n 1 n 2 2 n n n n n], [0 1 n 2 2 n n n n n], [0 1 3 2 2 n n n n n], [0 1 3 2 2 n n n n 0], [0 1 3 2 2 3 n n n 0], [0 1 3 2 2 3 n 0 n 0], [0 1 3 2 2 3 1 0 n 0], [0 1 3 2 2 3 1 0 0 0] | [0 1 3 2 2 3 1 0 0 0]",
+    "final_values": [
+      0,
+      1,
+      3,
+      2,
+      2,
+      3,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "m",
+      "i",
+      "b",
+      "ae",
+      "p",
+      "l",
+      "t",
+      "f",
+      "am",
+      "e"
+    ],
+    "dependency_order": [
+      "i",
+      "p",
+      "ae",
+      "m",
+      "b",
+      "e",
+      "l",
+      "f",
+      "t",
+      "am"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ad = val 1, an = shift(t) 3 mod 6, d = shift(al) 5 mod 6, n = shift(f) 1 mod 6, f = shift(ag) 5 mod 6, t = shift(ad) 3 mod 6, ag = shift(w) 0 mod 6, y = shift(an) 4 mod 6, w = shift(d) 1 mod 6, al = shift(y) 5 mod 6,\nvariables: ad an d n f t ag y w al\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n n n], [1 n n n n 4 n n n n], [1 1 n n n 4 n n n n], [1 1 n n n 4 n 5 n n], [1 1 n n n 4 n 5 n 4], [1 1 3 n n 4 n 5 n 4], [1 1 3 n n 4 n 5 4 4], [1 1 3 n n 4 4 5 4 4], [1 1 3 n 3 4 4 5 4 4], [1 1 3 4 3 4 4 5 4 4] | [1 1 3 4 3 4 4 5 4 4]",
+    "final_values": [
+      1,
+      1,
+      3,
+      4,
+      3,
+      4,
+      4,
+      5,
+      4,
+      4
+    ],
+    "sequence_order": [
+      "ad",
+      "an",
+      "d",
+      "n",
+      "f",
+      "t",
+      "ag",
+      "y",
+      "w",
+      "al"
+    ],
+    "dependency_order": [
+      "ad",
+      "t",
+      "an",
+      "y",
+      "al",
+      "d",
+      "w",
+      "ag",
+      "f",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: n = shift(l) 1 mod 6, f = shift(c) 3 mod 6, ai = shift(o) 3 mod 6, t = shift(n) 1 mod 6, o = shift(f) 0 mod 6, m = shift(h) 1 mod 6, s = shift(t) 5 mod 6, h = val 0, l = shift(ai) 0 mod 6, c = shift(m) 5 mod 6,\nvariables: n f ai t o m s h l c\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0 n n], [n n n n n 1 n 0 n n], [n n n n n 1 n 0 n 0], [n 3 n n n 1 n 0 n 0], [n 3 n n 3 1 n 0 n 0], [n 3 0 n 3 1 n 0 n 0], [n 3 0 n 3 1 n 0 0 0], [1 3 0 n 3 1 n 0 0 0], [1 3 0 2 3 1 n 0 0 0], [1 3 0 2 3 1 1 0 0 0] | [1 3 0 2 3 1 1 0 0 0]",
+    "final_values": [
+      1,
+      3,
+      0,
+      2,
+      3,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "n",
+      "f",
+      "ai",
+      "t",
+      "o",
+      "m",
+      "s",
+      "h",
+      "l",
+      "c"
+    ],
+    "dependency_order": [
+      "h",
+      "m",
+      "c",
+      "f",
+      "o",
+      "ai",
+      "l",
+      "n",
+      "t",
+      "s"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: p = shift(u) 3 mod 6, g = shift(ae) 2 mod 6, am = shift(al) 3 mod 6, al = val 4, ae = shift(am) 5 mod 6, f = shift(g) 1 mod 6, q = shift(aa) 3 mod 6, an = shift(p) 0 mod 6, u = shift(q) 4 mod 6, aa = shift(f) 1 mod 6,\nvariables: p g am al ae f q an u aa\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 4 n n n n n n], [n n 1 4 n n n n n n], [n n 1 4 0 n n n n n], [n 2 1 4 0 n n n n n], [n 2 1 4 0 3 n n n n], [n 2 1 4 0 3 n n n 4], [n 2 1 4 0 3 1 n n 4], [n 2 1 4 0 3 1 n 5 4], [2 2 1 4 0 3 1 n 5 4], [2 2 1 4 0 3 1 2 5 4] | [2 2 1 4 0 3 1 2 5 4]",
+    "final_values": [
+      2,
+      2,
+      1,
+      4,
+      0,
+      3,
+      1,
+      2,
+      5,
+      4
+    ],
+    "sequence_order": [
+      "p",
+      "g",
+      "am",
+      "al",
+      "ae",
+      "f",
+      "q",
+      "an",
+      "u",
+      "aa"
+    ],
+    "dependency_order": [
+      "al",
+      "am",
+      "ae",
+      "g",
+      "f",
+      "aa",
+      "q",
+      "u",
+      "p",
+      "an"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: t = shift(w) 1 mod 6, ad = shift(al) 4 mod 6, ab = shift(ag) 1 mod 6, ac = shift(n) 0 mod 6, w = shift(ac) 5 mod 6, v = shift(ad) 3 mod 6, ag = shift(t) 5 mod 6, y = val 2, al = shift(y) 3 mod 6, n = shift(v) 0 mod 6,\nvariables: t ad ab ac w v ag y al n\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 2 n n], [n n n n n n n 2 5 n], [n 3 n n n n n 2 5 n], [n 3 n n n 0 n 2 5 n], [n 3 n n n 0 n 2 5 0], [n 3 n 0 n 0 n 2 5 0], [n 3 n 0 5 0 n 2 5 0], [0 3 n 0 5 0 n 2 5 0], [0 3 n 0 5 0 5 2 5 0], [0 3 0 0 5 0 5 2 5 0] | [0 3 0 0 5 0 5 2 5 0]",
+    "final_values": [
+      0,
+      3,
+      0,
+      0,
+      5,
+      0,
+      5,
+      2,
+      5,
+      0
+    ],
+    "sequence_order": [
+      "t",
+      "ad",
+      "ab",
+      "ac",
+      "w",
+      "v",
+      "ag",
+      "y",
+      "al",
+      "n"
+    ],
+    "dependency_order": [
+      "y",
+      "al",
+      "ad",
+      "v",
+      "n",
+      "ac",
+      "w",
+      "t",
+      "ag",
+      "ab"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ad = shift(e) 4 mod 6, t = shift(a) 5 mod 6, m = shift(g) 5 mod 6, e = shift(c) 1 mod 6, j = shift(m) 5 mod 6, c = shift(ag) 1 mod 6, f = shift(ad) 0 mod 6, g = shift(t) 5 mod 6, a = shift(f) 1 mod 6, ag = val 1,\nvariables: ad t m e j c f g a ag\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 1], [n n n n n 2 n n n 1], [n n n 3 n 2 n n n 1], [1 n n 3 n 2 n n n 1], [1 n n 3 n 2 1 n n 1], [1 n n 3 n 2 1 n 2 1], [1 1 n 3 n 2 1 n 2 1], [1 1 n 3 n 2 1 0 2 1], [1 1 5 3 n 2 1 0 2 1], [1 1 5 3 4 2 1 0 2 1] | [1 1 5 3 4 2 1 0 2 1]",
+    "final_values": [
+      1,
+      1,
+      5,
+      3,
+      4,
+      2,
+      1,
+      0,
+      2,
+      1
+    ],
+    "sequence_order": [
+      "ad",
+      "t",
+      "m",
+      "e",
+      "j",
+      "c",
+      "f",
+      "g",
+      "a",
+      "ag"
+    ],
+    "dependency_order": [
+      "ag",
+      "c",
+      "e",
+      "ad",
+      "f",
+      "a",
+      "t",
+      "g",
+      "m",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: af = shift(q) 4 mod 6, ab = shift(ag) 2 mod 6, q = shift(e) 2 mod 6, y = shift(ad) 0 mod 6, ag = shift(af) 4 mod 6, ad = shift(j) 4 mod 6, j = shift(ab) 5 mod 6, h = shift(y) 1 mod 6, e = shift(u) 4 mod 6, u = val 1,\nvariables: af ab q y ag ad j h e u\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 1], [n n n n n n n n 5 1], [n n 1 n n n n n 5 1], [5 n 1 n n n n n 5 1], [5 n 1 n 3 n n n 5 1], [5 5 1 n 3 n n n 5 1], [5 5 1 n 3 n 4 n 5 1], [5 5 1 n 3 2 4 n 5 1], [5 5 1 2 3 2 4 n 5 1], [5 5 1 2 3 2 4 3 5 1] | [5 5 1 2 3 2 4 3 5 1]",
+    "final_values": [
+      5,
+      5,
+      1,
+      2,
+      3,
+      2,
+      4,
+      3,
+      5,
+      1
+    ],
+    "sequence_order": [
+      "af",
+      "ab",
+      "q",
+      "y",
+      "ag",
+      "ad",
+      "j",
+      "h",
+      "e",
+      "u"
+    ],
+    "dependency_order": [
+      "u",
+      "e",
+      "q",
+      "af",
+      "ag",
+      "ab",
+      "j",
+      "ad",
+      "y",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: c = shift(am) 2 mod 6, y = val 0, am = shift(i) 1 mod 6, r = shift(ae) 2 mod 6, w = shift(y) 5 mod 6, al = shift(r) 2 mod 6, i = shift(ah) 2 mod 6, b = shift(c) 4 mod 6, ae = shift(w) 1 mod 6, ah = shift(al) 2 mod 6,\nvariables: c y am r w al i b ae ah\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 0 n n n n n n n n], [n 0 n n 5 n n n n n], [n 0 n n 5 n n n 0 n], [n 0 n 2 5 n n n 0 n], [n 0 n 2 5 4 n n 0 n], [n 0 n 2 5 4 n n 0 0], [n 0 n 2 5 4 2 n 0 0], [n 0 3 2 5 4 2 n 0 0], [5 0 3 2 5 4 2 n 0 0], [5 0 3 2 5 4 2 3 0 0] | [5 0 3 2 5 4 2 3 0 0]",
+    "final_values": [
+      5,
+      0,
+      3,
+      2,
+      5,
+      4,
+      2,
+      3,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "c",
+      "y",
+      "am",
+      "r",
+      "w",
+      "al",
+      "i",
+      "b",
+      "ae",
+      "ah"
+    ],
+    "dependency_order": [
+      "y",
+      "w",
+      "ae",
+      "r",
+      "al",
+      "ah",
+      "i",
+      "am",
+      "c",
+      "b"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: n = shift(am) 4 mod 6, aa = shift(h) 2 mod 6, ad = shift(z) 3 mod 6, v = shift(t) 4 mod 6, o = shift(aa) 5 mod 6, g = shift(ad) 4 mod 6, h = shift(n) 4 mod 6, t = shift(o) 0 mod 6, z = val 4, am = shift(g) 3 mod 6,\nvariables: n aa ad v o g h t z am\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 4 n], [n n 1 n n n n n 4 n], [n n 1 n n 5 n n 4 n], [n n 1 n n 5 n n 4 2], [0 n 1 n n 5 n n 4 2], [0 n 1 n n 5 4 n 4 2], [0 0 1 n n 5 4 n 4 2], [0 0 1 n 5 5 4 n 4 2], [0 0 1 n 5 5 4 5 4 2], [0 0 1 3 5 5 4 5 4 2] | [0 0 1 3 5 5 4 5 4 2]",
+    "final_values": [
+      0,
+      0,
+      1,
+      3,
+      5,
+      5,
+      4,
+      5,
+      4,
+      2
+    ],
+    "sequence_order": [
+      "n",
+      "aa",
+      "ad",
+      "v",
+      "o",
+      "g",
+      "h",
+      "t",
+      "z",
+      "am"
+    ],
+    "dependency_order": [
+      "z",
+      "ad",
+      "g",
+      "am",
+      "n",
+      "h",
+      "aa",
+      "o",
+      "t",
+      "v"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: z = shift(ab) 2 mod 6, k = shift(c) 0 mod 6, u = shift(k) 2 mod 6, an = shift(af) 2 mod 6, g = shift(z) 2 mod 6, c = shift(an) 1 mod 6, ah = shift(s) 2 mod 6, af = shift(g) 3 mod 6, s = val 3, ab = shift(ah) 2 mod 6,\nvariables: z k u an g c ah af s ab\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 3 n], [n n n n n n 5 n 3 n], [n n n n n n 5 n 3 1], [3 n n n n n 5 n 3 1], [3 n n n 5 n 5 n 3 1], [3 n n n 5 n 5 2 3 1], [3 n n 4 5 n 5 2 3 1], [3 n n 4 5 5 5 2 3 1], [3 5 n 4 5 5 5 2 3 1], [3 5 1 4 5 5 5 2 3 1] | [3 5 1 4 5 5 5 2 3 1]",
+    "final_values": [
+      3,
+      5,
+      1,
+      4,
+      5,
+      5,
+      5,
+      2,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "z",
+      "k",
+      "u",
+      "an",
+      "g",
+      "c",
+      "ah",
+      "af",
+      "s",
+      "ab"
+    ],
+    "dependency_order": [
+      "s",
+      "ah",
+      "ab",
+      "z",
+      "g",
+      "af",
+      "an",
+      "c",
+      "k",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: i = shift(an) 2 mod 6, aa = shift(i) 1 mod 6, ae = shift(ak) 4 mod 6, ag = shift(x) 0 mod 6, ak = shift(m) 0 mod 6, x = val 1, u = shift(a) 0 mod 6, m = shift(u) 0 mod 6, a = shift(aa) 5 mod 6, an = shift(ag) 3 mod 6,\nvariables: i aa ae ag ak x u m a an\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n n n], [n n n 1 n 1 n n n n], [n n n 1 n 1 n n n 4], [0 n n 1 n 1 n n n 4], [0 1 n 1 n 1 n n n 4], [0 1 n 1 n 1 n n 0 4], [0 1 n 1 n 1 0 n 0 4], [0 1 n 1 n 1 0 0 0 4], [0 1 n 1 0 1 0 0 0 4], [0 1 4 1 0 1 0 0 0 4] | [0 1 4 1 0 1 0 0 0 4]",
+    "final_values": [
+      0,
+      1,
+      4,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      4
+    ],
+    "sequence_order": [
+      "i",
+      "aa",
+      "ae",
+      "ag",
+      "ak",
+      "x",
+      "u",
+      "m",
+      "a",
+      "an"
+    ],
+    "dependency_order": [
+      "x",
+      "ag",
+      "an",
+      "i",
+      "aa",
+      "a",
+      "u",
+      "m",
+      "ak",
+      "ae"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: z = shift(l) 1 mod 6, y = shift(af) 5 mod 6, b = shift(al) 3 mod 6, h = shift(g) 1 mod 6, af = shift(n) 1 mod 6, al = shift(z) 5 mod 6, n = shift(b) 0 mod 6, l = shift(f) 4 mod 6, g = shift(y) 0 mod 6, f = val 0,\nvariables: z y b h af al n l g f\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 0], [n n n n n n n 4 n 0], [5 n n n n n n 4 n 0], [5 n n n n 4 n 4 n 0], [5 n 1 n n 4 n 4 n 0], [5 n 1 n n 4 1 4 n 0], [5 n 1 n 2 4 1 4 n 0], [5 1 1 n 2 4 1 4 n 0], [5 1 1 n 2 4 1 4 1 0], [5 1 1 2 2 4 1 4 1 0] | [5 1 1 2 2 4 1 4 1 0]",
+    "final_values": [
+      5,
+      1,
+      1,
+      2,
+      2,
+      4,
+      1,
+      4,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "z",
+      "y",
+      "b",
+      "h",
+      "af",
+      "al",
+      "n",
+      "l",
+      "g",
+      "f"
+    ],
+    "dependency_order": [
+      "f",
+      "l",
+      "z",
+      "al",
+      "b",
+      "n",
+      "af",
+      "y",
+      "g",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: g = shift(af) 5 mod 6, h = shift(z) 1 mod 6, ae = shift(k) 2 mod 6, z = shift(v) 4 mod 6, af = shift(ae) 5 mod 6, o = shift(g) 4 mod 6, ak = val 4, i = shift(o) 1 mod 6, v = shift(i) 2 mod 6, k = shift(ak) 3 mod 6,\nvariables: g h ae z af o ak i v k\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 4 n n n], [n n n n n n 4 n n 1], [n n 3 n n n 4 n n 1], [n n 3 n 2 n 4 n n 1], [1 n 3 n 2 n 4 n n 1], [1 n 3 n 2 5 4 n n 1], [1 n 3 n 2 5 4 0 n 1], [1 n 3 n 2 5 4 0 2 1], [1 n 3 0 2 5 4 0 2 1], [1 1 3 0 2 5 4 0 2 1] | [1 1 3 0 2 5 4 0 2 1]",
+    "final_values": [
+      1,
+      1,
+      3,
+      0,
+      2,
+      5,
+      4,
+      0,
+      2,
+      1
+    ],
+    "sequence_order": [
+      "g",
+      "h",
+      "ae",
+      "z",
+      "af",
+      "o",
+      "ak",
+      "i",
+      "v",
+      "k"
+    ],
+    "dependency_order": [
+      "ak",
+      "k",
+      "ae",
+      "af",
+      "g",
+      "o",
+      "i",
+      "v",
+      "z",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: n = shift(ak) 5 mod 6, m = val 2, ak = shift(w) 4 mod 6, e = shift(ad) 3 mod 6, ad = shift(y) 1 mod 6, j = shift(e) 5 mod 6, l = shift(j) 0 mod 6, y = shift(m) 4 mod 6, w = shift(ah) 2 mod 6, ah = shift(l) 2 mod 6,\nvariables: n m ak e ad j l y w ah\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 2 n n n n n n n n], [n 2 n n n n n 0 n n], [n 2 n n 1 n n 0 n n], [n 2 n 4 1 n n 0 n n], [n 2 n 4 1 3 n 0 n n], [n 2 n 4 1 3 3 0 n n], [n 2 n 4 1 3 3 0 n 5], [n 2 n 4 1 3 3 0 1 5], [n 2 5 4 1 3 3 0 1 5], [4 2 5 4 1 3 3 0 1 5] | [4 2 5 4 1 3 3 0 1 5]",
+    "final_values": [
+      4,
+      2,
+      5,
+      4,
+      1,
+      3,
+      3,
+      0,
+      1,
+      5
+    ],
+    "sequence_order": [
+      "n",
+      "m",
+      "ak",
+      "e",
+      "ad",
+      "j",
+      "l",
+      "y",
+      "w",
+      "ah"
+    ],
+    "dependency_order": [
+      "m",
+      "y",
+      "ad",
+      "e",
+      "j",
+      "l",
+      "ah",
+      "w",
+      "ak",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ak = shift(u) 1 mod 6, p = shift(i) 4 mod 6, n = shift(w) 4 mod 6, x = val 3, z = shift(ak) 3 mod 6, i = shift(k) 3 mod 6, k = shift(z) 1 mod 6, w = shift(p) 3 mod 6, u = shift(l) 2 mod 6, l = shift(x) 2 mod 6,\nvariables: ak p n x z i k w u l\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 3 n n n n n n], [n n n 3 n n n n n 5], [n n n 3 n n n n 1 5], [2 n n 3 n n n n 1 5], [2 n n 3 5 n n n 1 5], [2 n n 3 5 n 0 n 1 5], [2 n n 3 5 3 0 n 1 5], [2 1 n 3 5 3 0 n 1 5], [2 1 n 3 5 3 0 4 1 5], [2 1 2 3 5 3 0 4 1 5] | [2 1 2 3 5 3 0 4 1 5]",
+    "final_values": [
+      2,
+      1,
+      2,
+      3,
+      5,
+      3,
+      0,
+      4,
+      1,
+      5
+    ],
+    "sequence_order": [
+      "ak",
+      "p",
+      "n",
+      "x",
+      "z",
+      "i",
+      "k",
+      "w",
+      "u",
+      "l"
+    ],
+    "dependency_order": [
+      "x",
+      "l",
+      "u",
+      "ak",
+      "z",
+      "k",
+      "i",
+      "p",
+      "w",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: w = shift(a) 1 mod 6, ae = shift(n) 1 mod 6, ak = shift(aa) 1 mod 6, ac = shift(ak) 2 mod 6, n = shift(w) 0 mod 6, aa = val 5, ad = shift(z) 5 mod 6, i = shift(ae) 0 mod 6, a = shift(ad) 2 mod 6, z = shift(ac) 1 mod 6,\nvariables: w ae ak ac n aa ad i a z\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 5 n n n n], [n n 0 n n 5 n n n n], [n n 0 2 n 5 n n n n], [n n 0 2 n 5 n n n 3], [n n 0 2 n 5 2 n n 3], [n n 0 2 n 5 2 n 4 3], [5 n 0 2 n 5 2 n 4 3], [5 n 0 2 5 5 2 n 4 3], [5 0 0 2 5 5 2 n 4 3], [5 0 0 2 5 5 2 0 4 3] | [5 0 0 2 5 5 2 0 4 3]",
+    "final_values": [
+      5,
+      0,
+      0,
+      2,
+      5,
+      5,
+      2,
+      0,
+      4,
+      3
+    ],
+    "sequence_order": [
+      "w",
+      "ae",
+      "ak",
+      "ac",
+      "n",
+      "aa",
+      "ad",
+      "i",
+      "a",
+      "z"
+    ],
+    "dependency_order": [
+      "aa",
+      "ak",
+      "ac",
+      "z",
+      "ad",
+      "a",
+      "w",
+      "n",
+      "ae",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: y = val 2, w = shift(y) 0 mod 6, b = shift(w) 5 mod 6, e = shift(b) 0 mod 6, al = shift(k) 2 mod 6, u = shift(e) 3 mod 6, af = shift(m) 0 mod 6, k = shift(p) 1 mod 6, m = shift(u) 1 mod 6, p = shift(af) 0 mod 6,\nvariables: y w b e al u af k m p\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[2 n n n n n n n n n], [2 2 n n n n n n n n], [2 2 1 n n n n n n n], [2 2 1 1 n n n n n n], [2 2 1 1 n 4 n n n n], [2 2 1 1 n 4 n n 5 n], [2 2 1 1 n 4 5 n 5 n], [2 2 1 1 n 4 5 n 5 5], [2 2 1 1 n 4 5 0 5 5], [2 2 1 1 2 4 5 0 5 5] | [2 2 1 1 2 4 5 0 5 5]",
+    "final_values": [
+      2,
+      2,
+      1,
+      1,
+      2,
+      4,
+      5,
+      0,
+      5,
+      5
+    ],
+    "sequence_order": [
+      "y",
+      "w",
+      "b",
+      "e",
+      "al",
+      "u",
+      "af",
+      "k",
+      "m",
+      "p"
+    ],
+    "dependency_order": [
+      "y",
+      "w",
+      "b",
+      "e",
+      "u",
+      "m",
+      "af",
+      "p",
+      "k",
+      "al"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: e = shift(o) 3 mod 6, o = val 1, j = shift(e) 5 mod 6, ac = shift(t) 1 mod 6, n = shift(ac) 3 mod 6, t = shift(s) 0 mod 6, k = shift(v) 3 mod 6, v = shift(j) 5 mod 6, s = shift(p) 1 mod 6, p = shift(k) 3 mod 6,\nvariables: e o j ac n t k v s p\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n n n], [4 1 n n n n n n n n], [4 1 3 n n n n n n n], [4 1 3 n n n n 2 n n], [4 1 3 n n n 5 2 n n], [4 1 3 n n n 5 2 n 2], [4 1 3 n n n 5 2 3 2], [4 1 3 n n 3 5 2 3 2], [4 1 3 4 n 3 5 2 3 2], [4 1 3 4 1 3 5 2 3 2] | [4 1 3 4 1 3 5 2 3 2]",
+    "final_values": [
+      4,
+      1,
+      3,
+      4,
+      1,
+      3,
+      5,
+      2,
+      3,
+      2
+    ],
+    "sequence_order": [
+      "e",
+      "o",
+      "j",
+      "ac",
+      "n",
+      "t",
+      "k",
+      "v",
+      "s",
+      "p"
+    ],
+    "dependency_order": [
+      "o",
+      "e",
+      "j",
+      "v",
+      "k",
+      "p",
+      "s",
+      "t",
+      "ac",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: p = shift(g) 0 mod 6, q = shift(l) 1 mod 6, n = shift(a) 2 mod 6, ae = shift(an) 3 mod 6, g = shift(t) 4 mod 6, a = shift(af) 5 mod 6, an = shift(p) 2 mod 6, t = val 3, l = shift(ae) 1 mod 6, af = shift(q) 5 mod 6,\nvariables: p q n ae g a an t l af\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 3 n n], [n n n n 1 n n 3 n n], [1 n n n 1 n n 3 n n], [1 n n n 1 n 3 3 n n], [1 n n 0 1 n 3 3 n n], [1 n n 0 1 n 3 3 1 n], [1 2 n 0 1 n 3 3 1 n], [1 2 n 0 1 n 3 3 1 1], [1 2 n 0 1 0 3 3 1 1], [1 2 2 0 1 0 3 3 1 1] | [1 2 2 0 1 0 3 3 1 1]",
+    "final_values": [
+      1,
+      2,
+      2,
+      0,
+      1,
+      0,
+      3,
+      3,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "p",
+      "q",
+      "n",
+      "ae",
+      "g",
+      "a",
+      "an",
+      "t",
+      "l",
+      "af"
+    ],
+    "dependency_order": [
+      "t",
+      "g",
+      "p",
+      "an",
+      "ae",
+      "l",
+      "q",
+      "af",
+      "a",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: i = shift(q) 1 mod 6, m = shift(r) 4 mod 6, y = shift(i) 3 mod 6, c = shift(an) 4 mod 6, q = val 0, r = shift(y) 0 mod 6, an = shift(a) 2 mod 6, a = shift(v) 1 mod 6, v = shift(ai) 5 mod 6, ai = shift(m) 0 mod 6,\nvariables: i m y c q r an a v ai\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n n n], [1 n n n 0 n n n n n], [1 n 4 n 0 n n n n n], [1 n 4 n 0 4 n n n n], [1 2 4 n 0 4 n n n n], [1 2 4 n 0 4 n n n 2], [1 2 4 n 0 4 n n 1 2], [1 2 4 n 0 4 n 2 1 2], [1 2 4 n 0 4 4 2 1 2], [1 2 4 2 0 4 4 2 1 2] | [1 2 4 2 0 4 4 2 1 2]",
+    "final_values": [
+      1,
+      2,
+      4,
+      2,
+      0,
+      4,
+      4,
+      2,
+      1,
+      2
+    ],
+    "sequence_order": [
+      "i",
+      "m",
+      "y",
+      "c",
+      "q",
+      "r",
+      "an",
+      "a",
+      "v",
+      "ai"
+    ],
+    "dependency_order": [
+      "q",
+      "i",
+      "y",
+      "r",
+      "m",
+      "ai",
+      "v",
+      "a",
+      "an",
+      "c"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: n = shift(an) 3 mod 6, f = shift(ak) 0 mod 6, h = val 3, q = shift(p) 2 mod 6, ak = shift(n) 3 mod 6, m = shift(q) 3 mod 6, k = shift(f) 5 mod 6, p = shift(ab) 5 mod 6, ab = shift(k) 2 mod 6, an = shift(h) 5 mod 6,\nvariables: n f h q ak m k p ab an\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 3 n n n n n n n], [n n 3 n n n n n n 2], [5 n 3 n n n n n n 2], [5 n 3 n 2 n n n n 2], [5 2 3 n 2 n n n n 2], [5 2 3 n 2 n 1 n n 2], [5 2 3 n 2 n 1 n 3 2], [5 2 3 n 2 n 1 2 3 2], [5 2 3 4 2 n 1 2 3 2], [5 2 3 4 2 1 1 2 3 2] | [5 2 3 4 2 1 1 2 3 2]",
+    "final_values": [
+      5,
+      2,
+      3,
+      4,
+      2,
+      1,
+      1,
+      2,
+      3,
+      2
+    ],
+    "sequence_order": [
+      "n",
+      "f",
+      "h",
+      "q",
+      "ak",
+      "m",
+      "k",
+      "p",
+      "ab",
+      "an"
+    ],
+    "dependency_order": [
+      "h",
+      "an",
+      "n",
+      "ak",
+      "f",
+      "k",
+      "ab",
+      "p",
+      "q",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: u = shift(r) 4 mod 6, i = shift(ad) 2 mod 6, h = shift(k) 2 mod 6, ab = shift(ah) 2 mod 6, b = shift(d) 4 mod 6, ah = shift(i) 0 mod 6, d = val 4, k = shift(b) 3 mod 6, ad = shift(h) 1 mod 6, r = shift(ab) 0 mod 6,\nvariables: u i h ab b ah d k ad r\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 4 n n n], [n n n n 2 n 4 n n n], [n n n n 2 n 4 5 n n], [n n 1 n 2 n 4 5 n n], [n n 1 n 2 n 4 5 2 n], [n 4 1 n 2 n 4 5 2 n], [n 4 1 n 2 4 4 5 2 n], [n 4 1 0 2 4 4 5 2 n], [n 4 1 0 2 4 4 5 2 0], [4 4 1 0 2 4 4 5 2 0] | [4 4 1 0 2 4 4 5 2 0]",
+    "final_values": [
+      4,
+      4,
+      1,
+      0,
+      2,
+      4,
+      4,
+      5,
+      2,
+      0
+    ],
+    "sequence_order": [
+      "u",
+      "i",
+      "h",
+      "ab",
+      "b",
+      "ah",
+      "d",
+      "k",
+      "ad",
+      "r"
+    ],
+    "dependency_order": [
+      "d",
+      "b",
+      "k",
+      "h",
+      "ad",
+      "i",
+      "ah",
+      "ab",
+      "r",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: f = shift(m) 2 mod 6, an = val 5, ah = shift(af) 0 mod 6, af = shift(l) 2 mod 6, ac = shift(w) 2 mod 6, l = shift(ak) 5 mod 6, ad = shift(ac) 5 mod 6, w = shift(f) 0 mod 6, m = shift(an) 3 mod 6, ak = shift(ad) 5 mod 6,\nvariables: f an ah af ac l ad w m ak\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 5 n n n n n n n n], [n 5 n n n n n n 2 n], [4 5 n n n n n n 2 n], [4 5 n n n n n 4 2 n], [4 5 n n 0 n n 4 2 n], [4 5 n n 0 n 5 4 2 n], [4 5 n n 0 n 5 4 2 4], [4 5 n n 0 3 5 4 2 4], [4 5 n 5 0 3 5 4 2 4], [4 5 5 5 0 3 5 4 2 4] | [4 5 5 5 0 3 5 4 2 4]",
+    "final_values": [
+      4,
+      5,
+      5,
+      5,
+      0,
+      3,
+      5,
+      4,
+      2,
+      4
+    ],
+    "sequence_order": [
+      "f",
+      "an",
+      "ah",
+      "af",
+      "ac",
+      "l",
+      "ad",
+      "w",
+      "m",
+      "ak"
+    ],
+    "dependency_order": [
+      "an",
+      "m",
+      "f",
+      "w",
+      "ac",
+      "ad",
+      "ak",
+      "l",
+      "af",
+      "ah"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: c = shift(v) 5 mod 6, n = shift(c) 4 mod 6, ad = shift(a) 1 mod 6, b = shift(f) 0 mod 6, q = shift(ad) 4 mod 6, v = val 1, f = shift(ag) 1 mod 6, a = shift(t) 1 mod 6, ag = shift(n) 4 mod 6, t = shift(b) 0 mod 6,\nvariables: c n ad b q v f a ag t\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n n n], [0 n n n n 1 n n n n], [0 4 n n n 1 n n n n], [0 4 n n n 1 n n 2 n], [0 4 n n n 1 3 n 2 n], [0 4 n 3 n 1 3 n 2 n], [0 4 n 3 n 1 3 n 2 3], [0 4 n 3 n 1 3 4 2 3], [0 4 5 3 n 1 3 4 2 3], [0 4 5 3 3 1 3 4 2 3] | [0 4 5 3 3 1 3 4 2 3]",
+    "final_values": [
+      0,
+      4,
+      5,
+      3,
+      3,
+      1,
+      3,
+      4,
+      2,
+      3
+    ],
+    "sequence_order": [
+      "c",
+      "n",
+      "ad",
+      "b",
+      "q",
+      "v",
+      "f",
+      "a",
+      "ag",
+      "t"
+    ],
+    "dependency_order": [
+      "v",
+      "c",
+      "n",
+      "ag",
+      "f",
+      "b",
+      "t",
+      "a",
+      "ad",
+      "q"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: b = shift(f) 2 mod 6, e = shift(ab) 1 mod 6, f = shift(z) 5 mod 6, z = shift(am) 4 mod 6, j = shift(e) 1 mod 6, ab = shift(ae) 3 mod 6, am = val 1, af = shift(m) 3 mod 6, ae = shift(af) 0 mod 6, m = shift(b) 2 mod 6,\nvariables: b e f z j ab am af ae m\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n n n], [n n n 5 n n 1 n n n], [n n 4 5 n n 1 n n n], [0 n 4 5 n n 1 n n n], [0 n 4 5 n n 1 n n 2], [0 n 4 5 n n 1 5 n 2], [0 n 4 5 n n 1 5 5 2], [0 n 4 5 n 2 1 5 5 2], [0 3 4 5 n 2 1 5 5 2], [0 3 4 5 4 2 1 5 5 2] | [0 3 4 5 4 2 1 5 5 2]",
+    "final_values": [
+      0,
+      3,
+      4,
+      5,
+      4,
+      2,
+      1,
+      5,
+      5,
+      2
+    ],
+    "sequence_order": [
+      "b",
+      "e",
+      "f",
+      "z",
+      "j",
+      "ab",
+      "am",
+      "af",
+      "ae",
+      "m"
+    ],
+    "dependency_order": [
+      "am",
+      "z",
+      "f",
+      "b",
+      "m",
+      "af",
+      "ae",
+      "ab",
+      "e",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: j = shift(aj) 0 mod 6, ah = shift(x) 3 mod 6, g = shift(s) 0 mod 6, z = shift(j) 3 mod 6, an = shift(h) 0 mod 6, aj = shift(an) 4 mod 6, ag = val 3, h = shift(g) 5 mod 6, x = shift(z) 3 mod 6, s = shift(ag) 4 mod 6,\nvariables: j ah g z an aj ag h x s\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 3 n n n], [n n n n n n 3 n n 1], [n n 1 n n n 3 n n 1], [n n 1 n n n 3 0 n 1], [n n 1 n 0 n 3 0 n 1], [n n 1 n 0 4 3 0 n 1], [4 n 1 n 0 4 3 0 n 1], [4 n 1 1 0 4 3 0 n 1], [4 n 1 1 0 4 3 0 4 1], [4 1 1 1 0 4 3 0 4 1] | [4 1 1 1 0 4 3 0 4 1]",
+    "final_values": [
+      4,
+      1,
+      1,
+      1,
+      0,
+      4,
+      3,
+      0,
+      4,
+      1
+    ],
+    "sequence_order": [
+      "j",
+      "ah",
+      "g",
+      "z",
+      "an",
+      "aj",
+      "ag",
+      "h",
+      "x",
+      "s"
+    ],
+    "dependency_order": [
+      "ag",
+      "s",
+      "g",
+      "h",
+      "an",
+      "aj",
+      "j",
+      "z",
+      "x",
+      "ah"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: o = shift(t) 5 mod 6, j = shift(b) 5 mod 6, ad = shift(f) 4 mod 6, b = shift(u) 4 mod 6, u = shift(i) 1 mod 6, i = val 4, y = shift(o) 1 mod 6, f = shift(ab) 1 mod 6, t = shift(ad) 5 mod 6, ab = shift(j) 1 mod 6,\nvariables: o j ad b u i y f t ab\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 4 n n n n], [n n n n 5 4 n n n n], [n n n 3 5 4 n n n n], [n 2 n 3 5 4 n n n n], [n 2 n 3 5 4 n n n 3], [n 2 n 3 5 4 n 4 n 3], [n 2 2 3 5 4 n 4 n 3], [n 2 2 3 5 4 n 4 1 3], [0 2 2 3 5 4 n 4 1 3], [0 2 2 3 5 4 1 4 1 3] | [0 2 2 3 5 4 1 4 1 3]",
+    "final_values": [
+      0,
+      2,
+      2,
+      3,
+      5,
+      4,
+      1,
+      4,
+      1,
+      3
+    ],
+    "sequence_order": [
+      "o",
+      "j",
+      "ad",
+      "b",
+      "u",
+      "i",
+      "y",
+      "f",
+      "t",
+      "ab"
+    ],
+    "dependency_order": [
+      "i",
+      "u",
+      "b",
+      "j",
+      "ab",
+      "f",
+      "ad",
+      "t",
+      "o",
+      "y"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ac = shift(af) 0 mod 6, u = shift(p) 1 mod 6, k = shift(h) 0 mod 6, f = val 3, af = shift(f) 0 mod 6, p = shift(k) 2 mod 6, e = shift(ac) 2 mod 6, ab = shift(u) 2 mod 6, n = shift(e) 3 mod 6, h = shift(n) 4 mod 6,\nvariables: ac u k f af p e ab n h\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 3 n n n n n n], [n n n 3 3 n n n n n], [3 n n 3 3 n n n n n], [3 n n 3 3 n 5 n n n], [3 n n 3 3 n 5 n 2 n], [3 n n 3 3 n 5 n 2 0], [3 n 0 3 3 n 5 n 2 0], [3 n 0 3 3 2 5 n 2 0], [3 3 0 3 3 2 5 n 2 0], [3 3 0 3 3 2 5 5 2 0] | [3 3 0 3 3 2 5 5 2 0]",
+    "final_values": [
+      3,
+      3,
+      0,
+      3,
+      3,
+      2,
+      5,
+      5,
+      2,
+      0
+    ],
+    "sequence_order": [
+      "ac",
+      "u",
+      "k",
+      "f",
+      "af",
+      "p",
+      "e",
+      "ab",
+      "n",
+      "h"
+    ],
+    "dependency_order": [
+      "f",
+      "af",
+      "ac",
+      "e",
+      "n",
+      "h",
+      "k",
+      "p",
+      "u",
+      "ab"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: t = shift(i) 3 mod 6, l = shift(q) 3 mod 6, a = val 5, z = shift(h) 1 mod 6, f = shift(c) 0 mod 6, h = shift(t) 3 mod 6, c = shift(l) 1 mod 6, q = shift(e) 2 mod 6, e = shift(z) 2 mod 6, i = shift(a) 1 mod 6,\nvariables: t l a z f h c q e i\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 5 n n n n n n n], [n n 5 n n n n n n 0], [3 n 5 n n n n n n 0], [3 n 5 n n 0 n n n 0], [3 n 5 1 n 0 n n n 0], [3 n 5 1 n 0 n n 3 0], [3 n 5 1 n 0 n 5 3 0], [3 2 5 1 n 0 n 5 3 0], [3 2 5 1 n 0 3 5 3 0], [3 2 5 1 3 0 3 5 3 0] | [3 2 5 1 3 0 3 5 3 0]",
+    "final_values": [
+      3,
+      2,
+      5,
+      1,
+      3,
+      0,
+      3,
+      5,
+      3,
+      0
+    ],
+    "sequence_order": [
+      "t",
+      "l",
+      "a",
+      "z",
+      "f",
+      "h",
+      "c",
+      "q",
+      "e",
+      "i"
+    ],
+    "dependency_order": [
+      "a",
+      "i",
+      "t",
+      "h",
+      "z",
+      "e",
+      "q",
+      "l",
+      "c",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: q = shift(ad) 2 mod 6, g = shift(r) 0 mod 6, z = shift(ak) 1 mod 6, ah = shift(x) 2 mod 6, ad = val 2, k = shift(z) 3 mod 6, x = shift(g) 3 mod 6, r = shift(q) 3 mod 6, ak = shift(e) 4 mod 6, e = shift(ah) 5 mod 6,\nvariables: q g z ah ad k x r ak e\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 2 n n n n n], [4 n n n 2 n n n n n], [4 n n n 2 n n 1 n n], [4 1 n n 2 n n 1 n n], [4 1 n n 2 n 4 1 n n], [4 1 n 0 2 n 4 1 n n], [4 1 n 0 2 n 4 1 n 5], [4 1 n 0 2 n 4 1 3 5], [4 1 4 0 2 n 4 1 3 5], [4 1 4 0 2 1 4 1 3 5] | [4 1 4 0 2 1 4 1 3 5]",
+    "final_values": [
+      4,
+      1,
+      4,
+      0,
+      2,
+      1,
+      4,
+      1,
+      3,
+      5
+    ],
+    "sequence_order": [
+      "q",
+      "g",
+      "z",
+      "ah",
+      "ad",
+      "k",
+      "x",
+      "r",
+      "ak",
+      "e"
+    ],
+    "dependency_order": [
+      "ad",
+      "q",
+      "r",
+      "g",
+      "x",
+      "ah",
+      "e",
+      "ak",
+      "z",
+      "k"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: i = shift(ae) 4 mod 6, ab = shift(b) 4 mod 6, j = val 3, l = shift(j) 3 mod 6, b = shift(r) 3 mod 6, h = shift(z) 2 mod 6, ag = shift(i) 4 mod 6, ae = shift(ab) 2 mod 6, r = shift(h) 4 mod 6, z = shift(l) 2 mod 6,\nvariables: i ab j l b h ag ae r z\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 3 n n n n n n n], [n n 3 0 n n n n n n], [n n 3 0 n n n n n 2], [n n 3 0 n 4 n n n 2], [n n 3 0 n 4 n n 2 2], [n n 3 0 5 4 n n 2 2], [n 3 3 0 5 4 n n 2 2], [n 3 3 0 5 4 n 5 2 2], [3 3 3 0 5 4 n 5 2 2], [3 3 3 0 5 4 1 5 2 2] | [3 3 3 0 5 4 1 5 2 2]",
+    "final_values": [
+      3,
+      3,
+      3,
+      0,
+      5,
+      4,
+      1,
+      5,
+      2,
+      2
+    ],
+    "sequence_order": [
+      "i",
+      "ab",
+      "j",
+      "l",
+      "b",
+      "h",
+      "ag",
+      "ae",
+      "r",
+      "z"
+    ],
+    "dependency_order": [
+      "j",
+      "l",
+      "z",
+      "h",
+      "r",
+      "b",
+      "ab",
+      "ae",
+      "i",
+      "ag"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: i = shift(g) 2 mod 6, g = shift(ae) 3 mod 6, w = shift(ak) 0 mod 6, d = val 2, al = shift(d) 2 mod 6, f = shift(w) 0 mod 6, ak = shift(o) 1 mod 6, y = shift(al) 5 mod 6, o = shift(i) 3 mod 6, ae = shift(y) 5 mod 6,\nvariables: i g w d al f ak y o ae\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 2 n n n n n n], [n n n 2 4 n n n n n], [n n n 2 4 n n 3 n n], [n n n 2 4 n n 3 n 2], [n 5 n 2 4 n n 3 n 2], [1 5 n 2 4 n n 3 n 2], [1 5 n 2 4 n n 3 4 2], [1 5 n 2 4 n 5 3 4 2], [1 5 5 2 4 n 5 3 4 2], [1 5 5 2 4 5 5 3 4 2] | [1 5 5 2 4 5 5 3 4 2]",
+    "final_values": [
+      1,
+      5,
+      5,
+      2,
+      4,
+      5,
+      5,
+      3,
+      4,
+      2
+    ],
+    "sequence_order": [
+      "i",
+      "g",
+      "w",
+      "d",
+      "al",
+      "f",
+      "ak",
+      "y",
+      "o",
+      "ae"
+    ],
+    "dependency_order": [
+      "d",
+      "al",
+      "y",
+      "ae",
+      "g",
+      "i",
+      "o",
+      "ak",
+      "w",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: j = shift(q) 2 mod 6, af = shift(s) 3 mod 6, e = shift(am) 0 mod 6, ad = val 0, m = shift(ad) 5 mod 6, b = shift(d) 4 mod 6, q = shift(m) 0 mod 6, s = shift(b) 3 mod 6, d = shift(j) 4 mod 6, am = shift(af) 2 mod 6,\nvariables: j af e ad m b q s d am\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n n n], [n n n 0 5 n n n n n], [n n n 0 5 n 5 n n n], [1 n n 0 5 n 5 n n n], [1 n n 0 5 n 5 n 5 n], [1 n n 0 5 3 5 n 5 n], [1 n n 0 5 3 5 0 5 n], [1 3 n 0 5 3 5 0 5 n], [1 3 n 0 5 3 5 0 5 5], [1 3 5 0 5 3 5 0 5 5] | [1 3 5 0 5 3 5 0 5 5]",
+    "final_values": [
+      1,
+      3,
+      5,
+      0,
+      5,
+      3,
+      5,
+      0,
+      5,
+      5
+    ],
+    "sequence_order": [
+      "j",
+      "af",
+      "e",
+      "ad",
+      "m",
+      "b",
+      "q",
+      "s",
+      "d",
+      "am"
+    ],
+    "dependency_order": [
+      "ad",
+      "m",
+      "q",
+      "j",
+      "d",
+      "b",
+      "s",
+      "af",
+      "am",
+      "e"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: aa = shift(y) 3 mod 6, ac = val 4, k = shift(aa) 1 mod 6, r = shift(k) 2 mod 6, y = shift(p) 3 mod 6, d = shift(ae) 3 mod 6, ae = shift(w) 5 mod 6, w = shift(r) 1 mod 6, p = shift(a) 2 mod 6, a = shift(ac) 4 mod 6,\nvariables: aa ac k r y d ae w p a\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 4 n n n n n n n n], [n 4 n n n n n n n 2], [n 4 n n n n n n 4 2], [n 4 n n 1 n n n 4 2], [4 4 n n 1 n n n 4 2], [4 4 5 n 1 n n n 4 2], [4 4 5 1 1 n n n 4 2], [4 4 5 1 1 n n 2 4 2], [4 4 5 1 1 n 1 2 4 2], [4 4 5 1 1 4 1 2 4 2] | [4 4 5 1 1 4 1 2 4 2]",
+    "final_values": [
+      4,
+      4,
+      5,
+      1,
+      1,
+      4,
+      1,
+      2,
+      4,
+      2
+    ],
+    "sequence_order": [
+      "aa",
+      "ac",
+      "k",
+      "r",
+      "y",
+      "d",
+      "ae",
+      "w",
+      "p",
+      "a"
+    ],
+    "dependency_order": [
+      "ac",
+      "a",
+      "p",
+      "y",
+      "aa",
+      "k",
+      "r",
+      "w",
+      "ae",
+      "d"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ai = shift(a) 4 mod 6, u = shift(af) 4 mod 6, ad = shift(j) 2 mod 6, j = shift(ai) 2 mod 6, a = shift(u) 3 mod 6, ag = shift(ak) 3 mod 6, c = shift(aa) 1 mod 6, aa = shift(ad) 2 mod 6, ak = val 0, af = shift(ag) 0 mod 6,\nvariables: ai u ad j a ag c aa ak af\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 0 n], [n n n n n 3 n n 0 n], [n n n n n 3 n n 0 3], [n 1 n n n 3 n n 0 3], [n 1 n n 4 3 n n 0 3], [2 1 n n 4 3 n n 0 3], [2 1 n 4 4 3 n n 0 3], [2 1 0 4 4 3 n n 0 3], [2 1 0 4 4 3 n 2 0 3], [2 1 0 4 4 3 3 2 0 3] | [2 1 0 4 4 3 3 2 0 3]",
+    "final_values": [
+      2,
+      1,
+      0,
+      4,
+      4,
+      3,
+      3,
+      2,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "ai",
+      "u",
+      "ad",
+      "j",
+      "a",
+      "ag",
+      "c",
+      "aa",
+      "ak",
+      "af"
+    ],
+    "dependency_order": [
+      "ak",
+      "ag",
+      "af",
+      "u",
+      "a",
+      "ai",
+      "j",
+      "ad",
+      "aa",
+      "c"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ae = shift(ak) 4 mod 6, ab = shift(e) 4 mod 6, w = shift(k) 3 mod 6, i = shift(ab) 0 mod 6, k = shift(ae) 1 mod 6, b = shift(w) 5 mod 6, a = shift(b) 0 mod 6, q = val 4, ak = shift(i) 2 mod 6, e = shift(q) 4 mod 6,\nvariables: ae ab w i k b a q ak e\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 4 n n], [n n n n n n n 4 n 2], [n 0 n n n n n 4 n 2], [n 0 n 0 n n n 4 n 2], [n 0 n 0 n n n 4 2 2], [0 0 n 0 n n n 4 2 2], [0 0 n 0 1 n n 4 2 2], [0 0 4 0 1 n n 4 2 2], [0 0 4 0 1 3 n 4 2 2], [0 0 4 0 1 3 3 4 2 2] | [0 0 4 0 1 3 3 4 2 2]",
+    "final_values": [
+      0,
+      0,
+      4,
+      0,
+      1,
+      3,
+      3,
+      4,
+      2,
+      2
+    ],
+    "sequence_order": [
+      "ae",
+      "ab",
+      "w",
+      "i",
+      "k",
+      "b",
+      "a",
+      "q",
+      "ak",
+      "e"
+    ],
+    "dependency_order": [
+      "q",
+      "e",
+      "ab",
+      "i",
+      "ak",
+      "ae",
+      "k",
+      "w",
+      "b",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: q = shift(p) 5 mod 6, p = shift(m) 5 mod 6, o = shift(ag) 0 mod 6, d = val 0, x = shift(d) 0 mod 6, m = shift(aj) 2 mod 6, af = shift(q) 2 mod 6, ag = shift(x) 3 mod 6, aj = shift(o) 5 mod 6, l = shift(af) 3 mod 6,\nvariables: q p o d x m af ag aj l\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n n n], [n n n 0 0 n n n n n], [n n n 0 0 n n 3 n n], [n n 3 0 0 n n 3 n n], [n n 3 0 0 n n 3 2 n], [n n 3 0 0 4 n 3 2 n], [n 3 3 0 0 4 n 3 2 n], [2 3 3 0 0 4 n 3 2 n], [2 3 3 0 0 4 4 3 2 n], [2 3 3 0 0 4 4 3 2 1] | [2 3 3 0 0 4 4 3 2 1]",
+    "final_values": [
+      2,
+      3,
+      3,
+      0,
+      0,
+      4,
+      4,
+      3,
+      2,
+      1
+    ],
+    "sequence_order": [
+      "q",
+      "p",
+      "o",
+      "d",
+      "x",
+      "m",
+      "af",
+      "ag",
+      "aj",
+      "l"
+    ],
+    "dependency_order": [
+      "d",
+      "x",
+      "ag",
+      "o",
+      "aj",
+      "m",
+      "p",
+      "q",
+      "af",
+      "l"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: b = shift(ai) 0 mod 6, z = shift(ag) 5 mod 6, aa = val 2, aj = shift(g) 5 mod 6, af = shift(c) 2 mod 6, ai = shift(af) 5 mod 6, ag = shift(aj) 3 mod 6, g = shift(ac) 2 mod 6, ac = shift(aa) 0 mod 6, c = shift(z) 3 mod 6,\nvariables: b z aa aj af ai ag g ac c\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 2 n n n n n n n], [n n 2 n n n n n 2 n], [n n 2 n n n n 4 2 n], [n n 2 3 n n n 4 2 n], [n n 2 3 n n 0 4 2 n], [n 5 2 3 n n 0 4 2 n], [n 5 2 3 n n 0 4 2 2], [n 5 2 3 4 n 0 4 2 2], [n 5 2 3 4 3 0 4 2 2], [3 5 2 3 4 3 0 4 2 2] | [3 5 2 3 4 3 0 4 2 2]",
+    "final_values": [
+      3,
+      5,
+      2,
+      3,
+      4,
+      3,
+      0,
+      4,
+      2,
+      2
+    ],
+    "sequence_order": [
+      "b",
+      "z",
+      "aa",
+      "aj",
+      "af",
+      "ai",
+      "ag",
+      "g",
+      "ac",
+      "c"
+    ],
+    "dependency_order": [
+      "aa",
+      "ac",
+      "g",
+      "aj",
+      "ag",
+      "z",
+      "c",
+      "af",
+      "ai",
+      "b"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ak = val 4, h = shift(ak) 5 mod 6, z = shift(ab) 1 mod 6, a = shift(u) 1 mod 6, ab = shift(a) 5 mod 6, ai = shift(h) 0 mod 6, p = shift(z) 0 mod 6, u = shift(o) 3 mod 6, o = shift(ai) 4 mod 6, r = shift(p) 0 mod 6,\nvariables: ak h z a ab ai p u o r\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[4 n n n n n n n n n], [4 3 n n n n n n n n], [4 3 n n n 3 n n n n], [4 3 n n n 3 n n 1 n], [4 3 n n n 3 n 4 1 n], [4 3 n 5 n 3 n 4 1 n], [4 3 n 5 4 3 n 4 1 n], [4 3 5 5 4 3 n 4 1 n], [4 3 5 5 4 3 5 4 1 n], [4 3 5 5 4 3 5 4 1 5] | [4 3 5 5 4 3 5 4 1 5]",
+    "final_values": [
+      4,
+      3,
+      5,
+      5,
+      4,
+      3,
+      5,
+      4,
+      1,
+      5
+    ],
+    "sequence_order": [
+      "ak",
+      "h",
+      "z",
+      "a",
+      "ab",
+      "ai",
+      "p",
+      "u",
+      "o",
+      "r"
+    ],
+    "dependency_order": [
+      "ak",
+      "h",
+      "ai",
+      "o",
+      "u",
+      "a",
+      "ab",
+      "z",
+      "p",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: i = shift(u) 1 mod 6, h = shift(ab) 1 mod 6, ag = shift(f) 2 mod 6, k = val 0, u = shift(k) 0 mod 6, ad = shift(i) 4 mod 6, f = shift(t) 2 mod 6, aj = shift(ag) 0 mod 6, t = shift(ad) 1 mod 6, ab = shift(aj) 5 mod 6,\nvariables: i h ag k u ad f aj t ab\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n n n], [n n n 0 0 n n n n n], [1 n n 0 0 n n n n n], [1 n n 0 0 5 n n n n], [1 n n 0 0 5 n n 0 n], [1 n n 0 0 5 2 n 0 n], [1 n 4 0 0 5 2 n 0 n], [1 n 4 0 0 5 2 4 0 n], [1 n 4 0 0 5 2 4 0 3], [1 4 4 0 0 5 2 4 0 3] | [1 4 4 0 0 5 2 4 0 3]",
+    "final_values": [
+      1,
+      4,
+      4,
+      0,
+      0,
+      5,
+      2,
+      4,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "i",
+      "h",
+      "ag",
+      "k",
+      "u",
+      "ad",
+      "f",
+      "aj",
+      "t",
+      "ab"
+    ],
+    "dependency_order": [
+      "k",
+      "u",
+      "i",
+      "ad",
+      "t",
+      "f",
+      "ag",
+      "aj",
+      "ab",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: p = shift(h) 3 mod 6, ah = val 3, ak = shift(g) 4 mod 6, ad = shift(af) 2 mod 6, af = shift(ak) 3 mod 6, u = shift(ab) 5 mod 6, c = shift(ad) 4 mod 6, g = shift(p) 1 mod 6, ab = shift(c) 0 mod 6, h = shift(ah) 1 mod 6,\nvariables: p ah ak ad af u c g ab h\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 3 n n n n n n n n], [n 3 n n n n n n n 4], [1 3 n n n n n n n 4], [1 3 n n n n n 2 n 4], [1 3 0 n n n n 2 n 4], [1 3 0 n 3 n n 2 n 4], [1 3 0 5 3 n n 2 n 4], [1 3 0 5 3 n 3 2 n 4], [1 3 0 5 3 n 3 2 3 4], [1 3 0 5 3 2 3 2 3 4] | [1 3 0 5 3 2 3 2 3 4]",
+    "final_values": [
+      1,
+      3,
+      0,
+      5,
+      3,
+      2,
+      3,
+      2,
+      3,
+      4
+    ],
+    "sequence_order": [
+      "p",
+      "ah",
+      "ak",
+      "ad",
+      "af",
+      "u",
+      "c",
+      "g",
+      "ab",
+      "h"
+    ],
+    "dependency_order": [
+      "ah",
+      "h",
+      "p",
+      "g",
+      "ak",
+      "af",
+      "ad",
+      "c",
+      "ab",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: af = shift(aj) 0 mod 6, am = shift(af) 0 mod 6, q = shift(am) 0 mod 6, ab = shift(ad) 2 mod 6, b = shift(n) 1 mod 6, l = shift(ab) 2 mod 6, ai = shift(l) 5 mod 6, aj = val 4, n = shift(q) 3 mod 6, ad = shift(b) 4 mod 6,\nvariables: af am q ab b l ai aj n ad\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 4 n n], [4 n n n n n n 4 n n], [4 4 n n n n n 4 n n], [4 4 4 n n n n 4 n n], [4 4 4 n n n n 4 1 n], [4 4 4 n 2 n n 4 1 n], [4 4 4 n 2 n n 4 1 0], [4 4 4 2 2 n n 4 1 0], [4 4 4 2 2 4 n 4 1 0], [4 4 4 2 2 4 3 4 1 0] | [4 4 4 2 2 4 3 4 1 0]",
+    "final_values": [
+      4,
+      4,
+      4,
+      2,
+      2,
+      4,
+      3,
+      4,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "af",
+      "am",
+      "q",
+      "ab",
+      "b",
+      "l",
+      "ai",
+      "aj",
+      "n",
+      "ad"
+    ],
+    "dependency_order": [
+      "aj",
+      "af",
+      "am",
+      "q",
+      "n",
+      "b",
+      "ad",
+      "ab",
+      "l",
+      "ai"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ab = shift(c) 1 mod 6, an = shift(v) 5 mod 6, b = shift(ac) 3 mod 6, ac = shift(p) 2 mod 6, p = shift(an) 2 mod 6, r = shift(ab) 0 mod 6, c = val 1, y = shift(r) 1 mod 6, v = shift(y) 4 mod 6, h = shift(b) 1 mod 6,\nvariables: ab an b ac p r c y v h\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n n n], [2 n n n n n 1 n n n], [2 n n n n 2 1 n n n], [2 n n n n 2 1 3 n n], [2 n n n n 2 1 3 1 n], [2 0 n n n 2 1 3 1 n], [2 0 n n 2 2 1 3 1 n], [2 0 n 4 2 2 1 3 1 n], [2 0 1 4 2 2 1 3 1 n], [2 0 1 4 2 2 1 3 1 2] | [2 0 1 4 2 2 1 3 1 2]",
+    "final_values": [
+      2,
+      0,
+      1,
+      4,
+      2,
+      2,
+      1,
+      3,
+      1,
+      2
+    ],
+    "sequence_order": [
+      "ab",
+      "an",
+      "b",
+      "ac",
+      "p",
+      "r",
+      "c",
+      "y",
+      "v",
+      "h"
+    ],
+    "dependency_order": [
+      "c",
+      "ab",
+      "r",
+      "y",
+      "v",
+      "an",
+      "p",
+      "ac",
+      "b",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: ad = shift(d) 0 mod 6, ah = shift(r) 0 mod 6, ag = shift(e) 3 mod 6, r = shift(ak) 4 mod 6, k = shift(j) 0 mod 6, aj = shift(k) 3 mod 6, j = val 1, e = shift(aj) 1 mod 6, d = shift(ag) 1 mod 6, ak = shift(ad) 2 mod 6,\nvariables: ad ah ag r k aj j e d ak\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n n n], [n n n n 1 n 1 n n n], [n n n n 1 4 1 n n n], [n n n n 1 4 1 5 n n], [n n 2 n 1 4 1 5 n n], [n n 2 n 1 4 1 5 3 n], [3 n 2 n 1 4 1 5 3 n], [3 n 2 n 1 4 1 5 3 5], [3 n 2 3 1 4 1 5 3 5], [3 3 2 3 1 4 1 5 3 5] | [3 3 2 3 1 4 1 5 3 5]",
+    "final_values": [
+      3,
+      3,
+      2,
+      3,
+      1,
+      4,
+      1,
+      5,
+      3,
+      5
+    ],
+    "sequence_order": [
+      "ad",
+      "ah",
+      "ag",
+      "r",
+      "k",
+      "aj",
+      "j",
+      "e",
+      "d",
+      "ak"
+    ],
+    "dependency_order": [
+      "j",
+      "k",
+      "aj",
+      "e",
+      "ag",
+      "d",
+      "ad",
+      "ak",
+      "r",
+      "ah"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: a = shift(af) 4 mod 6, ak = shift(ae) 1 mod 6, af = shift(ak) 0 mod 6, o = shift(j) 2 mod 6, t = shift(a) 0 mod 6, q = shift(n) 0 mod 6, j = shift(w) 4 mod 6, w = shift(q) 0 mod 6, ae = val 1, n = shift(t) 1 mod 6,\nvariables: a ak af o t q j w ae n\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 1 n], [n 2 n n n n n n 1 n], [n 2 2 n n n n n 1 n], [0 2 2 n n n n n 1 n], [0 2 2 n 0 n n n 1 n], [0 2 2 n 0 n n n 1 1], [0 2 2 n 0 1 n n 1 1], [0 2 2 n 0 1 n 1 1 1], [0 2 2 n 0 1 5 1 1 1], [0 2 2 1 0 1 5 1 1 1] | [0 2 2 1 0 1 5 1 1 1]",
+    "final_values": [
+      0,
+      2,
+      2,
+      1,
+      0,
+      1,
+      5,
+      1,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "a",
+      "ak",
+      "af",
+      "o",
+      "t",
+      "q",
+      "j",
+      "w",
+      "ae",
+      "n"
+    ],
+    "dependency_order": [
+      "ae",
+      "ak",
+      "af",
+      "a",
+      "t",
+      "n",
+      "q",
+      "w",
+      "j",
+      "o"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: k = shift(d) 5 mod 6, aa = val 0, d = shift(ac) 2 mod 6, b = shift(am) 4 mod 6, ae = shift(k) 1 mod 6, ac = shift(aa) 4 mod 6, g = shift(b) 1 mod 6, z = shift(ae) 1 mod 6, am = shift(z) 2 mod 6, n = shift(g) 5 mod 6,\nvariables: k aa d b ae ac g z am n\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 0 n n n n n n n n], [n 0 n n n 4 n n n n], [n 0 0 n n 4 n n n n], [5 0 0 n n 4 n n n n], [5 0 0 n 0 4 n n n n], [5 0 0 n 0 4 n 1 n n], [5 0 0 n 0 4 n 1 3 n], [5 0 0 1 0 4 n 1 3 n], [5 0 0 1 0 4 2 1 3 n], [5 0 0 1 0 4 2 1 3 1] | [5 0 0 1 0 4 2 1 3 1]",
+    "final_values": [
+      5,
+      0,
+      0,
+      1,
+      0,
+      4,
+      2,
+      1,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "k",
+      "aa",
+      "d",
+      "b",
+      "ae",
+      "ac",
+      "g",
+      "z",
+      "am",
+      "n"
+    ],
+    "dependency_order": [
+      "aa",
+      "ac",
+      "d",
+      "k",
+      "ae",
+      "z",
+      "am",
+      "b",
+      "g",
+      "n"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nCyclic example: shift(2) 3 mod 6 = 5. This means add 3 to the input modulo 6.\nsequence: j = shift(ak) 2 mod 6, l = shift(y) 4 mod 6, ak = shift(aa) 3 mod 6, aa = shift(p) 0 mod 6, r = val 3, i = shift(a) 5 mod 6, p = shift(l) 1 mod 6, o = shift(i) 0 mod 6, a = shift(j) 3 mod 6, y = shift(r) 4 mod 6,\nvariables: j l ak aa r i p o a y\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 3 n n n n n], [n n n n 3 n n n n 1], [n 5 n n 3 n n n n 1], [n 5 n n 3 n 0 n n 1], [n 5 n 0 3 n 0 n n 1], [n 5 3 0 3 n 0 n n 1], [5 5 3 0 3 n 0 n n 1], [5 5 3 0 3 n 0 n 2 1], [5 5 3 0 3 1 0 n 2 1], [5 5 3 0 3 1 0 1 2 1] | [5 5 3 0 3 1 0 1 2 1]",
+    "final_values": [
+      5,
+      5,
+      3,
+      0,
+      3,
+      1,
+      0,
+      1,
+      2,
+      1
+    ],
+    "sequence_order": [
+      "j",
+      "l",
+      "ak",
+      "aa",
+      "r",
+      "i",
+      "p",
+      "o",
+      "a",
+      "y"
+    ],
+    "dependency_order": [
+      "r",
+      "y",
+      "l",
+      "p",
+      "aa",
+      "ak",
+      "j",
+      "a",
+      "i",
+      "o"
+    ]
+  }
+]

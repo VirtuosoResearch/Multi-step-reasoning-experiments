@@ -31,6 +31,7 @@ class CoconutMultitaskModel(MultitaskModel):
         *args,
         coconut_steps_to_full_latent=1,
         coconut_latents_per_step=1,
+        coconut_max_train_latent_thoughts=-1,
         coconut_eval_latent_thoughts=-1,
         coconut_bot_token="<bot>",
         coconut_eot_token="<eot>",
@@ -39,6 +40,7 @@ class CoconutMultitaskModel(MultitaskModel):
         super().__init__(*args, **kwargs)
         self.coconut_steps_to_full_latent = max(1, int(coconut_steps_to_full_latent))
         self.coconut_latents_per_step = max(0, int(coconut_latents_per_step))
+        self.coconut_max_train_latent_thoughts = int(coconut_max_train_latent_thoughts)
         self.coconut_eval_latent_thoughts = int(coconut_eval_latent_thoughts)
         self.coconut_bot_token = coconut_bot_token
         self.coconut_eot_token = coconut_eot_token
@@ -50,15 +52,24 @@ class CoconutMultitaskModel(MultitaskModel):
             raise ValueError(f"Coconut eot token {coconut_eot_token!r} is not registered in tokenizer")
 
     @staticmethod
-    def build_coconut_target(answer: str, reduction_fraction: float, latents_per_step: int) -> Tuple[str, int, int]:
+    def build_coconut_target(
+        answer: str,
+        reduction_fraction: float,
+        latents_per_step: int,
+        max_latent_thoughts: int = -1,
+    ) -> Tuple[str, int, int]:
         steps, final_answer = parse_coconut_answer(answer)
         if len(steps) == 0:
             return final_answer, 0, 0
 
+        latents_per_step = max(0, int(latents_per_step))
         removed_steps = int(math.floor(reduction_fraction * len(steps)))
         removed_steps = min(max(removed_steps, 0), len(steps))
+        if latents_per_step > 0 and max_latent_thoughts is not None and int(max_latent_thoughts) >= 0:
+            max_removed_steps = int(max_latent_thoughts) // latents_per_step
+            removed_steps = min(removed_steps, max_removed_steps)
         remaining_steps = steps[removed_steps:]
-        latent_count = removed_steps * max(0, int(latents_per_step))
+        latent_count = removed_steps * latents_per_step
 
         if len(remaining_steps) == 0:
             return final_answer, removed_steps, latent_count
@@ -81,12 +92,33 @@ class CoconutMultitaskModel(MultitaskModel):
     def _embed_ids(self, token_ids: torch.Tensor) -> torch.Tensor:
         return self.model.get_input_embeddings()(token_ids.unsqueeze(0))
 
+    def _decoder_backbone(self):
+        model = self.model
+        if hasattr(model, "get_base_model"):
+            model = model.get_base_model()
+        for attr_name in ("model", "transformer", "gpt_neox"):
+            if hasattr(model, attr_name):
+                return getattr(model, attr_name)
+        return None
+
     def _forward_hidden(self, inputs_embeds: torch.Tensor) -> torch.Tensor:
         attention_mask = torch.ones(
             inputs_embeds.shape[:2],
             dtype=torch.long,
             device=inputs_embeds.device,
         )
+        decoder_backbone = self._decoder_backbone()
+        if decoder_backbone is not None:
+            output = decoder_backbone(
+                inputs_embeds=inputs_embeds,
+                attention_mask=attention_mask,
+                use_cache=False,
+                return_dict=True,
+            )
+            return output.last_hidden_state[:, -1:, :]
+
+        # Fallback for model classes where the decoder backbone is not exposed.
+        # This is more memory-heavy because Transformers stores all layer states.
         output = self.model(
             inputs_embeds=inputs_embeds,
             attention_mask=attention_mask,
@@ -163,6 +195,7 @@ class CoconutMultitaskModel(MultitaskModel):
             answer_text,
             reduction_fraction,
             self.coconut_latents_per_step,
+            self.coconut_max_train_latent_thoughts,
         )
 
         output, _, _ = self._coconut_forward_for_target(

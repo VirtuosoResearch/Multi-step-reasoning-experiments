@@ -1,0 +1,4002 @@
+[
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: c = permute(u) 2 4 3 1 0, w = permute(ab) 1 4 3 0 2, ab = permute(x) 1 3 0 2 4, u = permute(ag) 0 3 4 2 1, n = permute(y) 3 1 4 0 2, y = val 0, ag = permute(w) 3 1 2 4 0, f = permute(n) 1 2 4 0 3, x = permute(z) 2 1 3 4 0, z = permute(f) 0 3 4 1 2,\nvariables: c w ab u n y ag f x z\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 0 n n n n], [n n n n 3 0 n n n n], [n n n n 3 0 n 0 n n], [n n n n 3 0 n 0 n 0], [n n n n 3 0 n 0 2 0], [n n 0 n 3 0 n 0 2 0], [n 1 0 n 3 0 n 0 2 0], [n 1 0 n 3 0 1 0 2 0], [n 1 0 3 3 0 1 0 2 0], [1 1 0 3 3 0 1 0 2 0] | [1 1 0 3 3 0 1 0 2 0]",
+    "final_values": [
+      1,
+      1,
+      0,
+      3,
+      3,
+      0,
+      1,
+      0,
+      2,
+      0
+    ],
+    "sequence_order": [
+      "c",
+      "w",
+      "ab",
+      "u",
+      "n",
+      "y",
+      "ag",
+      "f",
+      "x",
+      "z"
+    ],
+    "dependency_order": [
+      "y",
+      "n",
+      "f",
+      "z",
+      "x",
+      "ab",
+      "w",
+      "ag",
+      "u",
+      "c"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: z = val 0, i = permute(ab) 0 2 1 4 3, ab = permute(y) 1 4 2 0 3, n = permute(aa) 4 0 1 3 2, l = permute(g) 1 4 2 3 0, y = permute(l) 2 3 1 4 0, g = permute(n) 2 0 4 3 1, u = permute(i) 0 2 1 3 4, aa = permute(w) 4 1 3 0 2, w = permute(z) 0 4 2 3 1,\nvariables: z i ab n l y g u aa w\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[0 n n n n n n n n n], [0 n n n n n n n n 0], [0 n n n n n n n 4 0], [0 n n 2 n n n n 4 0], [0 n n 2 n n 4 n 4 0], [0 n n 2 0 n 4 n 4 0], [0 n n 2 0 2 4 n 4 0], [0 n 2 2 0 2 4 n 4 0], [0 1 2 2 0 2 4 n 4 0], [0 1 2 2 0 2 4 2 4 0] | [0 1 2 2 0 2 4 2 4 0]",
+    "final_values": [
+      0,
+      1,
+      2,
+      2,
+      0,
+      2,
+      4,
+      2,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "z",
+      "i",
+      "ab",
+      "n",
+      "l",
+      "y",
+      "g",
+      "u",
+      "aa",
+      "w"
+    ],
+    "dependency_order": [
+      "z",
+      "w",
+      "aa",
+      "n",
+      "g",
+      "l",
+      "y",
+      "ab",
+      "i",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: r = permute(ah) 2 0 4 1 3, q = permute(ak) 0 1 2 3 4, a = val 0, b = permute(h) 0 1 2 4 3, ah = permute(q) 1 3 0 2 4, h = permute(s) 3 4 1 0 2, s = permute(a) 0 1 2 3 4, t = permute(ag) 4 1 3 2 0, ag = permute(r) 1 2 3 0 4, ak = permute(b) 0 4 1 3 2,\nvariables: r q a b ah h s t ag ak\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 0 n n n n n n n], [n n 0 n n n 0 n n n], [n n 0 n n 3 0 n n n], [n n 0 4 n 3 0 n n n], [n n 0 4 n 3 0 n n 2], [n 2 0 4 n 3 0 n n 2], [n 2 0 4 0 3 0 n n 2], [2 2 0 4 0 3 0 n n 2], [2 2 0 4 0 3 0 n 3 2], [2 2 0 4 0 3 0 2 3 2] | [2 2 0 4 0 3 0 2 3 2]",
+    "final_values": [
+      2,
+      2,
+      0,
+      4,
+      0,
+      3,
+      0,
+      2,
+      3,
+      2
+    ],
+    "sequence_order": [
+      "r",
+      "q",
+      "a",
+      "b",
+      "ah",
+      "h",
+      "s",
+      "t",
+      "ag",
+      "ak"
+    ],
+    "dependency_order": [
+      "a",
+      "s",
+      "h",
+      "b",
+      "ak",
+      "q",
+      "ah",
+      "r",
+      "ag",
+      "t"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ah = permute(r) 2 0 4 3 1, h = permute(aj) 4 2 0 3 1, r = permute(y) 1 0 4 3 2, ad = val 1, o = permute(k) 0 1 3 4 2, y = permute(j) 1 3 2 0 4, aj = permute(ad) 0 4 3 1 2, j = permute(o) 4 3 0 1 2, k = permute(h) 0 2 3 4 1, am = permute(ah) 3 4 1 0 2,\nvariables: ah h r ad o y aj j k am\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n n n], [n n n 1 n n 4 n n n], [n 1 n 1 n n 4 n n n], [n 1 n 1 n n 4 n 2 n], [n 1 n 1 3 n 4 n 2 n], [n 1 n 1 3 n 4 1 2 n], [n 1 n 1 3 3 4 1 2 n], [n 1 3 1 3 3 4 1 2 n], [3 1 3 1 3 3 4 1 2 n], [3 1 3 1 3 3 4 1 2 0] | [3 1 3 1 3 3 4 1 2 0]",
+    "final_values": [
+      3,
+      1,
+      3,
+      1,
+      3,
+      3,
+      4,
+      1,
+      2,
+      0
+    ],
+    "sequence_order": [
+      "ah",
+      "h",
+      "r",
+      "ad",
+      "o",
+      "y",
+      "aj",
+      "j",
+      "k",
+      "am"
+    ],
+    "dependency_order": [
+      "ad",
+      "aj",
+      "h",
+      "k",
+      "o",
+      "j",
+      "y",
+      "r",
+      "ah",
+      "am"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: aa = val 3, ah = permute(ad) 1 3 0 2 4, an = permute(n) 2 1 4 3 0, l = permute(y) 4 1 3 0 2, n = permute(d) 4 2 1 3 0, z = permute(l) 2 1 0 3 4, y = permute(an) 3 4 0 1 2, d = permute(o) 1 0 2 3 4, ad = permute(z) 3 0 4 1 2, o = permute(aa) 2 1 0 3 4,\nvariables: aa ah an l n z y d ad o\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[3 n n n n n n n n n], [3 n n n n n n n n 3], [3 n n n n n n 3 n 3], [3 n n n 3 n n 3 n 3], [3 n 3 n 3 n n 3 n 3], [3 n 3 n 3 n 1 3 n 3], [3 n 3 1 3 n 1 3 n 3], [3 n 3 1 3 1 1 3 n 3], [3 n 3 1 3 1 1 3 0 3], [3 1 3 1 3 1 1 3 0 3] | [3 1 3 1 3 1 1 3 0 3]",
+    "final_values": [
+      3,
+      1,
+      3,
+      1,
+      3,
+      1,
+      1,
+      3,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "aa",
+      "ah",
+      "an",
+      "l",
+      "n",
+      "z",
+      "y",
+      "d",
+      "ad",
+      "o"
+    ],
+    "dependency_order": [
+      "aa",
+      "o",
+      "d",
+      "n",
+      "an",
+      "y",
+      "l",
+      "z",
+      "ad",
+      "ah"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: z = permute(m) 1 0 4 2 3, an = val 3, s = permute(al) 4 2 1 0 3, ah = permute(y) 1 3 4 2 0, x = permute(z) 3 2 0 4 1, ag = permute(s) 3 0 2 1 4, al = permute(an) 2 0 1 4 3, y = permute(x) 3 1 0 4 2, q = permute(ag) 4 3 0 2 1, m = permute(q) 4 3 0 1 2,\nvariables: z an s ah x ag al y q m\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 3 n n n n n n n n], [n 3 n n n n 4 n n n], [n 3 3 n n n 4 n n n], [n 3 3 n n 1 4 n n n], [n 3 3 n n 1 4 n 3 n], [n 3 3 n n 1 4 n 3 1], [0 3 3 n n 1 4 n 3 1], [0 3 3 n 3 1 4 n 3 1], [0 3 3 n 3 1 4 4 3 1], [0 3 3 0 3 1 4 4 3 1] | [0 3 3 0 3 1 4 4 3 1]",
+    "final_values": [
+      0,
+      3,
+      3,
+      0,
+      3,
+      1,
+      4,
+      4,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "z",
+      "an",
+      "s",
+      "ah",
+      "x",
+      "ag",
+      "al",
+      "y",
+      "q",
+      "m"
+    ],
+    "dependency_order": [
+      "an",
+      "al",
+      "s",
+      "ag",
+      "q",
+      "m",
+      "z",
+      "x",
+      "y",
+      "ah"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: am = val 0, o = permute(a) 3 4 0 2 1, w = permute(am) 3 4 0 1 2, ah = permute(aj) 3 2 0 4 1, a = permute(ah) 4 0 3 1 2, b = permute(o) 3 4 0 1 2, c = permute(m) 0 1 2 4 3, u = permute(c) 2 1 3 0 4, m = permute(b) 2 1 3 0 4, aj = permute(w) 4 1 3 2 0,\nvariables: am o w ah a b c u m aj\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[0 n n n n n n n n n], [0 n 3 n n n n n n n], [0 n 3 n n n n n n 2], [0 n 3 0 n n n n n 2], [0 n 3 0 4 n n n n 2], [0 1 3 0 4 n n n n 2], [0 1 3 0 4 4 n n n 2], [0 1 3 0 4 4 n n 4 2], [0 1 3 0 4 4 3 n 4 2], [0 1 3 0 4 4 3 0 4 2] | [0 1 3 0 4 4 3 0 4 2]",
+    "final_values": [
+      0,
+      1,
+      3,
+      0,
+      4,
+      4,
+      3,
+      0,
+      4,
+      2
+    ],
+    "sequence_order": [
+      "am",
+      "o",
+      "w",
+      "ah",
+      "a",
+      "b",
+      "c",
+      "u",
+      "m",
+      "aj"
+    ],
+    "dependency_order": [
+      "am",
+      "w",
+      "aj",
+      "ah",
+      "a",
+      "o",
+      "b",
+      "m",
+      "c",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: q = permute(ab) 3 4 2 0 1, aj = permute(am) 4 1 3 2 0, g = val 2, e = permute(g) 1 4 3 0 2, b = permute(e) 1 3 2 0 4, ab = permute(r) 1 2 4 3 0, r = permute(aj) 1 2 3 4 0, i = permute(z) 2 0 3 1 4, am = permute(i) 0 4 1 3 2, z = permute(b) 1 2 0 4 3,\nvariables: q aj g e b ab r i am z\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 2 n n n n n n n], [n n 2 3 n n n n n n], [n n 2 3 0 n n n n n], [n n 2 3 0 n n n n 1], [n n 2 3 0 n n 0 n 1], [n n 2 3 0 n n 0 0 1], [n 4 2 3 0 n n 0 0 1], [n 4 2 3 0 n 0 0 0 1], [n 4 2 3 0 1 0 0 0 1], [4 4 2 3 0 1 0 0 0 1] | [4 4 2 3 0 1 0 0 0 1]",
+    "final_values": [
+      4,
+      4,
+      2,
+      3,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "q",
+      "aj",
+      "g",
+      "e",
+      "b",
+      "ab",
+      "r",
+      "i",
+      "am",
+      "z"
+    ],
+    "dependency_order": [
+      "g",
+      "e",
+      "b",
+      "z",
+      "i",
+      "am",
+      "aj",
+      "r",
+      "ab",
+      "q"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: aj = permute(r) 0 3 1 4 2, g = permute(aj) 4 1 0 2 3, m = permute(v) 3 4 2 1 0, v = permute(aa) 2 3 1 4 0, o = permute(ad) 2 3 4 0 1, r = val 1, aa = permute(ag) 4 0 1 2 3, l = permute(o) 3 0 4 1 2, ag = permute(l) 4 3 2 1 0, ad = permute(g) 0 3 1 4 2,\nvariables: aj g m v o r aa l ag ad\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n n n], [3 n n n n 1 n n n n], [3 2 n n n 1 n n n n], [3 2 n n n 1 n n n 1], [3 2 n n 3 1 n n n 1], [3 2 n n 3 1 n 1 n 1], [3 2 n n 3 1 n 1 3 1], [3 2 n n 3 1 2 1 3 1], [3 2 n 1 3 1 2 1 3 1], [3 2 4 1 3 1 2 1 3 1] | [3 2 4 1 3 1 2 1 3 1]",
+    "final_values": [
+      3,
+      2,
+      4,
+      1,
+      3,
+      1,
+      2,
+      1,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "aj",
+      "g",
+      "m",
+      "v",
+      "o",
+      "r",
+      "aa",
+      "l",
+      "ag",
+      "ad"
+    ],
+    "dependency_order": [
+      "r",
+      "aj",
+      "g",
+      "ad",
+      "o",
+      "l",
+      "ag",
+      "aa",
+      "v",
+      "m"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: v = permute(y) 2 0 1 4 3, d = permute(e) 0 3 2 1 4, ab = permute(d) 0 4 3 2 1, ak = permute(ab) 1 0 4 2 3, e = permute(v) 2 1 3 0 4, y = val 2, am = permute(m) 1 2 0 3 4, b = permute(am) 0 2 4 1 3, m = permute(ak) 2 0 1 4 3, h = permute(b) 2 0 1 3 4,\nvariables: v d ab ak e y am b m h\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 2 n n n n], [1 n n n n 2 n n n n], [1 n n n 1 2 n n n n], [1 3 n n 1 2 n n n n], [1 3 2 n 1 2 n n n n], [1 3 2 4 1 2 n n n n], [1 3 2 4 1 2 n n 3 n], [1 3 2 4 1 2 3 n 3 n], [1 3 2 4 1 2 3 1 3 n], [1 3 2 4 1 2 3 1 3 0] | [1 3 2 4 1 2 3 1 3 0]",
+    "final_values": [
+      1,
+      3,
+      2,
+      4,
+      1,
+      2,
+      3,
+      1,
+      3,
+      0
+    ],
+    "sequence_order": [
+      "v",
+      "d",
+      "ab",
+      "ak",
+      "e",
+      "y",
+      "am",
+      "b",
+      "m",
+      "h"
+    ],
+    "dependency_order": [
+      "y",
+      "v",
+      "e",
+      "d",
+      "ab",
+      "ak",
+      "m",
+      "am",
+      "b",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: e = permute(w) 2 1 0 3 4, i = permute(aj) 3 2 4 1 0, ab = permute(a) 4 3 0 1 2, g = permute(e) 0 1 3 2 4, a = permute(i) 3 0 4 1 2, aj = permute(al) 0 4 1 3 2, t = val 3, al = permute(g) 4 2 3 1 0, w = permute(y) 1 4 2 0 3, y = permute(t) 2 0 3 1 4,\nvariables: e i ab g a aj t al w y\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 3 n n n], [n n n n n n 3 n n 1], [n n n n n n 3 n 4 1], [4 n n n n n 3 n 4 1], [4 n n 4 n n 3 n 4 1], [4 n n 4 n n 3 0 4 1], [4 n n 4 n 0 3 0 4 1], [4 3 n 4 n 0 3 0 4 1], [4 3 n 4 1 0 3 0 4 1], [4 3 3 4 1 0 3 0 4 1] | [4 3 3 4 1 0 3 0 4 1]",
+    "final_values": [
+      4,
+      3,
+      3,
+      4,
+      1,
+      0,
+      3,
+      0,
+      4,
+      1
+    ],
+    "sequence_order": [
+      "e",
+      "i",
+      "ab",
+      "g",
+      "a",
+      "aj",
+      "t",
+      "al",
+      "w",
+      "y"
+    ],
+    "dependency_order": [
+      "t",
+      "y",
+      "w",
+      "e",
+      "g",
+      "al",
+      "aj",
+      "i",
+      "a",
+      "ab"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: af = permute(q) 1 3 2 4 0, am = permute(n) 1 2 0 4 3, h = permute(af) 3 4 2 0 1, i = permute(ab) 3 0 1 4 2, ag = permute(i) 3 4 2 0 1, q = permute(b) 0 4 1 2 3, ab = val 2, b = permute(ag) 2 4 0 1 3, n = permute(h) 0 4 2 1 3, a = permute(am) 3 0 1 4 2,\nvariables: af am h i ag q ab b n a\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 2 n n n], [n n n 1 n n 2 n n n], [n n n 1 4 n 2 n n n], [n n n 1 4 n 2 3 n n], [n n n 1 4 2 2 3 n n], [2 n n 1 4 2 2 3 n n], [2 n 2 1 4 2 2 3 n n], [2 n 2 1 4 2 2 3 2 n], [2 0 2 1 4 2 2 3 2 n], [2 0 2 1 4 2 2 3 2 3] | [2 0 2 1 4 2 2 3 2 3]",
+    "final_values": [
+      2,
+      0,
+      2,
+      1,
+      4,
+      2,
+      2,
+      3,
+      2,
+      3
+    ],
+    "sequence_order": [
+      "af",
+      "am",
+      "h",
+      "i",
+      "ag",
+      "q",
+      "ab",
+      "b",
+      "n",
+      "a"
+    ],
+    "dependency_order": [
+      "ab",
+      "i",
+      "ag",
+      "b",
+      "q",
+      "af",
+      "h",
+      "n",
+      "am",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ac = permute(ad) 3 1 0 4 2, am = permute(aa) 1 0 2 4 3, j = permute(s) 1 4 3 2 0, ae = permute(k) 3 1 4 2 0, k = permute(am) 2 0 1 3 4, ad = permute(l) 4 1 0 3 2, l = val 1, u = permute(ae) 2 4 1 3 0, aa = permute(ac) 0 2 3 1 4, s = permute(u) 4 3 2 1 0,\nvariables: ac am j ae k ad l u aa s\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n n n], [n n n n n 1 1 n n n], [1 n n n n 1 1 n n n], [1 n n n n 1 1 n 2 n], [1 2 n n n 1 1 n 2 n], [1 2 n n 1 1 1 n 2 n], [1 2 n 1 1 1 1 n 2 n], [1 2 n 1 1 1 1 4 2 n], [1 2 n 1 1 1 1 4 2 0], [1 2 1 1 1 1 1 4 2 0] | [1 2 1 1 1 1 1 4 2 0]",
+    "final_values": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      4,
+      2,
+      0
+    ],
+    "sequence_order": [
+      "ac",
+      "am",
+      "j",
+      "ae",
+      "k",
+      "ad",
+      "l",
+      "u",
+      "aa",
+      "s"
+    ],
+    "dependency_order": [
+      "l",
+      "ad",
+      "ac",
+      "aa",
+      "am",
+      "k",
+      "ae",
+      "u",
+      "s",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: g = permute(i) 3 1 4 2 0, f = val 3, ah = permute(h) 2 3 0 4 1, t = permute(g) 4 3 1 0 2, i = permute(o) 2 3 4 1 0, ak = permute(t) 0 1 4 3 2, m = permute(l) 1 0 3 4 2, h = permute(m) 3 2 4 1 0, l = permute(ak) 0 3 1 2 4, o = permute(f) 4 2 0 1 3,\nvariables: g f ah t i ak m h l o\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 3 n n n n n n n n], [n 3 n n n n n n n 1], [n 3 n n 3 n n n n 1], [2 3 n n 3 n n n n 1], [2 3 n 1 3 n n n n 1], [2 3 n 1 3 1 n n n 1], [2 3 n 1 3 1 n n 3 1], [2 3 n 1 3 1 4 n 3 1], [2 3 n 1 3 1 4 0 3 1], [2 3 2 1 3 1 4 0 3 1] | [2 3 2 1 3 1 4 0 3 1]",
+    "final_values": [
+      2,
+      3,
+      2,
+      1,
+      3,
+      1,
+      4,
+      0,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "g",
+      "f",
+      "ah",
+      "t",
+      "i",
+      "ak",
+      "m",
+      "h",
+      "l",
+      "o"
+    ],
+    "dependency_order": [
+      "f",
+      "o",
+      "i",
+      "g",
+      "t",
+      "ak",
+      "l",
+      "m",
+      "h",
+      "ah"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: o = permute(ak) 1 0 3 2 4, a = permute(b) 3 4 0 1 2, i = permute(o) 2 0 3 1 4, b = permute(ad) 2 0 1 3 4, ai = permute(a) 3 0 2 4 1, g = permute(i) 1 3 4 2 0, ak = val 4, j = permute(g) 2 3 4 0 1, ad = permute(al) 2 4 3 0 1, al = permute(j) 0 2 3 4 1,\nvariables: o a i b ai g ak j ad al\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 4 n n n], [4 n n n n n 4 n n n], [4 n 4 n n n 4 n n n], [4 n 4 n n 0 4 n n n], [4 n 4 n n 0 4 2 n n], [4 n 4 n n 0 4 2 n 3], [4 n 4 n n 0 4 2 0 3], [4 n 4 2 n 0 4 2 0 3], [4 0 4 2 n 0 4 2 0 3], [4 0 4 2 3 0 4 2 0 3] | [4 0 4 2 3 0 4 2 0 3]",
+    "final_values": [
+      4,
+      0,
+      4,
+      2,
+      3,
+      0,
+      4,
+      2,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "o",
+      "a",
+      "i",
+      "b",
+      "ai",
+      "g",
+      "ak",
+      "j",
+      "ad",
+      "al"
+    ],
+    "dependency_order": [
+      "ak",
+      "o",
+      "i",
+      "g",
+      "j",
+      "al",
+      "ad",
+      "b",
+      "a",
+      "ai"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: w = permute(k) 3 1 2 4 0, r = permute(af) 4 0 2 3 1, k = permute(x) 4 2 1 3 0, s = permute(r) 3 0 4 1 2, x = val 4, m = permute(l) 3 4 2 1 0, l = permute(s) 3 1 0 4 2, af = permute(ak) 1 3 2 4 0, ak = permute(w) 1 3 2 4 0, z = permute(m) 2 1 4 0 3,\nvariables: w r k s x m l af ak z\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 4 n n n n n], [n n 0 n 4 n n n n n], [3 n 0 n 4 n n n n n], [3 n 0 n 4 n n n 4 n], [3 n 0 n 4 n n 0 4 n], [3 4 0 n 4 n n 0 4 n], [3 4 0 2 4 n n 0 4 n], [3 4 0 2 4 n 0 0 4 n], [3 4 0 2 4 3 0 0 4 n], [3 4 0 2 4 3 0 0 4 0] | [3 4 0 2 4 3 0 0 4 0]",
+    "final_values": [
+      3,
+      4,
+      0,
+      2,
+      4,
+      3,
+      0,
+      0,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "w",
+      "r",
+      "k",
+      "s",
+      "x",
+      "m",
+      "l",
+      "af",
+      "ak",
+      "z"
+    ],
+    "dependency_order": [
+      "x",
+      "k",
+      "w",
+      "ak",
+      "af",
+      "r",
+      "s",
+      "l",
+      "m",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: b = permute(a) 3 2 0 4 1, a = permute(ab) 2 3 0 1 4, n = permute(q) 2 0 1 4 3, ag = permute(g) 3 4 1 2 0, k = permute(aj) 0 4 2 1 3, ab = permute(ag) 4 1 3 0 2, h = permute(k) 0 4 2 3 1, g = val 1, aj = permute(n) 3 1 4 2 0, q = permute(b) 4 3 0 1 2,\nvariables: b a n ag k ab h g aj q\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 1 n n], [n n n 4 n n n 1 n n], [n n n 4 n 2 n 1 n n], [n 0 n 4 n 2 n 1 n n], [3 0 n 4 n 2 n 1 n n], [3 0 n 4 n 2 n 1 n 1], [3 0 0 4 n 2 n 1 n 1], [3 0 0 4 n 2 n 1 3 1], [3 0 0 4 1 2 n 1 3 1], [3 0 0 4 1 2 4 1 3 1] | [3 0 0 4 1 2 4 1 3 1]",
+    "final_values": [
+      3,
+      0,
+      0,
+      4,
+      1,
+      2,
+      4,
+      1,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "b",
+      "a",
+      "n",
+      "ag",
+      "k",
+      "ab",
+      "h",
+      "g",
+      "aj",
+      "q"
+    ],
+    "dependency_order": [
+      "g",
+      "ag",
+      "ab",
+      "a",
+      "b",
+      "q",
+      "n",
+      "aj",
+      "k",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: a = permute(ah) 2 1 4 0 3, x = permute(a) 2 1 3 4 0, r = permute(f) 0 4 3 1 2, ae = permute(r) 3 0 4 2 1, e = permute(ae) 3 4 2 0 1, ah = permute(l) 0 2 4 1 3, c = permute(e) 0 1 2 4 3, l = permute(z) 1 0 4 2 3, f = val 1, z = permute(c) 3 0 4 2 1,\nvariables: a x r ae e ah c l f z\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 1 n], [n n 4 n n n n n 1 n], [n n 4 1 n n n n 1 n], [n n 4 1 4 n n n 1 n], [n n 4 1 4 n 3 n 1 n], [n n 4 1 4 n 3 n 1 2], [n n 4 1 4 n 3 4 1 2], [n n 4 1 4 3 3 4 1 2], [0 n 4 1 4 3 3 4 1 2], [0 2 4 1 4 3 3 4 1 2] | [0 2 4 1 4 3 3 4 1 2]",
+    "final_values": [
+      0,
+      2,
+      4,
+      1,
+      4,
+      3,
+      3,
+      4,
+      1,
+      2
+    ],
+    "sequence_order": [
+      "a",
+      "x",
+      "r",
+      "ae",
+      "e",
+      "ah",
+      "c",
+      "l",
+      "f",
+      "z"
+    ],
+    "dependency_order": [
+      "f",
+      "r",
+      "ae",
+      "e",
+      "c",
+      "z",
+      "l",
+      "ah",
+      "a",
+      "x"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: t = permute(n) 3 2 0 1 4, al = permute(d) 3 2 1 4 0, n = permute(am) 2 1 4 0 3, g = permute(al) 1 4 0 3 2, ai = permute(t) 2 1 0 4 3, r = permute(ai) 2 1 3 0 4, d = val 4, z = permute(g) 4 2 3 1 0, y = permute(z) 3 2 0 4 1, am = permute(y) 1 2 3 0 4,\nvariables: t al n g ai r d z y am\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 4 n n n], [n 0 n n n n 4 n n n], [n 0 n 1 n n 4 n n n], [n 0 n 1 n n 4 2 n n], [n 0 n 1 n n 4 2 0 n], [n 0 n 1 n n 4 2 0 1], [n 0 1 1 n n 4 2 0 1], [2 0 1 1 n n 4 2 0 1], [2 0 1 1 0 n 4 2 0 1], [2 0 1 1 0 2 4 2 0 1] | [2 0 1 1 0 2 4 2 0 1]",
+    "final_values": [
+      2,
+      0,
+      1,
+      1,
+      0,
+      2,
+      4,
+      2,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "t",
+      "al",
+      "n",
+      "g",
+      "ai",
+      "r",
+      "d",
+      "z",
+      "y",
+      "am"
+    ],
+    "dependency_order": [
+      "d",
+      "al",
+      "g",
+      "z",
+      "y",
+      "am",
+      "n",
+      "t",
+      "ai",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: an = val 2, c = permute(an) 3 1 4 0 2, m = permute(t) 1 3 2 4 0, q = permute(aa) 3 2 0 4 1, ai = permute(m) 1 2 3 4 0, t = permute(f) 3 4 1 0 2, ae = permute(q) 1 0 3 4 2, s = permute(ai) 2 3 1 0 4, f = permute(ae) 2 1 3 0 4, aa = permute(c) 2 0 4 3 1,\nvariables: an c m q ai t ae s f aa\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[2 n n n n n n n n n], [2 4 n n n n n n n n], [2 4 n n n n n n n 1], [2 4 n 2 n n n n n 1], [2 4 n 2 n n 3 n n 1], [2 4 n 2 n n 3 n 0 1], [2 4 n 2 n 3 3 n 0 1], [2 4 4 2 n 3 3 n 0 1], [2 4 4 2 0 3 3 n 0 1], [2 4 4 2 0 3 3 2 0 1] | [2 4 4 2 0 3 3 2 0 1]",
+    "final_values": [
+      2,
+      4,
+      4,
+      2,
+      0,
+      3,
+      3,
+      2,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "an",
+      "c",
+      "m",
+      "q",
+      "ai",
+      "t",
+      "ae",
+      "s",
+      "f",
+      "aa"
+    ],
+    "dependency_order": [
+      "an",
+      "c",
+      "aa",
+      "q",
+      "ae",
+      "f",
+      "t",
+      "m",
+      "ai",
+      "s"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ak = permute(ab) 3 4 2 1 0, j = permute(ah) 1 2 3 4 0, ah = permute(g) 4 0 1 3 2, ad = permute(a) 3 0 2 1 4, ag = val 0, g = permute(ad) 1 0 3 4 2, s = permute(ak) 2 3 0 4 1, a = permute(e) 0 4 3 1 2, e = permute(ag) 2 3 0 4 1, ab = permute(j) 2 1 0 3 4,\nvariables: ak j ah ad ag g s a e ab\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n n n], [n n n n 0 n n n 2 n], [n n n n 0 n n 3 2 n], [n n n 1 0 n n 3 2 n], [n n n 1 0 0 n 3 2 n], [n n 4 1 0 0 n 3 2 n], [n 0 4 1 0 0 n 3 2 n], [n 0 4 1 0 0 n 3 2 2], [2 0 4 1 0 0 n 3 2 2], [2 0 4 1 0 0 0 3 2 2] | [2 0 4 1 0 0 0 3 2 2]",
+    "final_values": [
+      2,
+      0,
+      4,
+      1,
+      0,
+      0,
+      0,
+      3,
+      2,
+      2
+    ],
+    "sequence_order": [
+      "ak",
+      "j",
+      "ah",
+      "ad",
+      "ag",
+      "g",
+      "s",
+      "a",
+      "e",
+      "ab"
+    ],
+    "dependency_order": [
+      "ag",
+      "e",
+      "a",
+      "ad",
+      "g",
+      "ah",
+      "j",
+      "ab",
+      "ak",
+      "s"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: z = permute(h) 4 0 1 3 2, y = val 3, ac = permute(z) 3 0 2 4 1, ae = permute(g) 2 3 1 0 4, h = permute(an) 1 0 4 3 2, al = permute(ac) 2 4 0 3 1, g = permute(y) 2 1 4 0 3, an = permute(ag) 4 3 2 1 0, u = permute(al) 3 0 4 1 2, ag = permute(ae) 3 2 4 1 0,\nvariables: z y ac ae h al g an u ag\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 3 n n n n n n n n], [n 3 n n n n 0 n n n], [n 3 n 2 n n 0 n n n], [n 3 n 2 n n 0 n n 4], [n 3 n 2 n n 0 0 n 4], [n 3 n 2 1 n 0 0 n 4], [0 3 n 2 1 n 0 0 n 4], [0 3 3 2 1 n 0 0 n 4], [0 3 3 2 1 3 0 0 n 4], [0 3 3 2 1 3 0 0 1 4] | [0 3 3 2 1 3 0 0 1 4]",
+    "final_values": [
+      0,
+      3,
+      3,
+      2,
+      1,
+      3,
+      0,
+      0,
+      1,
+      4
+    ],
+    "sequence_order": [
+      "z",
+      "y",
+      "ac",
+      "ae",
+      "h",
+      "al",
+      "g",
+      "an",
+      "u",
+      "ag"
+    ],
+    "dependency_order": [
+      "y",
+      "g",
+      "ae",
+      "ag",
+      "an",
+      "h",
+      "z",
+      "ac",
+      "al",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: a = permute(u) 4 3 2 0 1, f = permute(b) 3 0 4 2 1, t = permute(s) 3 4 1 0 2, aa = permute(ab) 4 2 0 3 1, s = permute(f) 3 4 0 1 2, u = permute(t) 0 2 3 4 1, p = permute(o) 4 3 1 0 2, b = val 4, ab = permute(p) 1 3 2 4 0, o = permute(a) 1 2 3 0 4,\nvariables: a f t aa s u p b ab o\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 4 n n], [n 1 n n n n n 4 n n], [n 1 n n 4 n n 4 n n], [n 1 2 n 4 n n 4 n n], [n 1 2 n 4 3 n 4 n n], [0 1 2 n 4 3 n 4 n n], [0 1 2 n 4 3 n 4 n 1], [0 1 2 n 4 3 3 4 n 1], [0 1 2 n 4 3 3 4 4 1], [0 1 2 1 4 3 3 4 4 1] | [0 1 2 1 4 3 3 4 4 1]",
+    "final_values": [
+      0,
+      1,
+      2,
+      1,
+      4,
+      3,
+      3,
+      4,
+      4,
+      1
+    ],
+    "sequence_order": [
+      "a",
+      "f",
+      "t",
+      "aa",
+      "s",
+      "u",
+      "p",
+      "b",
+      "ab",
+      "o"
+    ],
+    "dependency_order": [
+      "b",
+      "f",
+      "s",
+      "t",
+      "u",
+      "a",
+      "o",
+      "p",
+      "ab",
+      "aa"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: b = permute(an) 0 3 1 4 2, z = permute(e) 4 3 1 0 2, e = permute(b) 1 0 4 3 2, an = permute(w) 4 2 1 3 0, f = permute(al) 2 3 4 1 0, ab = val 3, w = permute(ab) 4 2 0 3 1, al = permute(x) 0 1 2 4 3, x = permute(z) 2 1 3 4 0, r = permute(f) 0 2 4 3 1,\nvariables: b z e an f ab w al x r\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 3 n n n n], [n n n n n 3 3 n n n], [n n n 3 n 3 3 n n n], [4 n n 3 n 3 3 n n n], [4 n 2 3 n 3 3 n n n], [4 1 2 3 n 3 3 n n n], [4 1 2 3 n 3 3 n 1 n], [4 1 2 3 n 3 3 1 1 n], [4 1 2 3 3 3 3 1 1 n], [4 1 2 3 3 3 3 1 1 3] | [4 1 2 3 3 3 3 1 1 3]",
+    "final_values": [
+      4,
+      1,
+      2,
+      3,
+      3,
+      3,
+      3,
+      1,
+      1,
+      3
+    ],
+    "sequence_order": [
+      "b",
+      "z",
+      "e",
+      "an",
+      "f",
+      "ab",
+      "w",
+      "al",
+      "x",
+      "r"
+    ],
+    "dependency_order": [
+      "ab",
+      "w",
+      "an",
+      "b",
+      "e",
+      "z",
+      "x",
+      "al",
+      "f",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: t = val 3, aa = permute(af) 1 0 3 2 4, a = permute(l) 3 4 1 0 2, r = permute(p) 3 1 0 2 4, af = permute(b) 2 4 1 0 3, ad = permute(t) 1 3 4 2 0, b = permute(ad) 3 2 4 1 0, q = permute(r) 0 3 2 4 1, l = permute(q) 4 1 3 0 2, p = permute(aa) 1 3 0 4 2,\nvariables: t aa a r af ad b q l p\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[3 n n n n n n n n n], [3 n n n n 2 n n n n], [3 n n n n 2 4 n n n], [3 n n n 3 2 4 n n n], [3 2 n n 3 2 4 n n n], [3 2 n n 3 2 4 n n 0], [3 2 n 3 3 2 4 n n 0], [3 2 n 3 3 2 4 4 n 0], [3 2 n 3 3 2 4 4 2 0], [3 2 1 3 3 2 4 4 2 0] | [3 2 1 3 3 2 4 4 2 0]",
+    "final_values": [
+      3,
+      2,
+      1,
+      3,
+      3,
+      2,
+      4,
+      4,
+      2,
+      0
+    ],
+    "sequence_order": [
+      "t",
+      "aa",
+      "a",
+      "r",
+      "af",
+      "ad",
+      "b",
+      "q",
+      "l",
+      "p"
+    ],
+    "dependency_order": [
+      "t",
+      "ad",
+      "b",
+      "af",
+      "aa",
+      "p",
+      "r",
+      "q",
+      "l",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: d = permute(al) 4 0 1 2 3, y = permute(ae) 1 0 2 3 4, e = permute(c) 0 2 1 4 3, ae = permute(g) 4 1 2 0 3, c = permute(y) 0 1 4 2 3, i = val 1, g = permute(ah) 0 4 2 1 3, x = permute(i) 1 4 2 0 3, ah = permute(x) 3 4 0 2 1, al = permute(e) 1 0 3 4 2,\nvariables: d y e ae c i g x ah al\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n n n], [n n n n n 1 n 4 n n], [n n n n n 1 n 4 1 n], [n n n n n 1 4 4 1 n], [n n n 3 n 1 4 4 1 n], [n 3 n 3 n 1 4 4 1 n], [n 3 n 3 2 1 4 4 1 n], [n 3 1 3 2 1 4 4 1 n], [n 3 1 3 2 1 4 4 1 0], [4 3 1 3 2 1 4 4 1 0] | [4 3 1 3 2 1 4 4 1 0]",
+    "final_values": [
+      4,
+      3,
+      1,
+      3,
+      2,
+      1,
+      4,
+      4,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "d",
+      "y",
+      "e",
+      "ae",
+      "c",
+      "i",
+      "g",
+      "x",
+      "ah",
+      "al"
+    ],
+    "dependency_order": [
+      "i",
+      "x",
+      "ah",
+      "g",
+      "ae",
+      "y",
+      "c",
+      "e",
+      "al",
+      "d"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ad = permute(r) 0 3 4 2 1, q = permute(ad) 2 0 4 1 3, ag = permute(i) 4 3 2 0 1, j = permute(t) 0 1 4 3 2, t = permute(q) 1 0 4 2 3, ab = permute(j) 4 1 3 0 2, i = permute(ab) 2 3 1 0 4, r = val 1, ai = permute(af) 1 2 0 3 4, af = permute(ag) 3 0 1 4 2,\nvariables: ad q ag j t ab i r ai af\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 1 n n], [3 n n n n n n 1 n n], [3 1 n n n n n 1 n n], [3 1 n n 0 n n 1 n n], [3 1 n 0 0 n n 1 n n], [3 1 n 0 0 4 n 1 n n], [3 1 n 0 0 4 4 1 n n], [3 1 1 0 0 4 4 1 n n], [3 1 1 0 0 4 4 1 n 0], [3 1 1 0 0 4 4 1 1 0] | [3 1 1 0 0 4 4 1 1 0]",
+    "final_values": [
+      3,
+      1,
+      1,
+      0,
+      0,
+      4,
+      4,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "ad",
+      "q",
+      "ag",
+      "j",
+      "t",
+      "ab",
+      "i",
+      "r",
+      "ai",
+      "af"
+    ],
+    "dependency_order": [
+      "r",
+      "ad",
+      "q",
+      "t",
+      "j",
+      "ab",
+      "i",
+      "ag",
+      "af",
+      "ai"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: h = val 2, ae = permute(g) 4 2 1 3 0, a = permute(c) 0 2 3 1 4, q = permute(a) 4 3 0 1 2, g = permute(x) 1 0 2 3 4, d = permute(aj) 1 2 0 4 3, aj = permute(l) 3 4 1 0 2, l = permute(q) 0 2 3 4 1, x = permute(h) 3 4 0 2 1, c = permute(ae) 0 3 1 4 2,\nvariables: h ae a q g d aj l x c\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[2 n n n n n n n n n], [2 n n n n n n n 0 n], [2 n n n 1 n n n 0 n], [2 2 n n 1 n n n 0 n], [2 2 n n 1 n n n 0 1], [2 2 2 n 1 n n n 0 1], [2 2 2 0 1 n n n 0 1], [2 2 2 0 1 n n 0 0 1], [2 2 2 0 1 n 3 0 0 1], [2 2 2 0 1 4 3 0 0 1] | [2 2 2 0 1 4 3 0 0 1]",
+    "final_values": [
+      2,
+      2,
+      2,
+      0,
+      1,
+      4,
+      3,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "h",
+      "ae",
+      "a",
+      "q",
+      "g",
+      "d",
+      "aj",
+      "l",
+      "x",
+      "c"
+    ],
+    "dependency_order": [
+      "h",
+      "x",
+      "g",
+      "ae",
+      "c",
+      "a",
+      "q",
+      "l",
+      "aj",
+      "d"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: al = permute(o) 0 3 2 4 1, ac = permute(af) 4 1 3 2 0, m = permute(al) 4 2 1 0 3, af = permute(ak) 0 1 2 3 4, n = permute(an) 4 2 0 3 1, ak = permute(u) 0 4 1 2 3, u = permute(m) 4 0 2 3 1, a = permute(n) 2 3 0 1 4, o = val 3, an = permute(ac) 1 0 4 3 2,\nvariables: al ac m af n ak u a o an\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 3 n], [4 n n n n n n n 3 n], [4 n 3 n n n n n 3 n], [4 n 3 n n n 3 n 3 n], [4 n 3 n n 2 3 n 3 n], [4 n 3 2 n 2 3 n 3 n], [4 3 3 2 n 2 3 n 3 n], [4 3 3 2 n 2 3 n 3 3], [4 3 3 2 3 2 3 n 3 3], [4 3 3 2 3 2 3 1 3 3] | [4 3 3 2 3 2 3 1 3 3]",
+    "final_values": [
+      4,
+      3,
+      3,
+      2,
+      3,
+      2,
+      3,
+      1,
+      3,
+      3
+    ],
+    "sequence_order": [
+      "al",
+      "ac",
+      "m",
+      "af",
+      "n",
+      "ak",
+      "u",
+      "a",
+      "o",
+      "an"
+    ],
+    "dependency_order": [
+      "o",
+      "al",
+      "m",
+      "u",
+      "ak",
+      "af",
+      "ac",
+      "an",
+      "n",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ad = permute(ag) 2 1 0 3 4, ah = permute(y) 4 2 0 1 3, ag = permute(an) 2 0 3 1 4, c = val 1, an = permute(c) 2 1 4 0 3, r = permute(ad) 3 4 0 2 1, aj = permute(r) 0 4 2 3 1, q = permute(ah) 0 2 1 3 4, ab = permute(aj) 1 0 3 4 2, y = permute(ab) 3 4 1 0 2,\nvariables: ad ah ag c an r aj q ab y\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 1 n n n n n n], [n n n 1 1 n n n n n], [n n 0 1 1 n n n n n], [2 n 0 1 1 n n n n n], [2 n 0 1 1 0 n n n n], [2 n 0 1 1 0 0 n n n], [2 n 0 1 1 0 0 n 1 n], [2 n 0 1 1 0 0 n 1 4], [2 3 0 1 1 0 0 n 1 4], [2 3 0 1 1 0 0 3 1 4] | [2 3 0 1 1 0 0 3 1 4]",
+    "final_values": [
+      2,
+      3,
+      0,
+      1,
+      1,
+      0,
+      0,
+      3,
+      1,
+      4
+    ],
+    "sequence_order": [
+      "ad",
+      "ah",
+      "ag",
+      "c",
+      "an",
+      "r",
+      "aj",
+      "q",
+      "ab",
+      "y"
+    ],
+    "dependency_order": [
+      "c",
+      "an",
+      "ag",
+      "ad",
+      "r",
+      "aj",
+      "ab",
+      "y",
+      "ah",
+      "q"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ac = val 4, ab = permute(g) 2 4 1 0 3, x = permute(w) 1 3 2 0 4, t = permute(ai) 4 1 2 0 3, ai = permute(c) 0 4 2 1 3, h = permute(x) 4 0 3 1 2, aa = permute(t) 1 0 2 4 3, g = permute(aa) 1 2 4 3 0, w = permute(ab) 0 4 1 3 2, c = permute(ac) 1 4 0 3 2,\nvariables: ac ab x t ai h aa g w c\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[4 n n n n n n n n n], [4 n n n n n n n n 2], [4 n n n 2 n n n n 2], [4 n n 2 2 n n n n 2], [4 n n 2 2 n 2 n n 2], [4 n n 2 2 n 2 4 n 2], [4 3 n 2 2 n 2 4 n 2], [4 3 n 2 2 n 2 4 3 2], [4 3 0 2 2 n 2 4 3 2], [4 3 0 2 2 4 2 4 3 2] | [4 3 0 2 2 4 2 4 3 2]",
+    "final_values": [
+      4,
+      3,
+      0,
+      2,
+      2,
+      4,
+      2,
+      4,
+      3,
+      2
+    ],
+    "sequence_order": [
+      "ac",
+      "ab",
+      "x",
+      "t",
+      "ai",
+      "h",
+      "aa",
+      "g",
+      "w",
+      "c"
+    ],
+    "dependency_order": [
+      "ac",
+      "c",
+      "ai",
+      "t",
+      "aa",
+      "g",
+      "ab",
+      "w",
+      "x",
+      "h"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: f = permute(o) 4 3 0 2 1, o = permute(a) 2 3 0 4 1, aa = permute(ag) 3 4 1 2 0, a = permute(am) 4 3 2 1 0, t = permute(d) 0 1 4 2 3, k = permute(aa) 0 3 4 1 2, am = permute(ai) 3 4 1 0 2, ag = permute(t) 2 0 1 4 3, ai = permute(k) 2 0 4 3 1, d = val 2,\nvariables: f o aa a t k am ag ai d\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 2], [n n n n 4 n n n n 2], [n n n n 4 n n 3 n 2], [n n 2 n 4 n n 3 n 2], [n n 2 n 4 4 n 3 n 2], [n n 2 n 4 4 n 3 1 2], [n n 2 n 4 4 4 3 1 2], [n n 2 0 4 4 4 3 1 2], [n 2 2 0 4 4 4 3 1 2], [0 2 2 0 4 4 4 3 1 2] | [0 2 2 0 4 4 4 3 1 2]",
+    "final_values": [
+      0,
+      2,
+      2,
+      0,
+      4,
+      4,
+      4,
+      3,
+      1,
+      2
+    ],
+    "sequence_order": [
+      "f",
+      "o",
+      "aa",
+      "a",
+      "t",
+      "k",
+      "am",
+      "ag",
+      "ai",
+      "d"
+    ],
+    "dependency_order": [
+      "d",
+      "t",
+      "ag",
+      "aa",
+      "k",
+      "ai",
+      "am",
+      "a",
+      "o",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: e = permute(ag) 4 1 2 3 0, r = permute(al) 4 0 3 2 1, d = permute(o) 4 2 1 0 3, ag = permute(ak) 3 0 4 1 2, ae = permute(ad) 0 1 3 2 4, al = permute(ae) 2 4 1 0 3, ad = permute(d) 0 3 1 2 4, o = permute(e) 1 2 4 0 3, ak = permute(i) 2 1 3 0 4, i = val 3,\nvariables: e r d ag ae al ad o ak i\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 3], [n n n n n n n n 0 3], [n n n 3 n n n n 0 3], [3 n n 3 n n n n 0 3], [3 n n 3 n n n 0 0 3], [3 n 4 3 n n n 0 0 3], [3 n 4 3 n n 4 0 0 3], [3 n 4 3 4 n 4 0 0 3], [3 n 4 3 4 3 4 0 0 3], [3 2 4 3 4 3 4 0 0 3] | [3 2 4 3 4 3 4 0 0 3]",
+    "final_values": [
+      3,
+      2,
+      4,
+      3,
+      4,
+      3,
+      4,
+      0,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "e",
+      "r",
+      "d",
+      "ag",
+      "ae",
+      "al",
+      "ad",
+      "o",
+      "ak",
+      "i"
+    ],
+    "dependency_order": [
+      "i",
+      "ak",
+      "ag",
+      "e",
+      "o",
+      "d",
+      "ad",
+      "ae",
+      "al",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: p = permute(u) 4 3 0 1 2, al = permute(p) 3 4 2 1 0, af = permute(aa) 2 0 4 1 3, an = permute(al) 4 3 0 1 2, q = permute(an) 1 3 0 4 2, u = permute(af) 4 0 3 2 1, j = permute(q) 3 1 4 0 2, x = permute(g) 3 4 2 1 0, aa = permute(x) 4 3 2 1 0, g = val 4,\nvariables: p al af an q u j x aa g\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 4], [n n n n n n n 0 n 4], [n n n n n n n 0 4 4], [n n 3 n n n n 0 4 4], [n n 3 n n 2 n 0 4 4], [0 n 3 n n 2 n 0 4 4], [0 3 3 n n 2 n 0 4 4], [0 3 3 1 n 2 n 0 4 4], [0 3 3 1 3 2 n 0 4 4], [0 3 3 1 3 2 0 0 4 4] | [0 3 3 1 3 2 0 0 4 4]",
+    "final_values": [
+      0,
+      3,
+      3,
+      1,
+      3,
+      2,
+      0,
+      0,
+      4,
+      4
+    ],
+    "sequence_order": [
+      "p",
+      "al",
+      "af",
+      "an",
+      "q",
+      "u",
+      "j",
+      "x",
+      "aa",
+      "g"
+    ],
+    "dependency_order": [
+      "g",
+      "x",
+      "aa",
+      "af",
+      "u",
+      "p",
+      "al",
+      "an",
+      "q",
+      "j"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: u = permute(y) 1 2 4 0 3, y = permute(n) 2 0 1 4 3, o = val 0, an = permute(ah) 1 2 3 4 0, g = permute(ag) 0 4 3 1 2, ad = permute(g) 3 2 1 0 4, ah = permute(o) 2 3 0 4 1, ac = permute(an) 0 1 2 4 3, ag = permute(u) 1 2 0 3 4, n = permute(ac) 3 4 0 2 1,\nvariables: u y o an g ad ah ac ag n\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 0 n n n n n n n], [n n 0 n n n 2 n n n], [n n 0 3 n n 2 n n n], [n n 0 3 n n 2 4 n n], [n n 0 3 n n 2 4 n 1], [n 0 0 3 n n 2 4 n 1], [1 0 0 3 n n 2 4 n 1], [1 0 0 3 n n 2 4 2 1], [1 0 0 3 3 n 2 4 2 1], [1 0 0 3 3 0 2 4 2 1] | [1 0 0 3 3 0 2 4 2 1]",
+    "final_values": [
+      1,
+      0,
+      0,
+      3,
+      3,
+      0,
+      2,
+      4,
+      2,
+      1
+    ],
+    "sequence_order": [
+      "u",
+      "y",
+      "o",
+      "an",
+      "g",
+      "ad",
+      "ah",
+      "ac",
+      "ag",
+      "n"
+    ],
+    "dependency_order": [
+      "o",
+      "ah",
+      "an",
+      "ac",
+      "n",
+      "y",
+      "u",
+      "ag",
+      "g",
+      "ad"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: w = permute(l) 4 2 0 3 1, an = permute(d) 2 0 3 4 1, h = val 4, d = permute(ac) 4 2 0 1 3, l = permute(i) 2 4 3 1 0, i = permute(f) 0 3 1 2 4, r = permute(an) 2 0 1 3 4, f = permute(r) 1 0 2 3 4, p = permute(h) 2 1 0 4 3, ac = permute(p) 1 4 2 3 0,\nvariables: w an h d l i r f p ac\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 4 n n n n n n n], [n n 4 n n n n n 3 n], [n n 4 n n n n n 3 3], [n n 4 1 n n n n 3 3], [n 0 4 1 n n n n 3 3], [n 0 4 1 n n 2 n 3 3], [n 0 4 1 n n 2 2 3 3], [n 0 4 1 n 1 2 2 3 3], [n 0 4 1 4 1 2 2 3 3], [1 0 4 1 4 1 2 2 3 3] | [1 0 4 1 4 1 2 2 3 3]",
+    "final_values": [
+      1,
+      0,
+      4,
+      1,
+      4,
+      1,
+      2,
+      2,
+      3,
+      3
+    ],
+    "sequence_order": [
+      "w",
+      "an",
+      "h",
+      "d",
+      "l",
+      "i",
+      "r",
+      "f",
+      "p",
+      "ac"
+    ],
+    "dependency_order": [
+      "h",
+      "p",
+      "ac",
+      "d",
+      "an",
+      "r",
+      "f",
+      "i",
+      "l",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: f = permute(t) 4 1 3 2 0, ab = permute(x) 4 3 1 0 2, aj = permute(q) 2 1 0 4 3, e = permute(p) 1 3 2 4 0, a = val 3, p = permute(f) 1 4 3 0 2, q = permute(a) 3 0 4 1 2, t = permute(ab) 0 4 1 2 3, aa = permute(aj) 2 0 4 3 1, x = permute(aa) 3 4 1 0 2,\nvariables: f ab aj e a p q t aa x\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 3 n n n n n], [n n n n 3 n 1 n n n], [n n 1 n 3 n 1 n n n], [n n 1 n 3 n 1 n 0 n], [n n 1 n 3 n 1 n 0 3], [n 0 1 n 3 n 1 n 0 3], [n 0 1 n 3 n 1 0 0 3], [4 0 1 n 3 n 1 0 0 3], [4 0 1 n 3 2 1 0 0 3], [4 0 1 2 3 2 1 0 0 3] | [4 0 1 2 3 2 1 0 0 3]",
+    "final_values": [
+      4,
+      0,
+      1,
+      2,
+      3,
+      2,
+      1,
+      0,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "f",
+      "ab",
+      "aj",
+      "e",
+      "a",
+      "p",
+      "q",
+      "t",
+      "aa",
+      "x"
+    ],
+    "dependency_order": [
+      "a",
+      "q",
+      "aj",
+      "aa",
+      "x",
+      "ab",
+      "t",
+      "f",
+      "p",
+      "e"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: aa = permute(n) 3 1 4 2 0, ad = permute(am) 0 1 2 4 3, aj = permute(ad) 2 4 1 3 0, c = permute(ab) 2 3 4 1 0, ak = permute(aj) 4 1 3 0 2, t = permute(aa) 2 3 4 0 1, y = permute(c) 2 3 1 4 0, n = val 1, am = permute(t) 1 3 0 2 4, ab = permute(ak) 1 3 0 4 2,\nvariables: aa ad aj c ak t y n am ab\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 1 n n], [1 n n n n n n 1 n n], [1 n n n n 3 n 1 n n], [1 n n n n 3 n 1 2 n], [1 2 n n n 3 n 1 2 n], [1 2 1 n n 3 n 1 2 n], [1 2 1 n 1 3 n 1 2 n], [1 2 1 n 1 3 n 1 2 3], [1 2 1 1 1 3 n 1 2 3], [1 2 1 1 1 3 3 1 2 3] | [1 2 1 1 1 3 3 1 2 3]",
+    "final_values": [
+      1,
+      2,
+      1,
+      1,
+      1,
+      3,
+      3,
+      1,
+      2,
+      3
+    ],
+    "sequence_order": [
+      "aa",
+      "ad",
+      "aj",
+      "c",
+      "ak",
+      "t",
+      "y",
+      "n",
+      "am",
+      "ab"
+    ],
+    "dependency_order": [
+      "n",
+      "aa",
+      "t",
+      "am",
+      "ad",
+      "aj",
+      "ak",
+      "ab",
+      "c",
+      "y"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: b = permute(u) 0 3 4 2 1, ac = permute(a) 3 2 1 4 0, ag = permute(f) 3 1 0 4 2, am = permute(b) 1 3 4 2 0, y = permute(ag) 4 2 0 1 3, f = permute(r) 0 1 2 4 3, r = permute(am) 3 0 1 4 2, a = val 4, ak = permute(y) 1 2 3 4 0, u = permute(ac) 1 0 3 2 4,\nvariables: b ac ag am y f r a ak u\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 4 n n], [n 0 n n n n n 4 n n], [n 0 n n n n n 4 n 1], [3 0 n n n n n 4 n 1], [3 0 n 2 n n n 4 n 1], [3 0 n 2 n n 1 4 n 1], [3 0 n 2 n 1 1 4 n 1], [3 0 1 2 n 1 1 4 n 1], [3 0 1 2 2 1 1 4 n 1], [3 0 1 2 2 1 1 4 3 1] | [3 0 1 2 2 1 1 4 3 1]",
+    "final_values": [
+      3,
+      0,
+      1,
+      2,
+      2,
+      1,
+      1,
+      4,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "b",
+      "ac",
+      "ag",
+      "am",
+      "y",
+      "f",
+      "r",
+      "a",
+      "ak",
+      "u"
+    ],
+    "dependency_order": [
+      "a",
+      "ac",
+      "u",
+      "b",
+      "am",
+      "r",
+      "f",
+      "ag",
+      "y",
+      "ak"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ah = permute(v) 0 1 2 3 4, q = permute(aa) 1 2 3 0 4, v = permute(ak) 0 2 1 4 3, an = permute(aj) 2 4 1 0 3, aa = permute(z) 4 1 0 3 2, r = permute(j) 3 2 0 4 1, aj = permute(ah) 3 2 0 1 4, z = permute(r) 3 4 2 0 1, j = permute(an) 2 3 1 0 4, ak = val 1,\nvariables: ah q v an aa r aj z j ak\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 1], [n n 2 n n n n n n 1], [2 n 2 n n n n n n 1], [2 n 2 n n n 0 n n 1], [2 n 2 2 n n 0 n n 1], [2 n 2 2 n n 0 n 1 1], [2 n 2 2 n 2 0 n 1 1], [2 n 2 2 n 2 0 2 1 1], [2 n 2 2 0 2 0 2 1 1], [2 1 2 2 0 2 0 2 1 1] | [2 1 2 2 0 2 0 2 1 1]",
+    "final_values": [
+      2,
+      1,
+      2,
+      2,
+      0,
+      2,
+      0,
+      2,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "ah",
+      "q",
+      "v",
+      "an",
+      "aa",
+      "r",
+      "aj",
+      "z",
+      "j",
+      "ak"
+    ],
+    "dependency_order": [
+      "ak",
+      "v",
+      "ah",
+      "aj",
+      "an",
+      "j",
+      "r",
+      "z",
+      "aa",
+      "q"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: i = permute(ag) 1 2 4 3 0, ag = permute(t) 0 2 3 1 4, t = permute(p) 1 4 3 0 2, m = permute(x) 4 0 3 2 1, x = permute(o) 0 3 4 2 1, d = permute(aj) 3 4 0 1 2, u = val 1, o = permute(i) 4 2 0 1 3, p = permute(u) 3 1 0 4 2, aj = permute(m) 4 0 1 3 2,\nvariables: i ag t m x d u o p aj\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n n n], [n n n n n n 1 n 1 n], [n n 4 n n n 1 n 1 n], [n 4 4 n n n 1 n 1 n], [0 4 4 n n n 1 n 1 n], [0 4 4 n n n 1 4 1 n], [0 4 4 n 1 n 1 4 1 n], [0 4 4 0 1 n 1 4 1 n], [0 4 4 0 1 n 1 4 1 4], [0 4 4 0 1 2 1 4 1 4] | [0 4 4 0 1 2 1 4 1 4]",
+    "final_values": [
+      0,
+      4,
+      4,
+      0,
+      1,
+      2,
+      1,
+      4,
+      1,
+      4
+    ],
+    "sequence_order": [
+      "i",
+      "ag",
+      "t",
+      "m",
+      "x",
+      "d",
+      "u",
+      "o",
+      "p",
+      "aj"
+    ],
+    "dependency_order": [
+      "u",
+      "p",
+      "t",
+      "ag",
+      "i",
+      "o",
+      "x",
+      "m",
+      "aj",
+      "d"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: y = permute(aj) 0 3 4 1 2, ah = val 1, q = permute(af) 1 4 0 2 3, ai = permute(ah) 3 1 4 0 2, ag = permute(am) 1 4 2 3 0, d = permute(ag) 1 2 3 0 4, aj = permute(q) 0 4 3 2 1, af = permute(d) 0 4 2 3 1, am = permute(ai) 1 4 3 0 2, w = permute(y) 4 2 0 1 3,\nvariables: y ah q ai ag d aj af am w\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n n n], [n 1 n 1 n n n n n n], [n 1 n 1 n n n n 4 n], [n 1 n 1 0 n n n 4 n], [n 1 n 1 0 1 n n 4 n], [n 1 n 1 0 1 n 4 4 n], [n 1 3 1 0 1 n 4 4 n], [n 1 3 1 0 1 2 4 4 n], [4 1 3 1 0 1 2 4 4 n], [4 1 3 1 0 1 2 4 4 3] | [4 1 3 1 0 1 2 4 4 3]",
+    "final_values": [
+      4,
+      1,
+      3,
+      1,
+      0,
+      1,
+      2,
+      4,
+      4,
+      3
+    ],
+    "sequence_order": [
+      "y",
+      "ah",
+      "q",
+      "ai",
+      "ag",
+      "d",
+      "aj",
+      "af",
+      "am",
+      "w"
+    ],
+    "dependency_order": [
+      "ah",
+      "ai",
+      "am",
+      "ag",
+      "d",
+      "af",
+      "q",
+      "aj",
+      "y",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: al = permute(am) 3 2 4 1 0, q = permute(a) 2 4 1 3 0, g = permute(al) 3 1 2 0 4, t = permute(q) 4 1 0 3 2, am = val 0, i = permute(aj) 1 0 2 4 3, b = permute(m) 0 4 2 3 1, a = permute(i) 0 3 2 1 4, m = permute(t) 0 3 1 2 4, aj = permute(g) 1 0 4 3 2,\nvariables: al q g t am i b a m aj\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n n n], [3 n n n 0 n n n n n], [3 n 0 n 0 n n n n n], [3 n 0 n 0 n n n n 1], [3 n 0 n 0 0 n n n 1], [3 n 0 n 0 0 n 0 n 1], [3 2 0 n 0 0 n 0 n 1], [3 2 0 0 0 0 n 0 n 1], [3 2 0 0 0 0 n 0 0 1], [3 2 0 0 0 0 0 0 0 1] | [3 2 0 0 0 0 0 0 0 1]",
+    "final_values": [
+      3,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "al",
+      "q",
+      "g",
+      "t",
+      "am",
+      "i",
+      "b",
+      "a",
+      "m",
+      "aj"
+    ],
+    "dependency_order": [
+      "am",
+      "al",
+      "g",
+      "aj",
+      "i",
+      "a",
+      "q",
+      "t",
+      "m",
+      "b"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ad = permute(ai) 4 2 3 1 0, af = permute(l) 0 3 2 4 1, l = permute(aj) 0 4 3 1 2, w = permute(af) 4 2 0 1 3, aj = val 2, ai = permute(w) 3 0 1 4 2, e = permute(ah) 3 0 2 4 1, ah = permute(ac) 2 4 1 0 3, f = permute(e) 3 0 4 1 2, ac = permute(ad) 0 3 1 4 2,\nvariables: ad af l w aj ai e ah f ac\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 2 n n n n n], [n n 3 n 2 n n n n n], [n 4 3 n 2 n n n n n], [n 4 3 3 2 n n n n n], [n 4 3 3 2 4 n n n n], [0 4 3 3 2 4 n n n n], [0 4 3 3 2 4 n n n 0], [0 4 3 3 2 4 n 2 n 0], [0 4 3 3 2 4 2 2 n 0], [0 4 3 3 2 4 2 2 4 0] | [0 4 3 3 2 4 2 2 4 0]",
+    "final_values": [
+      0,
+      4,
+      3,
+      3,
+      2,
+      4,
+      2,
+      2,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "ad",
+      "af",
+      "l",
+      "w",
+      "aj",
+      "ai",
+      "e",
+      "ah",
+      "f",
+      "ac"
+    ],
+    "dependency_order": [
+      "aj",
+      "l",
+      "af",
+      "w",
+      "ai",
+      "ad",
+      "ac",
+      "ah",
+      "e",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: i = permute(al) 4 1 2 0 3, al = permute(af) 2 3 1 0 4, an = permute(ag) 1 3 4 0 2, p = permute(f) 3 2 4 0 1, ag = val 4, r = permute(i) 3 2 4 0 1, ak = permute(p) 0 2 3 1 4, af = permute(s) 1 3 2 0 4, s = permute(ak) 3 0 4 1 2, f = permute(an) 4 1 0 3 2,\nvariables: i al an p ag r ak af s f\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 4 n n n n n], [n n 2 n 4 n n n n n], [n n 2 n 4 n n n n 0], [n n 2 3 4 n n n n 0], [n n 2 3 4 n 1 n n 0], [n n 2 3 4 n 1 n 0 0], [n n 2 3 4 n 1 1 0 0], [n 3 2 3 4 n 1 1 0 0], [0 3 2 3 4 n 1 1 0 0], [0 3 2 3 4 3 1 1 0 0] | [0 3 2 3 4 3 1 1 0 0]",
+    "final_values": [
+      0,
+      3,
+      2,
+      3,
+      4,
+      3,
+      1,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "i",
+      "al",
+      "an",
+      "p",
+      "ag",
+      "r",
+      "ak",
+      "af",
+      "s",
+      "f"
+    ],
+    "dependency_order": [
+      "ag",
+      "an",
+      "f",
+      "p",
+      "ak",
+      "s",
+      "af",
+      "al",
+      "i",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: o = permute(n) 1 4 2 3 0, ai = permute(an) 3 1 2 4 0, an = permute(s) 0 4 3 1 2, n = permute(am) 1 2 3 4 0, ab = permute(a) 2 3 0 1 4, s = val 3, a = permute(aa) 1 2 3 0 4, am = permute(w) 4 3 1 2 0, w = permute(ai) 0 4 2 1 3, aa = permute(o) 1 4 2 3 0,\nvariables: o ai an n ab s a am w aa\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 3 n n n n], [n n 1 n n 3 n n n n], [n 1 1 n n 3 n n n n], [n 1 1 n n 3 n n 4 n], [n 1 1 n n 3 n 0 4 n], [n 1 1 1 n 3 n 0 4 n], [4 1 1 1 n 3 n 0 4 n], [4 1 1 1 n 3 n 0 4 0], [4 1 1 1 n 3 1 0 4 0], [4 1 1 1 3 3 1 0 4 0] | [4 1 1 1 3 3 1 0 4 0]",
+    "final_values": [
+      4,
+      1,
+      1,
+      1,
+      3,
+      3,
+      1,
+      0,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "o",
+      "ai",
+      "an",
+      "n",
+      "ab",
+      "s",
+      "a",
+      "am",
+      "w",
+      "aa"
+    ],
+    "dependency_order": [
+      "s",
+      "an",
+      "ai",
+      "w",
+      "am",
+      "n",
+      "o",
+      "aa",
+      "a",
+      "ab"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: af = permute(y) 1 2 4 3 0, l = permute(s) 1 2 3 4 0, an = permute(af) 4 1 2 3 0, ah = permute(h) 1 2 4 0 3, p = permute(an) 1 4 2 3 0, y = permute(m) 1 2 4 0 3, h = permute(p) 3 1 4 2 0, m = permute(a) 2 1 0 4 3, a = val 0, s = permute(ah) 0 4 3 2 1,\nvariables: af l an ah p y h m a s\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 0 n], [n n n n n n n 2 0 n], [n n n n n 4 n 2 0 n], [0 n n n n 4 n 2 0 n], [0 n 4 n n 4 n 2 0 n], [0 n 4 n 0 4 n 2 0 n], [0 n 4 n 0 4 3 2 0 n], [0 n 4 0 0 4 3 2 0 n], [0 n 4 0 0 4 3 2 0 0], [0 1 4 0 0 4 3 2 0 0] | [0 1 4 0 0 4 3 2 0 0]",
+    "final_values": [
+      0,
+      1,
+      4,
+      0,
+      0,
+      4,
+      3,
+      2,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "af",
+      "l",
+      "an",
+      "ah",
+      "p",
+      "y",
+      "h",
+      "m",
+      "a",
+      "s"
+    ],
+    "dependency_order": [
+      "a",
+      "m",
+      "y",
+      "af",
+      "an",
+      "p",
+      "h",
+      "ah",
+      "s",
+      "l"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: g = permute(q) 1 2 3 4 0, x = permute(m) 1 2 3 4 0, s = permute(aa) 4 0 1 3 2, a = permute(g) 4 2 0 1 3, w = permute(p) 2 4 3 1 0, al = val 1, m = permute(al) 2 3 0 4 1, p = permute(s) 3 2 1 4 0, aa = permute(x) 1 4 0 3 2, q = permute(w) 2 4 1 0 3,\nvariables: g x s a w al m p aa q\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n n n], [n n n n n 1 3 n n n], [n 4 n n n 1 3 n n n], [n 4 n n n 1 3 n 2 n], [n 4 1 n n 1 3 n 2 n], [n 4 1 n n 1 3 2 2 n], [n 4 1 n 3 1 3 2 2 n], [n 4 1 n 3 1 3 2 2 0], [1 4 1 n 3 1 3 2 2 0], [1 4 1 2 3 1 3 2 2 0] | [1 4 1 2 3 1 3 2 2 0]",
+    "final_values": [
+      1,
+      4,
+      1,
+      2,
+      3,
+      1,
+      3,
+      2,
+      2,
+      0
+    ],
+    "sequence_order": [
+      "g",
+      "x",
+      "s",
+      "a",
+      "w",
+      "al",
+      "m",
+      "p",
+      "aa",
+      "q"
+    ],
+    "dependency_order": [
+      "al",
+      "m",
+      "x",
+      "aa",
+      "s",
+      "p",
+      "w",
+      "q",
+      "g",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: a = permute(ac) 4 2 1 0 3, u = val 1, ac = permute(x) 0 3 1 4 2, g = permute(am) 4 3 2 0 1, am = permute(j) 0 3 2 1 4, f = permute(g) 3 4 2 0 1, x = permute(an) 2 3 4 1 0, an = permute(ak) 4 0 3 1 2, j = permute(u) 1 0 4 3 2, ak = permute(f) 3 0 1 4 2,\nvariables: a u ac g am f x an j ak\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 1 n n n n n n n n], [n 1 n n n n n n 0 n], [n 1 n n 0 n n n 0 n], [n 1 n 4 0 n n n 0 n], [n 1 n 4 0 1 n n 0 n], [n 1 n 4 0 1 n n 0 0], [n 1 n 4 0 1 n 4 0 0], [n 1 n 4 0 1 0 4 0 0], [n 1 0 4 0 1 0 4 0 0], [4 1 0 4 0 1 0 4 0 0] | [4 1 0 4 0 1 0 4 0 0]",
+    "final_values": [
+      4,
+      1,
+      0,
+      4,
+      0,
+      1,
+      0,
+      4,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "a",
+      "u",
+      "ac",
+      "g",
+      "am",
+      "f",
+      "x",
+      "an",
+      "j",
+      "ak"
+    ],
+    "dependency_order": [
+      "u",
+      "j",
+      "am",
+      "g",
+      "f",
+      "ak",
+      "an",
+      "x",
+      "ac",
+      "a"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: l = val 1, an = permute(v) 0 3 1 2 4, af = permute(an) 1 3 2 4 0, h = permute(ah) 3 1 2 0 4, ah = permute(af) 4 0 1 3 2, b = permute(ak) 2 1 3 0 4, ak = permute(l) 4 2 1 0 3, v = permute(b) 0 3 4 2 1, u = permute(h) 4 3 0 1 2, g = permute(u) 1 2 4 3 0,\nvariables: l an af h ah b ak v u g\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[1 n n n n n n n n n], [1 n n n n n 2 n n n], [1 n n n n 3 2 n n n], [1 n n n n 3 2 2 n n], [1 1 n n n 3 2 2 n n], [1 1 3 n n 3 2 2 n n], [1 1 3 n 3 3 2 2 n n], [1 1 3 0 3 3 2 2 n n], [1 1 3 0 3 3 2 2 4 n], [1 1 3 0 3 3 2 2 4 0] | [1 1 3 0 3 3 2 2 4 0]",
+    "final_values": [
+      1,
+      1,
+      3,
+      0,
+      3,
+      3,
+      2,
+      2,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "l",
+      "an",
+      "af",
+      "h",
+      "ah",
+      "b",
+      "ak",
+      "v",
+      "u",
+      "g"
+    ],
+    "dependency_order": [
+      "l",
+      "ak",
+      "b",
+      "v",
+      "an",
+      "af",
+      "ah",
+      "h",
+      "u",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: am = permute(af) 0 3 2 1 4, w = permute(ae) 3 0 1 2 4, ac = permute(ab) 2 1 4 3 0, ae = val 3, ab = permute(f) 2 3 0 4 1, u = permute(ac) 4 2 0 3 1, an = permute(u) 3 1 0 4 2, f = permute(am) 1 0 2 3 4, e = permute(an) 0 3 4 2 1, af = permute(w) 4 1 3 0 2,\nvariables: am w ac ae ab u an f e af\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 3 n n n n n n], [n 2 n 3 n n n n n n], [n 2 n 3 n n n n n 3], [1 2 n 3 n n n n n 3], [1 2 n 3 n n n 0 n 3], [1 2 n 3 2 n n 0 n 3], [1 2 4 3 2 n n 0 n 3], [1 2 4 3 2 1 n 0 n 3], [1 2 4 3 2 1 1 0 n 3], [1 2 4 3 2 1 1 0 3 3] | [1 2 4 3 2 1 1 0 3 3]",
+    "final_values": [
+      1,
+      2,
+      4,
+      3,
+      2,
+      1,
+      1,
+      0,
+      3,
+      3
+    ],
+    "sequence_order": [
+      "am",
+      "w",
+      "ac",
+      "ae",
+      "ab",
+      "u",
+      "an",
+      "f",
+      "e",
+      "af"
+    ],
+    "dependency_order": [
+      "ae",
+      "w",
+      "af",
+      "am",
+      "f",
+      "ab",
+      "ac",
+      "u",
+      "an",
+      "e"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: b = permute(aa) 2 4 1 0 3, aa = permute(a) 0 1 4 3 2, q = permute(n) 3 2 1 0 4, a = permute(q) 4 1 0 3 2, af = permute(ad) 1 2 3 0 4, ak = val 0, ai = permute(af) 3 2 4 1 0, ad = permute(am) 0 4 2 1 3, am = permute(b) 4 0 1 3 2, n = permute(ak) 0 4 3 2 1,\nvariables: b aa q a af ak ai ad am n\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 0 n n n n], [n n n n n 0 n n n 0], [n n 3 n n 0 n n n 0], [n n 3 3 n 0 n n n 0], [n 3 3 3 n 0 n n n 0], [0 3 3 3 n 0 n n n 0], [0 3 3 3 n 0 n n 4 0], [0 3 3 3 n 0 n 3 4 0], [0 3 3 3 0 0 n 3 4 0], [0 3 3 3 0 0 3 3 4 0] | [0 3 3 3 0 0 3 3 4 0]",
+    "final_values": [
+      0,
+      3,
+      3,
+      3,
+      0,
+      0,
+      3,
+      3,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "b",
+      "aa",
+      "q",
+      "a",
+      "af",
+      "ak",
+      "ai",
+      "ad",
+      "am",
+      "n"
+    ],
+    "dependency_order": [
+      "ak",
+      "n",
+      "q",
+      "a",
+      "aa",
+      "b",
+      "am",
+      "ad",
+      "af",
+      "ai"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: x = permute(w) 3 4 2 1 0, ac = permute(b) 0 2 4 1 3, y = permute(d) 0 3 2 4 1, o = permute(ac) 1 0 4 2 3, r = permute(o) 2 1 0 3 4, q = permute(l) 0 3 4 1 2, w = val 0, d = permute(x) 2 3 4 1 0, l = permute(y) 4 2 3 0 1, b = permute(q) 1 3 4 0 2,\nvariables: x ac y o r q w d l b\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n n n], [3 n n n n n 0 n n n], [3 n n n n n 0 1 n n], [3 n 3 n n n 0 1 n n], [3 n 3 n n n 0 1 0 n], [3 n 3 n n 0 0 1 0 n], [3 n 3 n n 0 0 1 0 1], [3 2 3 n n 0 0 1 0 1], [3 2 3 4 n 0 0 1 0 1], [3 2 3 4 4 0 0 1 0 1] | [3 2 3 4 4 0 0 1 0 1]",
+    "final_values": [
+      3,
+      2,
+      3,
+      4,
+      4,
+      0,
+      0,
+      1,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "x",
+      "ac",
+      "y",
+      "o",
+      "r",
+      "q",
+      "w",
+      "d",
+      "l",
+      "b"
+    ],
+    "dependency_order": [
+      "w",
+      "x",
+      "d",
+      "y",
+      "l",
+      "q",
+      "b",
+      "ac",
+      "o",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ag = permute(al) 0 1 3 4 2, ab = permute(l) 0 3 4 1 2, p = permute(ae) 4 2 0 3 1, l = permute(n) 4 3 0 2 1, af = val 0, a = permute(af) 4 3 2 1 0, al = permute(a) 1 0 4 3 2, n = permute(aj) 2 4 1 3 0, ae = permute(ab) 4 1 3 2 0, aj = permute(ag) 0 4 1 3 2,\nvariables: ag ab p l af a al n ae aj\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n n n], [n n n n 0 4 n n n n], [n n n n 0 4 2 n n n], [3 n n n 0 4 2 n n n], [3 n n n 0 4 2 n n 3], [3 n n n 0 4 2 3 n 3], [3 n n 2 0 4 2 3 n 3], [3 4 n 2 0 4 2 3 n 3], [3 4 n 2 0 4 2 3 0 3], [3 4 4 2 0 4 2 3 0 3] | [3 4 4 2 0 4 2 3 0 3]",
+    "final_values": [
+      3,
+      4,
+      4,
+      2,
+      0,
+      4,
+      2,
+      3,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "ag",
+      "ab",
+      "p",
+      "l",
+      "af",
+      "a",
+      "al",
+      "n",
+      "ae",
+      "aj"
+    ],
+    "dependency_order": [
+      "af",
+      "a",
+      "al",
+      "ag",
+      "aj",
+      "n",
+      "l",
+      "ab",
+      "ae",
+      "p"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: b = permute(m) 4 0 1 2 3, p = permute(i) 3 1 2 4 0, af = val 3, c = permute(af) 2 0 3 4 1, aj = permute(y) 3 1 0 2 4, i = permute(b) 0 3 2 1 4, y = permute(c) 3 0 4 1 2, j = permute(aj) 3 4 0 2 1, x = permute(p) 4 1 0 3 2, m = permute(j) 0 4 2 3 1,\nvariables: b p af c aj i y j x m\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 3 n n n n n n n], [n n 3 4 n n n n n n], [n n 3 4 n n 2 n n n], [n n 3 4 0 n 2 n n n], [n n 3 4 0 n 2 3 n n], [n n 3 4 0 n 2 3 n 3], [2 n 3 4 0 n 2 3 n 3], [2 n 3 4 0 2 2 3 n 3], [2 2 3 4 0 2 2 3 n 3], [2 2 3 4 0 2 2 3 0 3] | [2 2 3 4 0 2 2 3 0 3]",
+    "final_values": [
+      2,
+      2,
+      3,
+      4,
+      0,
+      2,
+      2,
+      3,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "b",
+      "p",
+      "af",
+      "c",
+      "aj",
+      "i",
+      "y",
+      "j",
+      "x",
+      "m"
+    ],
+    "dependency_order": [
+      "af",
+      "c",
+      "y",
+      "aj",
+      "j",
+      "m",
+      "b",
+      "i",
+      "p",
+      "x"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: j = permute(i) 4 3 2 1 0, ad = permute(f) 0 1 3 4 2, i = permute(an) 3 0 1 2 4, y = permute(g) 4 1 0 3 2, f = permute(j) 4 0 1 2 3, ai = permute(d) 4 0 1 2 3, l = permute(ai) 1 2 0 4 3, d = permute(y) 0 3 4 2 1, an = permute(l) 3 4 1 2 0, g = val 3,\nvariables: j ad i y f ai l d an g\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 3], [n n n 3 n n n n n 3], [n n n 3 n n n 2 n 3], [n n n 3 n 1 n 2 n 3], [n n n 3 n 1 2 2 n 3], [n n n 3 n 1 2 2 1 3], [n n 0 3 n 1 2 2 1 3], [4 n 0 3 n 1 2 2 1 3], [4 n 0 3 3 1 2 2 1 3], [4 4 0 3 3 1 2 2 1 3] | [4 4 0 3 3 1 2 2 1 3]",
+    "final_values": [
+      4,
+      4,
+      0,
+      3,
+      3,
+      1,
+      2,
+      2,
+      1,
+      3
+    ],
+    "sequence_order": [
+      "j",
+      "ad",
+      "i",
+      "y",
+      "f",
+      "ai",
+      "l",
+      "d",
+      "an",
+      "g"
+    ],
+    "dependency_order": [
+      "g",
+      "y",
+      "d",
+      "ai",
+      "l",
+      "an",
+      "i",
+      "j",
+      "f",
+      "ad"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: l = permute(h) 4 2 0 1 3, d = permute(m) 2 0 4 3 1, m = permute(i) 1 0 2 4 3, j = permute(am) 4 3 1 0 2, am = permute(l) 0 4 3 1 2, an = permute(ae) 3 2 1 0 4, i = val 4, ae = permute(q) 3 4 0 2 1, h = permute(d) 0 1 2 4 3, q = permute(j) 3 4 1 2 0,\nvariables: l d m j am an i ae h q\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 4 n n n], [n n 3 n n n 4 n n n], [n 3 3 n n n 4 n n n], [n 3 3 n n n 4 n 4 n], [3 3 3 n n n 4 n 4 n], [3 3 3 n 1 n 4 n 4 n], [3 3 3 3 1 n 4 n 4 n], [3 3 3 3 1 n 4 n 4 2], [3 3 3 3 1 n 4 0 4 2], [3 3 3 3 1 3 4 0 4 2] | [3 3 3 3 1 3 4 0 4 2]",
+    "final_values": [
+      3,
+      3,
+      3,
+      3,
+      1,
+      3,
+      4,
+      0,
+      4,
+      2
+    ],
+    "sequence_order": [
+      "l",
+      "d",
+      "m",
+      "j",
+      "am",
+      "an",
+      "i",
+      "ae",
+      "h",
+      "q"
+    ],
+    "dependency_order": [
+      "i",
+      "m",
+      "d",
+      "h",
+      "l",
+      "am",
+      "j",
+      "q",
+      "ae",
+      "an"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: z = permute(b) 2 3 1 0 4, c = permute(af) 1 0 3 4 2, al = val 1, d = permute(c) 1 0 4 2 3, f = permute(z) 0 4 2 3 1, af = permute(i) 3 2 0 1 4, u = permute(d) 0 3 2 1 4, i = permute(f) 0 1 4 2 3, b = permute(al) 4 3 2 1 0, r = permute(u) 0 3 1 4 2,\nvariables: z c al d f af u i b r\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 1 n n n n n n n], [n n 1 n n n n n 3 n], [0 n 1 n n n n n 3 n], [0 n 1 n 0 n n n 3 n], [0 n 1 n 0 n n 0 3 n], [0 n 1 n 0 3 n 0 3 n], [0 4 1 n 0 3 n 0 3 n], [0 4 1 3 0 3 n 0 3 n], [0 4 1 3 0 3 1 0 3 n], [0 4 1 3 0 3 1 0 3 3] | [0 4 1 3 0 3 1 0 3 3]",
+    "final_values": [
+      0,
+      4,
+      1,
+      3,
+      0,
+      3,
+      1,
+      0,
+      3,
+      3
+    ],
+    "sequence_order": [
+      "z",
+      "c",
+      "al",
+      "d",
+      "f",
+      "af",
+      "u",
+      "i",
+      "b",
+      "r"
+    ],
+    "dependency_order": [
+      "al",
+      "b",
+      "z",
+      "f",
+      "i",
+      "af",
+      "c",
+      "d",
+      "u",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: an = permute(g) 1 4 0 2 3, ae = permute(w) 4 2 3 1 0, k = permute(ab) 3 1 4 0 2, t = permute(ae) 3 0 1 4 2, af = permute(y) 2 1 0 4 3, g = permute(t) 0 2 3 4 1, y = val 1, l = permute(k) 0 1 3 2 4, w = permute(af) 1 0 2 4 3, ab = permute(an) 3 0 4 2 1,\nvariables: an ae k t af g y l w ab\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n n n], [n n n n 1 n 1 n n n], [n n n n 1 n 1 n 0 n], [n 4 n n 1 n 1 n 0 n], [n 4 n 2 1 n 1 n 0 n], [n 4 n 2 1 3 1 n 0 n], [2 4 n 2 1 3 1 n 0 n], [2 4 n 2 1 3 1 n 0 4], [2 4 2 2 1 3 1 n 0 4], [2 4 2 2 1 3 1 3 0 4] | [2 4 2 2 1 3 1 3 0 4]",
+    "final_values": [
+      2,
+      4,
+      2,
+      2,
+      1,
+      3,
+      1,
+      3,
+      0,
+      4
+    ],
+    "sequence_order": [
+      "an",
+      "ae",
+      "k",
+      "t",
+      "af",
+      "g",
+      "y",
+      "l",
+      "w",
+      "ab"
+    ],
+    "dependency_order": [
+      "y",
+      "af",
+      "w",
+      "ae",
+      "t",
+      "g",
+      "an",
+      "ab",
+      "k",
+      "l"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: e = permute(an) 3 4 0 2 1, l = permute(g) 4 2 0 1 3, ai = permute(p) 0 4 1 2 3, v = permute(e) 1 4 2 0 3, g = permute(al) 0 1 3 4 2, t = val 1, al = permute(t) 1 3 0 2 4, m = permute(ai) 1 3 4 2 0, p = permute(l) 3 1 2 0 4, an = permute(m) 1 0 2 3 4,\nvariables: e l ai v g t al m p an\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n n n], [n n n n n 1 3 n n n], [n n n n 4 1 3 n n n], [n 3 n n 4 1 3 n n n], [n 3 n n 4 1 3 n 0 n], [n 3 0 n 4 1 3 n 0 n], [n 3 0 n 4 1 3 1 0 n], [n 3 0 n 4 1 3 1 0 0], [3 3 0 n 4 1 3 1 0 0], [3 3 0 0 4 1 3 1 0 0] | [3 3 0 0 4 1 3 1 0 0]",
+    "final_values": [
+      3,
+      3,
+      0,
+      0,
+      4,
+      1,
+      3,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "e",
+      "l",
+      "ai",
+      "v",
+      "g",
+      "t",
+      "al",
+      "m",
+      "p",
+      "an"
+    ],
+    "dependency_order": [
+      "t",
+      "al",
+      "g",
+      "l",
+      "p",
+      "ai",
+      "m",
+      "an",
+      "e",
+      "v"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: m = permute(p) 0 2 4 3 1, g = permute(ae) 1 2 0 4 3, aj = permute(ac) 3 4 0 2 1, ai = val 2, ak = permute(m) 2 3 4 0 1, h = permute(ab) 2 4 3 0 1, ae = permute(ak) 1 4 3 2 0, ac = permute(h) 1 3 2 0 4, ab = permute(ai) 0 4 1 2 3, p = permute(aj) 3 4 2 1 0,\nvariables: m g aj ai ak h ae ac ab p\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 2 n n n n n n], [n n n 2 n n n n 1 n], [n n n 2 n 4 n n 1 n], [n n n 2 n 4 n 4 1 n], [n n 1 2 n 4 n 4 1 n], [n n 1 2 n 4 n 4 1 4], [1 n 1 2 n 4 n 4 1 4], [1 n 1 2 3 4 n 4 1 4], [1 n 1 2 3 4 2 4 1 4], [1 0 1 2 3 4 2 4 1 4] | [1 0 1 2 3 4 2 4 1 4]",
+    "final_values": [
+      1,
+      0,
+      1,
+      2,
+      3,
+      4,
+      2,
+      4,
+      1,
+      4
+    ],
+    "sequence_order": [
+      "m",
+      "g",
+      "aj",
+      "ai",
+      "ak",
+      "h",
+      "ae",
+      "ac",
+      "ab",
+      "p"
+    ],
+    "dependency_order": [
+      "ai",
+      "ab",
+      "h",
+      "ac",
+      "aj",
+      "p",
+      "m",
+      "ak",
+      "ae",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ab = permute(an) 2 1 3 0 4, y = permute(al) 4 2 3 1 0, af = permute(ah) 0 2 1 3 4, o = permute(e) 3 0 4 2 1, ah = permute(y) 2 1 0 4 3, an = permute(af) 1 4 2 0 3, q = permute(o) 0 3 1 4 2, e = permute(m) 1 0 2 4 3, al = permute(q) 4 2 1 0 3, m = val 3,\nvariables: ab y af o ah an q e al m\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 3], [n n n n n n n 4 n 3], [n n n 1 n n n 4 n 3], [n n n 1 n n 3 4 n 3], [n n n 1 n n 3 4 0 3], [n 4 n 1 n n 3 4 0 3], [n 4 n 1 3 n 3 4 0 3], [n 4 3 1 3 n 3 4 0 3], [n 4 3 1 3 0 3 4 0 3], [2 4 3 1 3 0 3 4 0 3] | [2 4 3 1 3 0 3 4 0 3]",
+    "final_values": [
+      2,
+      4,
+      3,
+      1,
+      3,
+      0,
+      3,
+      4,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "ab",
+      "y",
+      "af",
+      "o",
+      "ah",
+      "an",
+      "q",
+      "e",
+      "al",
+      "m"
+    ],
+    "dependency_order": [
+      "m",
+      "e",
+      "o",
+      "q",
+      "al",
+      "y",
+      "ah",
+      "af",
+      "an",
+      "ab"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ab = val 2, z = permute(ac) 2 1 0 4 3, k = permute(b) 4 1 2 0 3, h = permute(af) 4 3 2 1 0, af = permute(a) 2 3 4 0 1, a = permute(ab) 3 2 1 0 4, an = permute(h) 3 1 4 2 0, e = permute(k) 2 0 1 4 3, b = permute(an) 3 4 1 0 2, ac = permute(e) 3 1 0 2 4,\nvariables: ab z k h af a an e b ac\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[2 n n n n n n n n n], [2 n n n n 1 n n n n], [2 n n n 3 1 n n n n], [2 n n 1 3 1 n n n n], [2 n n 1 3 1 1 n n n], [2 n n 1 3 1 1 n 4 n], [2 n 3 1 3 1 1 n 4 n], [2 n 3 1 3 1 1 4 4 n], [2 n 3 1 3 1 1 4 4 4], [2 3 3 1 3 1 1 4 4 4] | [2 3 3 1 3 1 1 4 4 4]",
+    "final_values": [
+      2,
+      3,
+      3,
+      1,
+      3,
+      1,
+      1,
+      4,
+      4,
+      4
+    ],
+    "sequence_order": [
+      "ab",
+      "z",
+      "k",
+      "h",
+      "af",
+      "a",
+      "an",
+      "e",
+      "b",
+      "ac"
+    ],
+    "dependency_order": [
+      "ab",
+      "a",
+      "af",
+      "h",
+      "an",
+      "b",
+      "k",
+      "e",
+      "ac",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: h = permute(q) 1 0 4 2 3, c = permute(m) 0 2 3 1 4, ad = val 1, o = permute(d) 3 2 0 1 4, v = permute(o) 3 0 2 1 4, d = permute(c) 0 3 2 4 1, f = permute(g) 0 1 4 3 2, q = permute(v) 3 0 1 4 2, m = permute(ad) 1 2 0 4 3, g = permute(h) 3 0 1 2 4,\nvariables: h c ad o v d f q m g\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 1 n n n n n n n], [n n 1 n n n n n 2 n], [n 3 1 n n n n n 2 n], [n 3 1 n n 4 n n 2 n], [n 3 1 4 n 4 n n 2 n], [n 3 1 4 4 4 n n 2 n], [n 3 1 4 4 4 n 2 2 n], [4 3 1 4 4 4 n 2 2 n], [4 3 1 4 4 4 n 2 2 4], [4 3 1 4 4 4 2 2 2 4] | [4 3 1 4 4 4 2 2 2 4]",
+    "final_values": [
+      4,
+      3,
+      1,
+      4,
+      4,
+      4,
+      2,
+      2,
+      2,
+      4
+    ],
+    "sequence_order": [
+      "h",
+      "c",
+      "ad",
+      "o",
+      "v",
+      "d",
+      "f",
+      "q",
+      "m",
+      "g"
+    ],
+    "dependency_order": [
+      "ad",
+      "m",
+      "c",
+      "d",
+      "o",
+      "v",
+      "q",
+      "h",
+      "g",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: z = permute(u) 4 0 1 2 3, f = permute(g) 2 0 3 1 4, x = val 0, u = permute(ab) 2 0 1 3 4, o = permute(x) 4 2 0 3 1, ah = permute(o) 0 4 3 1 2, ab = permute(f) 0 3 4 1 2, j = permute(m) 2 3 4 1 0, g = permute(j) 3 2 4 0 1, m = permute(ah) 1 4 3 2 0,\nvariables: z f x u o ah ab j g m\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 0 n n n n n n n], [n n 0 n 4 n n n n n], [n n 0 n 4 2 n n n n], [n n 0 n 4 2 n n n 3], [n n 0 n 4 2 n 1 n 3], [n n 0 n 4 2 n 1 2 3], [n 3 0 n 4 2 n 1 2 3], [n 3 0 n 4 2 1 1 2 3], [n 3 0 0 4 2 1 1 2 3], [4 3 0 0 4 2 1 1 2 3] | [4 3 0 0 4 2 1 1 2 3]",
+    "final_values": [
+      4,
+      3,
+      0,
+      0,
+      4,
+      2,
+      1,
+      1,
+      2,
+      3
+    ],
+    "sequence_order": [
+      "z",
+      "f",
+      "x",
+      "u",
+      "o",
+      "ah",
+      "ab",
+      "j",
+      "g",
+      "m"
+    ],
+    "dependency_order": [
+      "x",
+      "o",
+      "ah",
+      "m",
+      "j",
+      "g",
+      "f",
+      "ab",
+      "u",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ah = permute(j) 4 3 2 1 0, l = permute(ah) 1 2 0 4 3, j = permute(t) 3 2 4 0 1, an = permute(l) 0 1 2 3 4, q = permute(k) 4 0 1 3 2, m = permute(f) 4 0 1 3 2, f = permute(an) 1 4 2 3 0, k = permute(ai) 1 0 2 3 4, t = val 1, ai = permute(m) 0 3 1 2 4,\nvariables: ah l j an q m f k t ai\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 1 n], [n n 2 n n n n n 1 n], [2 n 2 n n n n n 1 n], [2 0 2 n n n n n 1 n], [2 0 2 0 n n n n 1 n], [2 0 2 0 n n 1 n 1 n], [2 0 2 0 n 0 1 n 1 n], [2 0 2 0 n 0 1 n 1 0], [2 0 2 0 n 0 1 1 1 0], [2 0 2 0 0 0 1 1 1 0] | [2 0 2 0 0 0 1 1 1 0]",
+    "final_values": [
+      2,
+      0,
+      2,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "ah",
+      "l",
+      "j",
+      "an",
+      "q",
+      "m",
+      "f",
+      "k",
+      "t",
+      "ai"
+    ],
+    "dependency_order": [
+      "t",
+      "j",
+      "ah",
+      "l",
+      "an",
+      "f",
+      "m",
+      "ai",
+      "k",
+      "q"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: an = permute(l) 1 3 0 4 2, l = permute(ai) 1 0 4 3 2, ak = permute(m) 3 0 1 2 4, m = permute(an) 2 4 1 3 0, ac = permute(ak) 1 4 2 3 0, r = permute(ac) 4 3 0 2 1, ai = val 1, y = permute(r) 3 1 4 2 0, n = permute(y) 1 0 3 4 2, v = permute(n) 3 1 2 4 0,\nvariables: an l ak m ac r ai y n v\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n n n], [n 0 n n n n 1 n n n], [1 0 n n n n 1 n n n], [1 0 n 4 n n 1 n n n], [1 0 4 4 n n 1 n n n], [1 0 4 4 0 n 1 n n n], [1 0 4 4 0 4 1 n n n], [1 0 4 4 0 4 1 0 n n], [1 0 4 4 0 4 1 0 1 n], [1 0 4 4 0 4 1 0 1 1] | [1 0 4 4 0 4 1 0 1 1]",
+    "final_values": [
+      1,
+      0,
+      4,
+      4,
+      0,
+      4,
+      1,
+      0,
+      1,
+      1
+    ],
+    "sequence_order": [
+      "an",
+      "l",
+      "ak",
+      "m",
+      "ac",
+      "r",
+      "ai",
+      "y",
+      "n",
+      "v"
+    ],
+    "dependency_order": [
+      "ai",
+      "l",
+      "an",
+      "m",
+      "ak",
+      "ac",
+      "r",
+      "y",
+      "n",
+      "v"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: z = permute(b) 0 2 4 1 3, b = permute(s) 2 0 1 4 3, j = permute(z) 0 4 3 2 1, l = permute(al) 1 2 4 3 0, s = permute(w) 2 3 1 4 0, w = permute(an) 1 0 2 4 3, al = permute(j) 1 4 2 3 0, an = val 2, r = permute(ah) 3 0 2 4 1, ah = permute(l) 1 4 2 0 3,\nvariables: z b j l s w al an r ah\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 2 n n], [n n n n n 2 n 2 n n], [n n n n 1 2 n 2 n n], [n 0 n n 1 2 n 2 n n], [0 0 n n 1 2 n 2 n n], [0 0 0 n 1 2 n 2 n n], [0 0 0 n 1 2 1 2 n n], [0 0 0 2 1 2 1 2 n n], [0 0 0 2 1 2 1 2 n 2], [0 0 0 2 1 2 1 2 2 2] | [0 0 0 2 1 2 1 2 2 2]",
+    "final_values": [
+      0,
+      0,
+      0,
+      2,
+      1,
+      2,
+      1,
+      2,
+      2,
+      2
+    ],
+    "sequence_order": [
+      "z",
+      "b",
+      "j",
+      "l",
+      "s",
+      "w",
+      "al",
+      "an",
+      "r",
+      "ah"
+    ],
+    "dependency_order": [
+      "an",
+      "w",
+      "s",
+      "b",
+      "z",
+      "j",
+      "al",
+      "l",
+      "ah",
+      "r"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ah = permute(q) 4 2 1 3 0, s = permute(ag) 1 0 2 3 4, e = permute(aj) 3 1 2 0 4, aj = val 0, q = permute(x) 4 1 2 3 0, ak = permute(m) 0 2 3 1 4, x = permute(o) 0 1 3 4 2, ag = permute(ah) 1 2 4 3 0, m = permute(e) 0 1 3 4 2, o = permute(ak) 2 4 1 3 0,\nvariables: ah s e aj q ak x ag m o\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n 0 n n n n n n], [n n 3 0 n n n n n n], [n n 3 0 n n n n 4 n], [n n 3 0 n 4 n n 4 n], [n n 3 0 n 4 n n 4 0], [n n 3 0 n 4 0 n 4 0], [n n 3 0 4 4 0 n 4 0], [0 n 3 0 4 4 0 n 4 0], [0 n 3 0 4 4 0 1 4 0], [0 0 3 0 4 4 0 1 4 0] | [0 0 3 0 4 4 0 1 4 0]",
+    "final_values": [
+      0,
+      0,
+      3,
+      0,
+      4,
+      4,
+      0,
+      1,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "ah",
+      "s",
+      "e",
+      "aj",
+      "q",
+      "ak",
+      "x",
+      "ag",
+      "m",
+      "o"
+    ],
+    "dependency_order": [
+      "aj",
+      "e",
+      "m",
+      "ak",
+      "o",
+      "x",
+      "q",
+      "ah",
+      "ag",
+      "s"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: b = permute(h) 1 4 2 0 3, e = permute(d) 0 1 2 3 4, f = permute(q) 4 2 0 3 1, t = permute(b) 3 4 2 1 0, l = permute(f) 0 3 2 4 1, d = val 0, q = permute(j) 0 3 2 4 1, j = permute(ae) 4 3 1 2 0, h = permute(l) 2 3 1 0 4, ae = permute(e) 1 3 4 0 2,\nvariables: b e f t l d q j h ae\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 0 n n n n], [n 0 n n n 0 n n n n], [n 0 n n n 0 n n n 1], [n 0 n n n 0 n 3 n 1], [n 0 n n n 0 4 3 n 1], [n 0 1 n n 0 4 3 n 1], [n 0 1 n 3 0 4 3 n 1], [n 0 1 n 3 0 4 3 0 1], [1 0 1 n 3 0 4 3 0 1], [1 0 1 4 3 0 4 3 0 1] | [1 0 1 4 3 0 4 3 0 1]",
+    "final_values": [
+      1,
+      0,
+      1,
+      4,
+      3,
+      0,
+      4,
+      3,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "b",
+      "e",
+      "f",
+      "t",
+      "l",
+      "d",
+      "q",
+      "j",
+      "h",
+      "ae"
+    ],
+    "dependency_order": [
+      "d",
+      "e",
+      "ae",
+      "j",
+      "q",
+      "f",
+      "l",
+      "h",
+      "b",
+      "t"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: m = permute(ad) 1 0 2 4 3, ad = permute(n) 1 0 3 2 4, al = permute(r) 2 1 0 4 3, q = permute(am) 2 3 4 1 0, am = val 2, r = permute(m) 0 3 2 1 4, ak = permute(an) 3 2 0 4 1, n = permute(w) 3 2 4 1 0, w = permute(ak) 1 0 4 2 3, an = permute(q) 4 0 1 3 2,\nvariables: m ad al q am r ak n w an\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 2 n n n n n], [n n n 4 2 n n n n n], [n n n 4 2 n n n n 2], [n n n 4 2 n 0 n n 2], [n n n 4 2 n 0 n 1 2], [n n n 4 2 n 0 2 1 2], [n 3 n 4 2 n 0 2 1 2], [4 3 n 4 2 n 0 2 1 2], [4 3 n 4 2 4 0 2 1 2], [4 3 3 4 2 4 0 2 1 2] | [4 3 3 4 2 4 0 2 1 2]",
+    "final_values": [
+      4,
+      3,
+      3,
+      4,
+      2,
+      4,
+      0,
+      2,
+      1,
+      2
+    ],
+    "sequence_order": [
+      "m",
+      "ad",
+      "al",
+      "q",
+      "am",
+      "r",
+      "ak",
+      "n",
+      "w",
+      "an"
+    ],
+    "dependency_order": [
+      "am",
+      "q",
+      "an",
+      "ak",
+      "w",
+      "n",
+      "ad",
+      "m",
+      "r",
+      "al"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ae = permute(z) 2 4 3 1 0, h = permute(ag) 1 3 0 4 2, ag = permute(u) 0 1 2 3 4, g = permute(ae) 3 4 0 2 1, z = permute(c) 0 3 1 4 2, u = permute(r) 1 4 0 3 2, j = permute(x) 0 2 3 1 4, r = permute(j) 1 0 3 4 2, c = permute(h) 4 3 1 0 2, x = val 0,\nvariables: ae h ag g z u j r c x\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 0], [n n n n n n 0 n n 0], [n n n n n n 0 1 n 0], [n n n n n 4 0 1 n 0], [n n 4 n n 4 0 1 n 0], [n 2 4 n n 4 0 1 n 0], [n 2 4 n n 4 0 1 1 0], [n 2 4 n 3 4 0 1 1 0], [1 2 4 n 3 4 0 1 1 0], [1 2 4 4 3 4 0 1 1 0] | [1 2 4 4 3 4 0 1 1 0]",
+    "final_values": [
+      1,
+      2,
+      4,
+      4,
+      3,
+      4,
+      0,
+      1,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "ae",
+      "h",
+      "ag",
+      "g",
+      "z",
+      "u",
+      "j",
+      "r",
+      "c",
+      "x"
+    ],
+    "dependency_order": [
+      "x",
+      "j",
+      "r",
+      "u",
+      "ag",
+      "h",
+      "c",
+      "z",
+      "ae",
+      "g"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: g = permute(y) 1 3 2 0 4, c = permute(h) 3 0 4 2 1, ak = permute(c) 0 2 3 1 4, f = permute(ad) 3 2 1 4 0, r = permute(f) 2 3 0 1 4, ad = permute(an) 4 3 1 0 2, h = permute(g) 3 0 2 4 1, y = permute(r) 0 4 1 3 2, an = val 2, ag = permute(ak) 2 1 3 4 0,\nvariables: g c ak f r ad h y an ag\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 2 n], [n n n n n 1 n n 2 n], [n n n 2 n 1 n n 2 n], [n n n 2 0 1 n n 2 n], [n n n 2 0 1 n 0 2 n], [1 n n 2 0 1 n 0 2 n], [1 n n 2 0 1 0 0 2 n], [1 3 n 2 0 1 0 0 2 n], [1 3 1 2 0 1 0 0 2 n], [1 3 1 2 0 1 0 0 2 1] | [1 3 1 2 0 1 0 0 2 1]",
+    "final_values": [
+      1,
+      3,
+      1,
+      2,
+      0,
+      1,
+      0,
+      0,
+      2,
+      1
+    ],
+    "sequence_order": [
+      "g",
+      "c",
+      "ak",
+      "f",
+      "r",
+      "ad",
+      "h",
+      "y",
+      "an",
+      "ag"
+    ],
+    "dependency_order": [
+      "an",
+      "ad",
+      "f",
+      "r",
+      "y",
+      "g",
+      "h",
+      "c",
+      "ak",
+      "ag"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: j = permute(ab) 3 1 0 4 2, ai = permute(al) 0 2 1 4 3, c = permute(aj) 0 3 2 4 1, ab = permute(u) 1 2 0 3 4, am = val 0, h = permute(am) 4 0 2 1 3, aj = permute(v) 2 3 4 0 1, u = permute(c) 1 0 4 3 2, al = permute(j) 0 4 3 1 2, v = permute(h) 3 0 1 4 2,\nvariables: j ai c ab am h aj u al v\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n n n], [n n n n 0 4 n n n n], [n n n n 0 4 n n n 2], [n n n n 0 4 4 n n 2], [n n 1 n 0 4 4 n n 2], [n n 1 n 0 4 4 0 n 2], [n n 1 1 0 4 4 0 n 2], [1 n 1 1 0 4 4 0 n 2], [1 n 1 1 0 4 4 0 4 2], [1 3 1 1 0 4 4 0 4 2] | [1 3 1 1 0 4 4 0 4 2]",
+    "final_values": [
+      1,
+      3,
+      1,
+      1,
+      0,
+      4,
+      4,
+      0,
+      4,
+      2
+    ],
+    "sequence_order": [
+      "j",
+      "ai",
+      "c",
+      "ab",
+      "am",
+      "h",
+      "aj",
+      "u",
+      "al",
+      "v"
+    ],
+    "dependency_order": [
+      "am",
+      "h",
+      "v",
+      "aj",
+      "c",
+      "u",
+      "ab",
+      "j",
+      "al",
+      "ai"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ac = permute(e) 2 3 1 4 0, ae = permute(ac) 2 1 4 3 0, al = permute(w) 1 0 2 3 4, u = permute(b) 3 2 1 4 0, p = permute(al) 4 0 1 2 3, b = permute(p) 0 3 4 1 2, e = permute(a) 2 0 3 1 4, w = permute(ab) 1 0 3 2 4, ab = permute(ae) 0 3 1 2 4, a = val 0,\nvariables: ac ae al u p b e w ab a\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 0], [n n n n n n 2 n n 0], [1 n n n n n 2 n n 0], [1 1 n n n n 2 n n 0], [1 1 n n n n 2 n 3 0], [1 1 n n n n 2 2 3 0], [1 1 2 n n n 2 2 3 0], [1 1 2 n 1 n 2 2 3 0], [1 1 2 n 1 3 2 2 3 0], [1 1 2 4 1 3 2 2 3 0] | [1 1 2 4 1 3 2 2 3 0]",
+    "final_values": [
+      1,
+      1,
+      2,
+      4,
+      1,
+      3,
+      2,
+      2,
+      3,
+      0
+    ],
+    "sequence_order": [
+      "ac",
+      "ae",
+      "al",
+      "u",
+      "p",
+      "b",
+      "e",
+      "w",
+      "ab",
+      "a"
+    ],
+    "dependency_order": [
+      "a",
+      "e",
+      "ac",
+      "ae",
+      "ab",
+      "w",
+      "al",
+      "p",
+      "b",
+      "u"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: t = permute(z) 2 3 1 4 0, ae = permute(j) 0 2 4 1 3, j = permute(c) 4 0 2 1 3, z = permute(l) 3 4 0 1 2, k = permute(h) 4 2 0 1 3, x = permute(t) 1 4 3 0 2, l = permute(ae) 0 2 4 1 3, h = permute(x) 3 2 0 4 1, c = val 1, ad = permute(k) 4 2 0 1 3,\nvariables: t ae j z k x l h c ad\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 1 n], [n n 0 n n n n n 1 n], [n 0 0 n n n n n 1 n], [n 0 0 n n n 0 n 1 n], [n 0 0 3 n n 0 n 1 n], [4 0 0 3 n n 0 n 1 n], [4 0 0 3 n 2 0 n 1 n], [4 0 0 3 n 2 0 0 1 n], [4 0 0 3 4 2 0 0 1 n], [4 0 0 3 4 2 0 0 1 3] | [4 0 0 3 4 2 0 0 1 3]",
+    "final_values": [
+      4,
+      0,
+      0,
+      3,
+      4,
+      2,
+      0,
+      0,
+      1,
+      3
+    ],
+    "sequence_order": [
+      "t",
+      "ae",
+      "j",
+      "z",
+      "k",
+      "x",
+      "l",
+      "h",
+      "c",
+      "ad"
+    ],
+    "dependency_order": [
+      "c",
+      "j",
+      "ae",
+      "l",
+      "z",
+      "t",
+      "x",
+      "h",
+      "k",
+      "ad"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: t = val 0, a = permute(l) 4 2 0 3 1, u = permute(d) 2 0 3 1 4, ai = permute(ac) 0 1 4 2 3, k = permute(ai) 2 4 0 1 3, d = permute(a) 1 2 3 4 0, l = permute(k) 1 4 0 3 2, ac = permute(v) 1 3 0 4 2, v = permute(t) 1 3 4 0 2, i = permute(u) 4 0 3 1 2,\nvariables: t a u ai k d l ac v i\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[0 n n n n n n n n n], [0 n n n n n n n 1 n], [0 n n n n n n 3 1 n], [0 n n 2 n n n 3 1 n], [0 n n 2 0 n n 3 1 n], [0 n n 2 0 n 1 3 1 n], [0 2 n 2 0 n 1 3 1 n], [0 2 n 2 0 3 1 3 1 n], [0 2 1 2 0 3 1 3 1 n], [0 2 1 2 0 3 1 3 1 0] | [0 2 1 2 0 3 1 3 1 0]",
+    "final_values": [
+      0,
+      2,
+      1,
+      2,
+      0,
+      3,
+      1,
+      3,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "t",
+      "a",
+      "u",
+      "ai",
+      "k",
+      "d",
+      "l",
+      "ac",
+      "v",
+      "i"
+    ],
+    "dependency_order": [
+      "t",
+      "v",
+      "ac",
+      "ai",
+      "k",
+      "l",
+      "a",
+      "d",
+      "u",
+      "i"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: w = permute(al) 4 1 0 2 3, v = permute(o) 4 1 2 0 3, e = permute(r) 1 3 0 4 2, am = permute(e) 3 0 4 1 2, al = permute(am) 3 0 1 4 2, ag = permute(w) 0 2 4 3 1, ab = permute(v) 0 1 3 4 2, r = val 0, t = permute(ab) 0 2 4 1 3, o = permute(ag) 4 0 3 2 1,\nvariables: w v e am al ag ab r t o\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0 n n], [n n 1 n n n n 0 n n], [n n 1 0 n n n 0 n n], [n n 1 0 3 n n 0 n n], [2 n 1 0 3 n n 0 n n], [2 n 1 0 3 4 n 0 n n], [2 n 1 0 3 4 n 0 n 1], [2 1 1 0 3 4 n 0 n 1], [2 1 1 0 3 4 1 0 n 1], [2 1 1 0 3 4 1 0 2 1] | [2 1 1 0 3 4 1 0 2 1]",
+    "final_values": [
+      2,
+      1,
+      1,
+      0,
+      3,
+      4,
+      1,
+      0,
+      2,
+      1
+    ],
+    "sequence_order": [
+      "w",
+      "v",
+      "e",
+      "am",
+      "al",
+      "ag",
+      "ab",
+      "r",
+      "t",
+      "o"
+    ],
+    "dependency_order": [
+      "r",
+      "e",
+      "am",
+      "al",
+      "w",
+      "ag",
+      "o",
+      "v",
+      "ab",
+      "t"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: o = permute(g) 3 1 2 0 4, f = permute(o) 1 4 2 0 3, r = permute(al) 0 2 1 4 3, w = permute(b) 0 1 2 4 3, b = permute(t) 0 1 3 2 4, t = permute(ai) 3 4 0 1 2, ai = permute(a) 0 2 3 1 4, al = val 4, a = permute(f) 3 4 2 1 0, g = permute(r) 1 4 2 3 0,\nvariables: o f r w b t ai al a g\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 4 n n], [n n 3 n n n n 4 n n], [n n 3 n n n n 4 n 3], [0 n 3 n n n n 4 n 3], [0 1 3 n n n n 4 n 3], [0 1 3 n n n n 4 4 3], [0 1 3 n n n 4 4 4 3], [0 1 3 n n 2 4 4 4 3], [0 1 3 n 3 2 4 4 4 3], [0 1 3 4 3 2 4 4 4 3] | [0 1 3 4 3 2 4 4 4 3]",
+    "final_values": [
+      0,
+      1,
+      3,
+      4,
+      3,
+      2,
+      4,
+      4,
+      4,
+      3
+    ],
+    "sequence_order": [
+      "o",
+      "f",
+      "r",
+      "w",
+      "b",
+      "t",
+      "ai",
+      "al",
+      "a",
+      "g"
+    ],
+    "dependency_order": [
+      "al",
+      "r",
+      "g",
+      "o",
+      "f",
+      "a",
+      "ai",
+      "t",
+      "b",
+      "w"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: aa = permute(q) 0 3 2 1 4, a = permute(t) 4 2 0 3 1, aj = permute(aa) 2 3 0 4 1, n = permute(r) 3 4 2 0 1, t = permute(ah) 3 4 1 2 0, o = permute(z) 0 1 2 4 3, r = val 2, q = permute(a) 1 2 0 3 4, ah = permute(n) 4 1 0 2 3, z = permute(aj) 2 0 1 4 3,\nvariables: aa a aj n t o r q ah z\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 2 n n n], [n n n 2 n n 2 n n n], [n n n 2 n n 2 n 0 n], [n n n 2 3 n 2 n 0 n], [n 3 n 2 3 n 2 n 0 n], [n 3 n 2 3 n 2 3 0 n], [1 3 n 2 3 n 2 3 0 n], [1 3 3 2 3 n 2 3 0 n], [1 3 3 2 3 n 2 3 0 4], [1 3 3 2 3 3 2 3 0 4] | [1 3 3 2 3 3 2 3 0 4]",
+    "final_values": [
+      1,
+      3,
+      3,
+      2,
+      3,
+      3,
+      2,
+      3,
+      0,
+      4
+    ],
+    "sequence_order": [
+      "aa",
+      "a",
+      "aj",
+      "n",
+      "t",
+      "o",
+      "r",
+      "q",
+      "ah",
+      "z"
+    ],
+    "dependency_order": [
+      "r",
+      "n",
+      "ah",
+      "t",
+      "a",
+      "q",
+      "aa",
+      "aj",
+      "z",
+      "o"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: u = permute(e) 0 2 4 3 1, s = permute(u) 4 0 2 3 1, o = permute(aj) 0 2 1 4 3, aj = permute(n) 0 1 2 4 3, p = permute(s) 2 1 0 3 4, n = permute(ad) 1 3 4 2 0, t = permute(p) 1 0 2 3 4, e = val 4, ad = permute(t) 4 0 1 2 3, v = permute(o) 3 4 1 0 2,\nvariables: u s o aj p n t e ad v\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 4 n n], [1 n n n n n n 4 n n], [1 0 n n n n n 4 n n], [1 0 n n 2 n n 4 n n], [1 0 n n 2 n 2 4 n n], [1 0 n n 2 n 2 4 1 n], [1 0 n n 2 3 2 4 1 n], [1 0 n 4 2 3 2 4 1 n], [1 0 3 4 2 3 2 4 1 n], [1 0 3 4 2 3 2 4 1 0] | [1 0 3 4 2 3 2 4 1 0]",
+    "final_values": [
+      1,
+      0,
+      3,
+      4,
+      2,
+      3,
+      2,
+      4,
+      1,
+      0
+    ],
+    "sequence_order": [
+      "u",
+      "s",
+      "o",
+      "aj",
+      "p",
+      "n",
+      "t",
+      "e",
+      "ad",
+      "v"
+    ],
+    "dependency_order": [
+      "e",
+      "u",
+      "s",
+      "p",
+      "t",
+      "ad",
+      "n",
+      "aj",
+      "o",
+      "v"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ae = permute(i) 3 0 1 2 4, a = permute(x) 2 1 3 0 4, s = val 3, i = permute(s) 3 4 2 1 0, f = permute(ab) 2 4 0 3 1, m = permute(e) 0 2 4 3 1, x = permute(m) 3 0 4 2 1, e = permute(aj) 1 0 2 3 4, aj = permute(ae) 0 2 3 4 1, ab = permute(a) 4 2 1 3 0,\nvariables: ae a s i f m x e aj ab\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 3 n n n n n n n], [n n 3 1 n n n n n n], [0 n 3 1 n n n n n n], [0 n 3 1 n n n n 0 n], [0 n 3 1 n n n 1 0 n], [0 n 3 1 n 2 n 1 0 n], [0 n 3 1 n 2 4 1 0 n], [0 4 3 1 n 2 4 1 0 n], [0 4 3 1 n 2 4 1 0 0], [0 4 3 1 2 2 4 1 0 0] | [0 4 3 1 2 2 4 1 0 0]",
+    "final_values": [
+      0,
+      4,
+      3,
+      1,
+      2,
+      2,
+      4,
+      1,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "ae",
+      "a",
+      "s",
+      "i",
+      "f",
+      "m",
+      "x",
+      "e",
+      "aj",
+      "ab"
+    ],
+    "dependency_order": [
+      "s",
+      "i",
+      "ae",
+      "aj",
+      "e",
+      "m",
+      "x",
+      "a",
+      "ab",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: p = permute(ak) 0 3 4 2 1, aa = val 3, h = permute(an) 1 4 2 0 3, ac = permute(u) 3 1 4 0 2, u = permute(p) 2 4 0 1 3, an = permute(aa) 0 4 3 1 2, f = permute(ac) 0 1 4 3 2, o = permute(h) 0 3 2 1 4, j = permute(o) 1 0 4 2 3, ak = permute(j) 4 3 1 2 0,\nvariables: p aa h ac u an f o j ak\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 3 n n n n n n n n], [n 3 n n n 1 n n n n], [n 3 4 n n 1 n n n n], [n 3 4 n n 1 n 4 n n], [n 3 4 n n 1 n 4 3 n], [n 3 4 n n 1 n 4 3 2], [4 3 4 n n 1 n 4 3 2], [4 3 4 n 3 1 n 4 3 2], [4 3 4 0 3 1 n 4 3 2], [4 3 4 0 3 1 0 4 3 2] | [4 3 4 0 3 1 0 4 3 2]",
+    "final_values": [
+      4,
+      3,
+      4,
+      0,
+      3,
+      1,
+      0,
+      4,
+      3,
+      2
+    ],
+    "sequence_order": [
+      "p",
+      "aa",
+      "h",
+      "ac",
+      "u",
+      "an",
+      "f",
+      "o",
+      "j",
+      "ak"
+    ],
+    "dependency_order": [
+      "aa",
+      "an",
+      "h",
+      "o",
+      "j",
+      "ak",
+      "p",
+      "u",
+      "ac",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: g = permute(h) 4 2 3 0 1, d = permute(g) 3 2 1 4 0, z = permute(j) 3 0 2 4 1, ac = permute(i) 2 3 4 1 0, k = val 0, i = permute(k) 0 4 1 3 2, ag = permute(z) 3 0 2 1 4, h = permute(ac) 3 1 2 0 4, j = permute(d) 3 4 1 2 0, f = permute(ag) 3 0 2 1 4,\nvariables: g d z ac k i ag h j f\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 0 n n n n n], [n n n n 0 0 n n n n], [n n n 2 0 0 n n n n], [n n n 2 0 0 n 2 n n], [3 n n 2 0 0 n 2 n n], [3 4 n 2 0 0 n 2 n n], [3 4 n 2 0 0 n 2 0 n], [3 4 3 2 0 0 n 2 0 n], [3 4 3 2 0 0 1 2 0 n], [3 4 3 2 0 0 1 2 0 0] | [3 4 3 2 0 0 1 2 0 0]",
+    "final_values": [
+      3,
+      4,
+      3,
+      2,
+      0,
+      0,
+      1,
+      2,
+      0,
+      0
+    ],
+    "sequence_order": [
+      "g",
+      "d",
+      "z",
+      "ac",
+      "k",
+      "i",
+      "ag",
+      "h",
+      "j",
+      "f"
+    ],
+    "dependency_order": [
+      "k",
+      "i",
+      "ac",
+      "h",
+      "g",
+      "d",
+      "j",
+      "z",
+      "ag",
+      "f"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: z = permute(af) 3 0 2 4 1, r = permute(i) 0 1 4 2 3, i = val 0, b = permute(r) 2 0 1 4 3, l = permute(ae) 4 3 2 0 1, ae = permute(ah) 4 2 0 1 3, ah = permute(an) 1 0 3 4 2, j = permute(b) 2 3 4 0 1, af = permute(l) 1 0 3 4 2, an = permute(j) 3 2 0 4 1,\nvariables: z r i b l ae ah j af an\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 0 n n n n n n n], [n 0 0 n n n n n n n], [n 0 0 2 n n n n n n], [n 0 0 2 n n n 4 n n], [n 0 0 2 n n n 4 n 1], [n 0 0 2 n n 0 4 n 1], [n 0 0 2 n 4 0 4 n 1], [n 0 0 2 1 4 0 4 n 1], [n 0 0 2 1 4 0 4 0 1], [3 0 0 2 1 4 0 4 0 1] | [3 0 0 2 1 4 0 4 0 1]",
+    "final_values": [
+      3,
+      0,
+      0,
+      2,
+      1,
+      4,
+      0,
+      4,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "z",
+      "r",
+      "i",
+      "b",
+      "l",
+      "ae",
+      "ah",
+      "j",
+      "af",
+      "an"
+    ],
+    "dependency_order": [
+      "i",
+      "r",
+      "b",
+      "j",
+      "an",
+      "ah",
+      "ae",
+      "l",
+      "af",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: f = permute(b) 3 4 0 1 2, e = permute(v) 0 2 1 4 3, v = permute(x) 0 4 2 1 3, b = permute(r) 2 3 4 0 1, y = permute(aj) 2 1 3 4 0, t = permute(al) 1 2 3 4 0, r = permute(t) 3 0 1 4 2, al = val 0, x = permute(y) 0 3 1 4 2, aj = permute(f) 3 2 1 4 0,\nvariables: f e v b y t r al x aj\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n 0 n n], [n n n n n 1 n 0 n n], [n n n n n 1 0 0 n n], [n n n 2 n 1 0 0 n n], [0 n n 2 n 1 0 0 n n], [0 n n 2 n 1 0 0 n 3], [0 n n 2 4 1 0 0 n 3], [0 n n 2 4 1 0 0 2 3], [0 n 2 2 4 1 0 0 2 3], [0 1 2 2 4 1 0 0 2 3] | [0 1 2 2 4 1 0 0 2 3]",
+    "final_values": [
+      0,
+      1,
+      2,
+      2,
+      4,
+      1,
+      0,
+      0,
+      2,
+      3
+    ],
+    "sequence_order": [
+      "f",
+      "e",
+      "v",
+      "b",
+      "y",
+      "t",
+      "r",
+      "al",
+      "x",
+      "aj"
+    ],
+    "dependency_order": [
+      "al",
+      "t",
+      "r",
+      "b",
+      "f",
+      "aj",
+      "y",
+      "x",
+      "v",
+      "e"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: w = val 4, t = permute(o) 2 0 1 4 3, e = permute(m) 1 0 2 4 3, an = permute(z) 4 0 1 3 2, p = permute(t) 3 1 2 0 4, ab = permute(ac) 1 4 3 0 2, ac = permute(p) 4 3 1 0 2, o = permute(w) 1 0 2 3 4, z = permute(e) 3 2 1 4 0, m = permute(ab) 2 4 3 0 1,\nvariables: w t e an p ab ac o z m\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[4 n n n n n n n n n], [4 n n n n n n 4 n n], [4 3 n n n n n 4 n n], [4 3 n n 0 n n 4 n n], [4 3 n n 0 n 4 4 n n], [4 3 n n 0 2 4 4 n n], [4 3 n n 0 2 4 4 n 3], [4 3 4 n 0 2 4 4 n 3], [4 3 4 n 0 2 4 4 0 3], [4 3 4 4 0 2 4 4 0 3] | [4 3 4 4 0 2 4 4 0 3]",
+    "final_values": [
+      4,
+      3,
+      4,
+      4,
+      0,
+      2,
+      4,
+      4,
+      0,
+      3
+    ],
+    "sequence_order": [
+      "w",
+      "t",
+      "e",
+      "an",
+      "p",
+      "ab",
+      "ac",
+      "o",
+      "z",
+      "m"
+    ],
+    "dependency_order": [
+      "w",
+      "o",
+      "t",
+      "p",
+      "ac",
+      "ab",
+      "m",
+      "e",
+      "z",
+      "an"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ae = permute(i) 1 4 0 2 3, i = permute(m) 2 1 3 4 0, l = permute(al) 3 4 2 0 1, ad = permute(ae) 0 2 4 1 3, al = val 3, p = permute(t) 0 3 2 4 1, o = permute(p) 4 2 1 0 3, ai = permute(ad) 4 1 0 2 3, t = permute(l) 4 2 1 0 3, m = permute(o) 0 3 4 2 1,\nvariables: ae i l ad al p o ai t m\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 3 n n n n n], [n n 0 n 3 n n n n n], [n n 0 n 3 n n n 4 n], [n n 0 n 3 1 n n 4 n], [n n 0 n 3 1 2 n 4 n], [n n 0 n 3 1 2 n 4 4], [n 0 0 n 3 1 2 n 4 4], [1 0 0 n 3 1 2 n 4 4], [1 0 0 2 3 1 2 n 4 4], [1 0 0 2 3 1 2 0 4 4] | [1 0 0 2 3 1 2 0 4 4]",
+    "final_values": [
+      1,
+      0,
+      0,
+      2,
+      3,
+      1,
+      2,
+      0,
+      4,
+      4
+    ],
+    "sequence_order": [
+      "ae",
+      "i",
+      "l",
+      "ad",
+      "al",
+      "p",
+      "o",
+      "ai",
+      "t",
+      "m"
+    ],
+    "dependency_order": [
+      "al",
+      "l",
+      "t",
+      "p",
+      "o",
+      "m",
+      "i",
+      "ae",
+      "ad",
+      "ai"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: w = permute(r) 1 3 0 2 4, ae = permute(w) 3 4 2 1 0, u = permute(ak) 3 1 4 2 0, d = permute(h) 0 2 3 1 4, h = permute(ae) 0 4 1 3 2, an = permute(k) 2 4 1 3 0, aa = val 4, r = permute(u) 3 2 1 4 0, k = permute(d) 2 0 3 4 1, ak = permute(aa) 0 1 3 2 4,\nvariables: w ae u d h an aa r k ak\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 4 n n n], [n n n n n n 4 n n 4], [n n 0 n n n 4 n n 4], [n n 0 n n n 4 3 n 4], [2 n 0 n n n 4 3 n 4], [2 2 0 n n n 4 3 n 4], [2 2 0 n 1 n 4 3 n 4], [2 2 0 2 1 n 4 3 n 4], [2 2 0 2 1 n 4 3 3 4], [2 2 0 2 1 3 4 3 3 4] | [2 2 0 2 1 3 4 3 3 4]",
+    "final_values": [
+      2,
+      2,
+      0,
+      2,
+      1,
+      3,
+      4,
+      3,
+      3,
+      4
+    ],
+    "sequence_order": [
+      "w",
+      "ae",
+      "u",
+      "d",
+      "h",
+      "an",
+      "aa",
+      "r",
+      "k",
+      "ak"
+    ],
+    "dependency_order": [
+      "aa",
+      "ak",
+      "u",
+      "r",
+      "w",
+      "ae",
+      "h",
+      "d",
+      "k",
+      "an"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ab = permute(ah) 2 0 4 1 3, u = permute(j) 4 1 3 0 2, m = permute(q) 3 0 1 4 2, j = permute(m) 3 0 4 2 1, ak = permute(k) 1 0 4 2 3, g = permute(t) 1 2 4 3 0, k = permute(g) 0 4 1 2 3, q = permute(ab) 4 1 3 0 2, ah = val 1, t = permute(u) 0 3 4 2 1,\nvariables: ab u m j ak g k q ah t\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 1 n], [0 n n n n n n n 1 n], [0 n n n n n n 4 1 n], [0 n 2 n n n n 4 1 n], [0 n 2 4 n n n 4 1 n], [0 2 2 4 n n n 4 1 n], [0 2 2 4 n n n 4 1 4], [0 2 2 4 n 0 n 4 1 4], [0 2 2 4 n 0 0 4 1 4], [0 2 2 4 1 0 0 4 1 4] | [0 2 2 4 1 0 0 4 1 4]",
+    "final_values": [
+      0,
+      2,
+      2,
+      4,
+      1,
+      0,
+      0,
+      4,
+      1,
+      4
+    ],
+    "sequence_order": [
+      "ab",
+      "u",
+      "m",
+      "j",
+      "ak",
+      "g",
+      "k",
+      "q",
+      "ah",
+      "t"
+    ],
+    "dependency_order": [
+      "ah",
+      "ab",
+      "q",
+      "m",
+      "j",
+      "u",
+      "t",
+      "g",
+      "k",
+      "ak"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: s = permute(z) 1 4 0 2 3, af = permute(ad) 2 0 4 1 3, z = permute(j) 3 2 4 0 1, r = permute(h) 2 3 0 1 4, i = permute(ah) 3 1 2 0 4, ah = permute(r) 4 2 1 0 3, ad = permute(i) 4 2 1 3 0, e = permute(s) 1 3 0 4 2, j = val 1, h = permute(e) 2 4 1 3 0,\nvariables: s af z r i ah ad e j h\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 1 n], [n n 2 n n n n n 1 n], [0 n 2 n n n n n 1 n], [0 n 2 n n n n 1 1 n], [0 n 2 n n n n 1 1 4], [0 n 2 4 n n n 1 1 4], [0 n 2 4 n 3 n 1 1 4], [0 n 2 4 0 3 n 1 1 4], [0 n 2 4 0 3 4 1 1 4], [0 3 2 4 0 3 4 1 1 4] | [0 3 2 4 0 3 4 1 1 4]",
+    "final_values": [
+      0,
+      3,
+      2,
+      4,
+      0,
+      3,
+      4,
+      1,
+      1,
+      4
+    ],
+    "sequence_order": [
+      "s",
+      "af",
+      "z",
+      "r",
+      "i",
+      "ah",
+      "ad",
+      "e",
+      "j",
+      "h"
+    ],
+    "dependency_order": [
+      "j",
+      "z",
+      "s",
+      "e",
+      "h",
+      "r",
+      "ah",
+      "i",
+      "ad",
+      "af"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: p = permute(ag) 2 1 4 3 0, t = permute(af) 2 1 3 0 4, am = permute(t) 3 1 2 4 0, v = permute(c) 0 4 1 3 2, c = val 3, b = permute(ah) 2 4 3 1 0, d = permute(p) 4 0 1 2 3, ag = permute(am) 2 3 0 4 1, af = permute(b) 4 1 2 3 0, ah = permute(v) 4 2 0 1 3,\nvariables: p t am v c b d ag af ah\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n 3 n n n n n], [n n n 3 3 n n n n n], [n n n 3 3 n n n n 1], [n n n 3 3 4 n n n 1], [n n n 3 3 4 n n 0 1], [n 2 n 3 3 4 n n 0 1], [n 2 2 3 3 4 n n 0 1], [n 2 2 3 3 4 n 0 0 1], [2 2 2 3 3 4 n 0 0 1], [2 2 2 3 3 4 1 0 0 1] | [2 2 2 3 3 4 1 0 0 1]",
+    "final_values": [
+      2,
+      2,
+      2,
+      3,
+      3,
+      4,
+      1,
+      0,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "p",
+      "t",
+      "am",
+      "v",
+      "c",
+      "b",
+      "d",
+      "ag",
+      "af",
+      "ah"
+    ],
+    "dependency_order": [
+      "c",
+      "v",
+      "ah",
+      "b",
+      "af",
+      "t",
+      "am",
+      "ag",
+      "p",
+      "d"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: u = permute(al) 4 0 1 3 2, e = permute(ad) 2 0 1 3 4, aa = val 4, al = permute(aa) 2 1 4 3 0, ad = permute(g) 0 2 1 4 3, ab = permute(p) 4 3 0 2 1, y = permute(u) 1 0 2 3 4, g = permute(y) 1 2 3 0 4, p = permute(t) 4 0 3 2 1, t = permute(e) 4 3 2 0 1,\nvariables: u e aa al ad ab y g p t\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n 4 n n n n n n n], [n n 4 0 n n n n n n], [4 n 4 0 n n n n n n], [4 n 4 0 n n 4 n n n], [4 n 4 0 n n 4 4 n n], [4 n 4 0 3 n 4 4 n n], [4 3 4 0 3 n 4 4 n n], [4 3 4 0 3 n 4 4 n 0], [4 3 4 0 3 n 4 4 4 0], [4 3 4 0 3 1 4 4 4 0] | [4 3 4 0 3 1 4 4 4 0]",
+    "final_values": [
+      4,
+      3,
+      4,
+      0,
+      3,
+      1,
+      4,
+      4,
+      4,
+      0
+    ],
+    "sequence_order": [
+      "u",
+      "e",
+      "aa",
+      "al",
+      "ad",
+      "ab",
+      "y",
+      "g",
+      "p",
+      "t"
+    ],
+    "dependency_order": [
+      "aa",
+      "al",
+      "u",
+      "y",
+      "g",
+      "ad",
+      "e",
+      "t",
+      "p",
+      "ab"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: q = permute(ak) 0 3 1 2 4, aa = permute(q) 2 0 3 4 1, p = permute(t) 2 3 4 0 1, z = permute(aa) 0 4 1 2 3, ag = permute(p) 2 0 3 4 1, ak = permute(o) 0 4 1 2 3, ah = val 0, t = permute(ah) 2 0 4 3 1, o = permute(i) 3 0 1 4 2, i = permute(ag) 2 0 3 4 1,\nvariables: q aa p z ag ak ah t o i\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 0 n n n], [n n n n n n 0 2 n n], [n n 4 n n n 0 2 n n], [n n 4 n 1 n 0 2 n n], [n n 4 n 1 n 0 2 n 0], [n n 4 n 1 n 0 2 3 0], [n n 4 n 1 2 0 2 3 0], [1 n 4 n 1 2 0 2 3 0], [1 0 4 n 1 2 0 2 3 0], [1 0 4 0 1 2 0 2 3 0] | [1 0 4 0 1 2 0 2 3 0]",
+    "final_values": [
+      1,
+      0,
+      4,
+      0,
+      1,
+      2,
+      0,
+      2,
+      3,
+      0
+    ],
+    "sequence_order": [
+      "q",
+      "aa",
+      "p",
+      "z",
+      "ag",
+      "ak",
+      "ah",
+      "t",
+      "o",
+      "i"
+    ],
+    "dependency_order": [
+      "ah",
+      "t",
+      "p",
+      "ag",
+      "i",
+      "o",
+      "ak",
+      "q",
+      "aa",
+      "z"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: n = permute(c) 4 1 2 0 3, ah = permute(aj) 2 1 0 4 3, u = permute(ai) 1 2 4 0 3, aj = permute(m) 3 4 2 1 0, b = permute(u) 1 0 2 4 3, s = permute(n) 4 3 2 0 1, m = permute(b) 1 2 4 0 3, c = permute(ah) 1 3 0 2 4, ai = val 4, t = permute(s) 3 1 0 2 4,\nvariables: n ah u aj b s m c ai t\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 4 n], [n n 3 n n n n n 4 n], [n n 3 n 4 n n n 4 n], [n n 3 n 4 n 3 n 4 n], [n n 3 1 4 n 3 n 4 n], [n 1 3 1 4 n 3 n 4 n], [n 1 3 1 4 n 3 3 4 n], [0 1 3 1 4 n 3 3 4 n], [0 1 3 1 4 4 3 3 4 n], [0 1 3 1 4 4 3 3 4 4] | [0 1 3 1 4 4 3 3 4 4]",
+    "final_values": [
+      0,
+      1,
+      3,
+      1,
+      4,
+      4,
+      3,
+      3,
+      4,
+      4
+    ],
+    "sequence_order": [
+      "n",
+      "ah",
+      "u",
+      "aj",
+      "b",
+      "s",
+      "m",
+      "c",
+      "ai",
+      "t"
+    ],
+    "dependency_order": [
+      "ai",
+      "u",
+      "b",
+      "m",
+      "aj",
+      "ah",
+      "c",
+      "n",
+      "s",
+      "t"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: an = permute(ah) 1 0 3 2 4, ak = val 2, ah = permute(v) 4 1 2 0 3, s = permute(an) 3 2 0 1 4, v = permute(d) 4 1 2 3 0, d = permute(k) 2 3 0 4 1, k = permute(aa) 3 2 4 1 0, al = permute(o) 0 1 4 2 3, o = permute(s) 3 2 1 4 0, aa = permute(ak) 3 2 1 4 0,\nvariables: an ak ah s v d k al o aa\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n 2 n n n n n n n n], [n 2 n n n n n n n 1], [n 2 n n n n 2 n n 1], [n 2 n n n 0 2 n n 1], [n 2 n n 4 0 2 n n 1], [n 2 3 n 4 0 2 n n 1], [2 2 3 n 4 0 2 n n 1], [2 2 3 0 4 0 2 n n 1], [2 2 3 0 4 0 2 n 3 1], [2 2 3 0 4 0 2 2 3 1] | [2 2 3 0 4 0 2 2 3 1]",
+    "final_values": [
+      2,
+      2,
+      3,
+      0,
+      4,
+      0,
+      2,
+      2,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "an",
+      "ak",
+      "ah",
+      "s",
+      "v",
+      "d",
+      "k",
+      "al",
+      "o",
+      "aa"
+    ],
+    "dependency_order": [
+      "ak",
+      "aa",
+      "k",
+      "d",
+      "v",
+      "ah",
+      "an",
+      "s",
+      "o",
+      "al"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: l = permute(ai) 2 1 4 3 0, p = permute(c) 3 1 4 2 0, i = permute(r) 4 0 3 1 2, v = permute(l) 1 0 3 2 4, c = permute(i) 2 0 4 3 1, r = permute(v) 2 4 0 1 3, aj = permute(ah) 4 2 1 3 0, ai = permute(aj) 4 2 0 1 3, ah = val 3, y = permute(p) 3 4 1 0 2,\nvariables: l p i v c r aj ai ah y\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n 3 n], [n n n n n n 3 n 3 n], [n n n n n n 3 1 3 n], [1 n n n n n 3 1 3 n], [1 n n 0 n n 3 1 3 n], [1 n n 0 n 2 3 1 3 n], [1 n 3 0 n 2 3 1 3 n], [1 n 3 0 3 2 3 1 3 n], [1 2 3 0 3 2 3 1 3 n], [1 2 3 0 3 2 3 1 3 1] | [1 2 3 0 3 2 3 1 3 1]",
+    "final_values": [
+      1,
+      2,
+      3,
+      0,
+      3,
+      2,
+      3,
+      1,
+      3,
+      1
+    ],
+    "sequence_order": [
+      "l",
+      "p",
+      "i",
+      "v",
+      "c",
+      "r",
+      "aj",
+      "ai",
+      "ah",
+      "y"
+    ],
+    "dependency_order": [
+      "ah",
+      "aj",
+      "ai",
+      "l",
+      "v",
+      "r",
+      "i",
+      "c",
+      "p",
+      "y"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: ai = permute(ab) 0 2 1 3 4, h = permute(e) 1 2 4 3 0, t = permute(c) 0 3 2 1 4, c = permute(ai) 4 2 0 3 1, w = permute(a) 1 2 3 4 0, a = permute(h) 0 4 3 1 2, ab = permute(s) 4 0 1 2 3, af = permute(w) 0 2 3 1 4, e = permute(t) 4 3 1 2 0, s = val 2,\nvariables: ai h t c w a ab af e s\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n n n n 2], [n n n n n n 1 n n 2], [2 n n n n n 1 n n 2], [2 n n 0 n n 1 n n 2], [2 n 0 0 n n 1 n n 2], [2 n 0 0 n n 1 n 4 2], [2 0 0 0 n n 1 n 4 2], [2 0 0 0 n 0 1 n 4 2], [2 0 0 0 1 0 1 n 4 2], [2 0 0 0 1 0 1 2 4 2] | [2 0 0 0 1 0 1 2 4 2]",
+    "final_values": [
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      2,
+      4,
+      2
+    ],
+    "sequence_order": [
+      "ai",
+      "h",
+      "t",
+      "c",
+      "w",
+      "a",
+      "ab",
+      "af",
+      "e",
+      "s"
+    ],
+    "dependency_order": [
+      "s",
+      "ab",
+      "ai",
+      "c",
+      "t",
+      "e",
+      "h",
+      "a",
+      "w",
+      "af"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: h = permute(an) 4 2 0 3 1, r = permute(m) 4 3 1 2 0, l = permute(r) 3 1 2 4 0, m = permute(v) 4 2 1 3 0, ab = permute(w) 4 2 3 1 0, v = val 1, an = permute(y) 3 0 2 1 4, y = permute(l) 3 4 1 2 0, w = permute(f) 2 3 0 1 4, f = permute(h) 0 2 3 1 4,\nvariables: h r l m ab v an y w f\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n 1 n n n n], [n n n 2 n 1 n n n n], [n 1 n 2 n 1 n n n n], [n 1 1 2 n 1 n n n n], [n 1 1 2 n 1 n 4 n n], [n 1 1 2 n 1 4 4 n n], [1 1 1 2 n 1 4 4 n n], [1 1 1 2 n 1 4 4 n 2], [1 1 1 2 n 1 4 4 0 2], [1 1 1 2 4 1 4 4 0 2] | [1 1 1 2 4 1 4 4 0 2]",
+    "final_values": [
+      1,
+      1,
+      1,
+      2,
+      4,
+      1,
+      4,
+      4,
+      0,
+      2
+    ],
+    "sequence_order": [
+      "h",
+      "r",
+      "l",
+      "m",
+      "ab",
+      "v",
+      "an",
+      "y",
+      "w",
+      "f"
+    ],
+    "dependency_order": [
+      "v",
+      "m",
+      "r",
+      "l",
+      "y",
+      "an",
+      "h",
+      "f",
+      "w",
+      "ab"
+    ]
+  },
+  {
+    "question": "lego_reasoning:\nPermutation example: permute(2) 1 3 5 4 = 3. This means when the input is 2, the output is the 2nd number in the list.\nsequence: h = permute(ag) 4 1 0 2 3, f = permute(b) 2 0 1 3 4, d = permute(aa) 4 0 2 3 1, b = permute(x) 4 2 1 3 0, ag = permute(g) 3 4 2 1 0, x = permute(v) 4 0 3 1 2, v = val 1, g = permute(d) 3 1 0 4 2, k = permute(f) 3 4 2 1 0, aa = permute(k) 1 2 3 0 4,\nvariables: h f d b ag x v g k aa\ninitial_trace: [n n n n n n n n n n]\nprogressive_steps | final_values:",
+    "answer": "[n n n n n n 1 n n n], [n n n n n 0 1 n n n], [n n n 4 n 0 1 n n n], [n 4 n 4 n 0 1 n n n], [n 4 n 4 n 0 1 n 0 n], [n 4 n 4 n 0 1 n 0 1], [n 4 0 4 n 0 1 n 0 1], [n 4 0 4 n 0 1 3 0 1], [n 4 0 4 1 0 1 3 0 1], [1 4 0 4 1 0 1 3 0 1] | [1 4 0 4 1 0 1 3 0 1]",
+    "final_values": [
+      1,
+      4,
+      0,
+      4,
+      1,
+      0,
+      1,
+      3,
+      0,
+      1
+    ],
+    "sequence_order": [
+      "h",
+      "f",
+      "d",
+      "b",
+      "ag",
+      "x",
+      "v",
+      "g",
+      "k",
+      "aa"
+    ],
+    "dependency_order": [
+      "v",
+      "x",
+      "b",
+      "f",
+      "k",
+      "aa",
+      "d",
+      "g",
+      "ag",
+      "h"
+    ]
+  }
+]
