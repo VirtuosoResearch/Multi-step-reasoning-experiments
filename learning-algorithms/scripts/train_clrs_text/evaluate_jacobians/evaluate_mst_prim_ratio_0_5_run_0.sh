@@ -7,7 +7,7 @@ cd "${repo_root}"
 
 device="${1:-2}"
 max_examples="${2:-10}"
-max_jacobian_steps="${3:-0}"
+max_jacobian_steps="${3:-5}"
 power_iters="${4:-10}"
 
 # checkpoint_path="external_lightning_logs/Qwen-Qwen2.5-1.5B_mst_prim_2000_len_[10]_lora_r_16_clrs_mst_prim_v1_ratio_0.5_run_0/epoch_epoch=9.pt"

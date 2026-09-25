@@ -11,3 +11,10 @@ learning-algorithms/external_lightning_logs/*
 wandb/
 */cmd_results/
 temporary/
+jacobian_results/
+*/pdfs/
+logs/
+**/figures/
+**/tests/
+.vscode/
+deprecated/

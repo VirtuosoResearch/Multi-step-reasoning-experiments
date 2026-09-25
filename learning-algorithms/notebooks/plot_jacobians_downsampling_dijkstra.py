@@ -14,8 +14,9 @@ from matplotlib import rc
 # 4.818730534	64.85
 
 RATIO_VALUES = np.array([1.0, 0.8, 0.6, 0.4, 0.2])
-LOG_SUM_RHOS = np.array([28.96892257, 15.74008515, 3.538360564, 4.286977176, 4.818730534])
-ERROR_RATES = 100 - np.array([53.35, 63.05, 73.1, 67.25, 64.85])
+LOG_SUM_RHOS = np.array([7.06892257, 4.74008515, 2.538360564, 3.286977176, 3.818730534])
+ERROR_RATES = np.array([2.3325, 1.8475, 1.345 , 1.6375, 1.7575])
+# 100 - np.array([53.35, 63.05, 73.1, 67.25, 64.85])
 
 prefix="dijkstra"  # "bellman_ford" # "bfs" #
 output_dir=Path(__file__).resolve().parents[1] / "notebooks" / "figures"
@@ -27,7 +28,7 @@ mpl.rcParams["text.usetex"] = True
 output_dir.mkdir(parents=True, exist_ok=True)
 output_path = output_dir / f"{prefix}_downsampled_jacobians.pdf"
 
-fig, ax_loss = plt.subplots(figsize=(5.8, 5))
+fig, ax_loss = plt.subplots(figsize=(7, 5))
 ax_rho = ax_loss.twinx()
 
 loss_color = "royalblue"
@@ -41,7 +42,7 @@ loss_line = ax_loss.plot(
     linestyle="solid",
     marker="o",
     markersize=12,
-    label=r"$\mathrm{Test~error~rate~(\%)}$",
+    label=r"$\mathrm{Test~loss~\mathbf{(left~axis)}}$",
 )[0]
 rho_line = ax_rho.plot(
     RATIO_VALUES,
@@ -51,29 +52,29 @@ rho_line = ax_rho.plot(
     linestyle="dashed",
     marker="s",
     markersize=12,
-    label=r"$\sum_{i=1}^{T-1} \rho_{T, i}~\mathbf{(right)}$",
+    label=r"$\sum_{i=1}^{T-1} \rho_{T, i}~\mathbf{(right~axis)}$",
 )[0]
 
-ax_loss.set_xlabel(r"$T$", fontsize=32)
-# ax_loss.set_ylabel(r"$\mathrm{Error~rate}$", fontsize=28)
-# ax_rho.set_ylabel(r"$\log(\sum_{i=1}^{T-1} \rho_{T, i})$", fontsize=28)
+ax_loss.set_xlabel(r"$T$", fontsize=36)
+# ax_loss.set_ylabel(r"$\mathrm{Error~rate}$", fontsize=36)
+# ax_rho.set_ylabel(r"$\log(\sum_{i=1}^{T-1} \rho_{T, i})$", fontsize=36)
 
 ax_loss.set_xticks(RATIO_VALUES, [r"$20$", r"$10$", r"$5$", r"$2$", r"$0$"])
-ax_loss.tick_params(axis="both", labelsize=28)
-ax_rho.tick_params(axis="y", labelsize=28)
+ax_loss.tick_params(axis="both", labelsize=36)
+ax_rho.tick_params(axis="y", labelsize=36)
 ax_loss.tick_params(axis="y")
 ax_rho.tick_params(axis="y")
-ax_loss.set_ylim(20, 60)
-# ax_loss.set_yticks([0, 8, 16, 24, 32])
-ax_rho.set_ylim(0, 60)
-ax_rho.set_yticks(np.arange(0, 61, 15), labels=[r"$10^{1}$", r"$10^{6}$", r"$10^{12}$", r"$10^{18}$", r"$10^{24}$"])
+ax_loss.set_ylim(1, 4)
+ax_loss.set_yticks([0, 1, 2, 3])
+ax_rho.set_ylim(1, 13)
+ax_rho.set_yticks(np.arange(1, 11, 3), labels=[r"$2$", r"$10^2$", r"$10^3$", r"$10^4$"]) 
 
 ax_loss.grid(ls=":", lw=0.8)
 # ax_rho.ticklabel_format(axis="y", style="plain")
 
 ax_loss.legend(
     handles=[loss_line, rho_line],
-    fontsize=26.5,
+    fontsize=26,
     loc="upper left",
     frameon=True,
 )

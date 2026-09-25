@@ -39,18 +39,18 @@ mpl.rcParams['savefig.dpi'] = 1200
 mpl.rcParams['text.usetex'] = True  # not really needed
 
 
-f, ax2 = plt.subplots(figsize=(6.5, 4.5))
+f, ax2 = plt.subplots(figsize=(5.5, 4.5))
 # 0.08
 # 0.03
 # 0.02
 # T_10_test_loss = smooth(T_10_test_loss[:, 1], 3)
 x = np.arange(len(T_10_test_loss))
 # p5 = ax2.plot(x+1, np.ones(len(x))*1.338347, lw = 2, color="orange", linestyle="solid", label=r"$\mathrm{No~CoT}$")
-p1 = ax2.plot(x+1, smooth(T_10_test_loss.mean(axis=1), 18), lw = 3, color="royalblue", linestyle="solid", label=r"$T=100$")
-p2 = ax2.plot(x+1, smooth(T_20_test_loss.mean(axis=1), 18), lw = 3, color="lightsteelblue", linestyle="solid", label=r"$T=200$")
-p3 = ax2.plot(x+1, smooth(T_30_test_loss.mean(axis=1), 18), lw = 3, color="lightgreen", linestyle="solid", label=r"$T=300$")
-p4 = ax2.plot(x+1, smooth(T_30_test_loss.mean(axis=1), 18), lw = 3, color="forestgreen", linestyle="solid", label=r"$T=400$")
-ax2.set_title(r'$\mathrm{Test~loss}$', fontsize = 32)
+p1 = ax2.plot(x+1, smooth(T_10_test_loss.mean(axis=1), 18), lw = 4, color="royalblue", linestyle="solid", label=r"$T=100$")
+p2 = ax2.plot(x+1, smooth(T_20_test_loss.mean(axis=1), 18), lw = 4, color="lightsteelblue", linestyle="solid", label=r"$T=200$")
+p3 = ax2.plot(x+1, smooth(T_30_test_loss.mean(axis=1), 18), lw = 4, color="lightgreen", linestyle="solid", label=r"$T=300$")
+p4 = ax2.plot(x+1, smooth(T_30_test_loss.mean(axis=1), 18), lw = 4, color="forestgreen", linestyle="solid", label=r"$T=400$")
+ax2.set_title(r'$L(f_W; \mathcal{D})$', fontsize = 32)
 ax2.set_xlabel(r'$\mathrm{Training~iterations}$', fontsize = 32) 
 plt.xticks(np.arange(0, 101, 25), [r"$0$", r"$250$", r"$500$", r"$750$", r"$1000$"]) # "", r"$1500$", "", r"$2000$"
 # ax2.set_ylim((-0.1, 1.55))
@@ -106,28 +106,28 @@ mpl.rcParams['savefig.dpi'] = 1200
 mpl.rcParams['text.usetex'] = True  # not really needed
 
 
-f, ax2 = plt.subplots(figsize=(6.5, 4.5))
+f, ax2 = plt.subplots(figsize=(5.5, 4.5))
 
 # T_10_test_loss = smooth(T_10_test_loss[:, 1], 3)
 x = np.arange(len(T_10_noise_stability))
 # p5 = ax2.plot(x+1, np.ones_like(x)*1.767, lw = 2, color="orange", linestyle="solid", label=r"$\mathrm{No~CoT}$")
-p1 = ax2.plot(x+1, smooth(T_10_noise_stability.mean(axis=1), 15), lw = 3, color="royalblue", linestyle="solid", label=r"$T=10$")
-ax2.fill_between(x+1, smooth(T_10_noise_stability.mean(axis=1) - T_10_noise_stability.std(axis=1)*0.2, 15),
-                     smooth(T_10_noise_stability.mean(axis=1) + T_10_noise_stability.std(axis=1)*0.2, 15),
+p1 = ax2.plot(x+1, smooth(T_10_noise_stability.mean(axis=1), 15), lw = 4, color="royalblue", linestyle="solid", label=r"$T=10$")
+ax2.fill_between(x+1, smooth(T_10_noise_stability.mean(axis=1) - T_10_noise_stability.std(axis=1), 15),
+                     smooth(T_10_noise_stability.mean(axis=1) + T_10_noise_stability.std(axis=1), 15),
                      color="royalblue", alpha=0.2)
-p2 = ax2.plot(x+1, smooth(T_20_noise_stability.mean(axis=1), 15), lw = 3, color="lightsteelblue", linestyle="solid", label=r"$T=20$")
-ax2.fill_between(x+1, smooth(T_20_noise_stability.mean(axis=1) - T_20_noise_stability.std(axis=1)*0.2, 15),
-                        smooth(T_20_noise_stability.mean(axis=1) + T_20_noise_stability.std(axis=1)*0.2, 15),
+p2 = ax2.plot(x+1, smooth(T_20_noise_stability.mean(axis=1), 15), lw = 4, color="lightsteelblue", linestyle="solid", label=r"$T=20$")
+ax2.fill_between(x+1, smooth(T_20_noise_stability.mean(axis=1) - T_20_noise_stability.std(axis=1), 15),
+                        smooth(T_20_noise_stability.mean(axis=1) + T_20_noise_stability.std(axis=1), 15),
                         color="lightsteelblue", alpha=0.2)
-p3 = ax2.plot(x+1, smooth(T_30_noise_stability.mean(axis=1), 15), lw = 3, color="lightgreen", linestyle="solid", label=r"$T=30$")
-ax2.fill_between(x+1, smooth(T_30_noise_stability.mean(axis=1) - T_30_noise_stability.std(axis=1)*0.2, 15),
-                     smooth(T_30_noise_stability.mean(axis=1) + T_30_noise_stability.std(axis=1)*0.2, 15),
+p3 = ax2.plot(x+1, smooth(T_30_noise_stability.mean(axis=1), 15), lw = 4, color="lightgreen", linestyle="solid", label=r"$T=30$")
+ax2.fill_between(x+1, smooth(T_30_noise_stability.mean(axis=1) - T_30_noise_stability.std(axis=1), 15),
+                     smooth(T_30_noise_stability.mean(axis=1) + T_30_noise_stability.std(axis=1), 15),
                      color="lightgreen", alpha=0.2)
 # p4 = ax2.plot(x+1, smooth(T_30_noise_stability.mean(axis=1), 15), lw = 3, color="forestgreen", linestyle="solid", label=r"$T=40$")
-# ax2.fill_between(x+1, smooth(T_30_noise_stability.mean(axis=1) - T_30_noise_stability.std(axis=1)*0.2, 15),
-#                      smooth(T_30_noise_stability.mean(axis=1)+ T_30_noise_stability.std(axis=1)*0.2, 15),
+# ax2.fill_between(x+1, smooth(T_30_noise_stability.mean(axis=1) - T_30_noise_stability.std(axis=1), 15),
+#                      smooth(T_30_noise_stability.mean(axis=1)+ T_30_noise_stability.std(axis=1), 15),
 #                      color="forestgreen", alpha=0.2)
-ax2.set_title(r'$\mathrm{Noise~stability}$', fontsize = 32)
+ax2.set_title(r'$L({f_{W+U}}; \mathcal{D}) - L(f_W; \mathcal{D})$', fontsize = 34)
 ax2.set_xlabel(r'$\mathrm{Training~iterations}$', fontsize = 32) 
 plt.xticks(np.arange(0, 101, 25), [r"$0$", r"$250$", r"$500$", r"$750$", r"$1000$"]) # "", r"$1500$", "", r"$2000$"
 # ax2.set_xlim((-1, 21))

@@ -25,18 +25,18 @@ mpl.rcParams["text.usetex"] = True
 output_dir.mkdir(parents=True, exist_ok=True)
 output_path = output_dir / f"{prefix}_bits_bar.pdf"
 
-fig, ax = plt.subplots(figsize=(5.8, 5))
+fig, ax = plt.subplots(figsize=(7, 5))
 
 x = np.arange(len(BIT_LABELS))
 bar_color = "royalblue"
 
 ax.bar(x, PRIM_VALUES, color=bar_color, width=0.65)
 
-ax.set_xlabel(r"$\mathrm{Bit~precision}$", fontsize=32)
-ax.set_ylabel(r"$\sum_{i=1}^{T-1} \rho_{T, i}$", fontsize=28)
+ax.set_xlabel(r"$\mathrm{Bit~precision}$", fontsize=36)
+# ax.set_ylabel(r"$\sum_{i=1}^{T-1} \rho_{T, i}$", fontsize=32)
 ax.set_xticks(x, BIT_LABELS)
-# ax.set_yticks(np.arange(0, 4.1, 1), [r"$1$", r"$2$", r"$8$", r"$20$", r"$50$"])
-ax.tick_params(axis="both", labelsize=28)
+ax.set_yticks(np.arange(0, 31, 10))
+ax.tick_params(axis="both", labelsize=36)
 ax.grid(axis="y", ls=":", lw=0.8)
 
 plt.tight_layout()

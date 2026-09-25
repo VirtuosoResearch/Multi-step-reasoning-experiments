@@ -18,8 +18,16 @@ MEAN_L_T_GAP = np.array([
 1.104263,
 # 1.6247299,
 ])
-MEAN_RECURSIVE_LOG_RHO_T_1 = np.array([1.00000000e+04, 3.62511394e+04, 1.37013767e+05, 4.74817139e+05,
-       1.59053437e+06, 5.81889180e+06]) # 1.68572301e+07
+bound_values = np.array([
+    0,
+0.3449774,
+0.8109022,
+1.2213081,
+2.3032357,
+6.3612268
+])
+# MEAN_RECURSIVE_LOG_RHO_T_1 = np.array([1.00000000e+04, 3.62511394e+04, 1.37013767e+05, 4.74817139e+05,
+#        1.59053437e+06, 5.81889180e+06]) # 1.68572301e+07
 
 prefix="bfs"  # "bellman_ford" # "bfs" #
 output_dir=Path(__file__).resolve().parents[1] / "notebooks" / "figures"
@@ -31,7 +39,7 @@ mpl.rcParams["text.usetex"] = True
 output_dir.mkdir(parents=True, exist_ok=True)
 output_path = output_dir / f"{prefix}_jacobian_scaling.pdf"
 
-fig, ax_loss = plt.subplots(figsize=(4.5, 4.5))
+fig, ax_loss = plt.subplots(figsize=(7, 5))
 ax_rho = ax_loss.twinx()
 
 loss_color = "royalblue"
@@ -45,17 +53,17 @@ loss_line = ax_loss.plot(
     linestyle="solid",
     marker="o",
     markersize=12,
-    label=r"$L_t(f_W)-L_t^{\mathrm{CoT}}(f_W)$",
+    label=r"$\mathrm{Inference~loss}~\mathbf{~(left~axis)}$",
 )[0]
 rho_line = ax_rho.plot(
     T_VALUES,
-    MEAN_RECURSIVE_LOG_RHO_T_1,
+    bound_values,
     lw=5,
     color=rho_color,
     linestyle="dashed",
     marker="s",
     markersize=12,
-    label=r"$\rho_{t,1}\mathrm{~(right~axis)}$",
+    label=r"$\mathrm{Our~bound}~\mathbf{~(right~axis)}$",
 )[0]
 
 ax_loss.set_xlabel(r"$T$", fontsize=32)
@@ -63,25 +71,27 @@ ax_loss.set_xlabel(r"$T$", fontsize=32)
 # ax_rho.set_ylabel(r"$\rho_{t,1}$", fontsize=32)
 
 ax_loss.set_xticks(T_VALUES)
-ax_loss.tick_params(axis="both", labelsize=28)
-ax_rho.tick_params(axis="y", labelsize=28)
+ax_loss.tick_params(axis="both", labelsize=32)
+ax_rho.tick_params(axis="y", labelsize=32)
 ax_loss.tick_params(axis="y")
 ax_rho.tick_params(axis="y")
-ax_loss.set_ylim(-0.12, 4)
-# ax_loss.set_yticks([0, 2, 4, 6, 8])
-ax_rho.set_ylim(-2e5, 8e6)
-ax_rho.set_yticks([0, 2e6, 4e6, 6e6, 8e6])
+ax_loss.set_ylim(-0.2, 3.5)
+ax_loss.set_yticks([0, 2, 4])
+ax_rho.set_ylim(-0.4, 7)
+ax_rho.set_yticks([0, 4, 8])
 
 ax_loss.grid(ls=":", lw=0.8)
 ax_rho.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
-ax_rho.yaxis.get_offset_text().set_fontsize(26)
+ax_rho.yaxis.get_offset_text().set_fontsize(32)
 
-# ax_loss.legend(
-#     handles=[loss_line, rho_line],
-#     fontsize=20,
-#     loc="upper left",
-#     frameon=True,
-# )
+ax_loss.legend(
+    handles=[rho_line, loss_line],
+    fontsize=26,
+    loc="upper left",
+    frameon=True,
+)
+
+plt.title(r"$\mathrm{Breadth}$" + "-" + r"$\mathrm{first~search}$", fontsize=32)
 
 plt.tight_layout()
 plt.savefig(output_path, format="pdf", dpi=1200)

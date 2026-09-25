@@ -18,8 +18,17 @@ MEAN_L_T_GAP = np.array([
 2.285090,
 # 2.9809759,
 ])
-MEAN_RECURSIVE_LOG_RHO_T_1 = np.array([1.00000000e+06, 3.40455992e+06, 1.43422838e+07, 5.08439297e+07,
-       1.60730230e+08, 5.28461229e+08]) # 1.46324452e+09
+bound_values = np.array([
+0,
+0.1481915,
+0.9249265,
+2.3797756,
+7.1525192,
+14.223101
+])
+
+# MEAN_RECURSIVE_LOG_RHO_T_1 = np.array([1.00000000e+06, 3.40455992e+06, 1.43422838e+07, 5.08439297e+07,
+#        1.60730230e+08, 5.28461229e+08]) # 1.46324452e+09
 
 prefix="dijkstra"  # "bellman_ford" # "bfs" #
 output_dir=Path(__file__).resolve().parents[1] / "notebooks" / "figures"
@@ -31,7 +40,7 @@ mpl.rcParams["text.usetex"] = True
 output_dir.mkdir(parents=True, exist_ok=True)
 output_path = output_dir / f"{prefix}_jacobian_scaling.pdf"
 
-fig, ax_loss = plt.subplots(figsize=(4.5, 4.5))
+fig, ax_loss = plt.subplots(figsize=(7, 5))
 ax_rho = ax_loss.twinx()
 
 loss_color = "royalblue"
@@ -49,7 +58,7 @@ loss_line = ax_loss.plot(
 )[0]
 rho_line = ax_rho.plot(
     T_VALUES,
-    MEAN_RECURSIVE_LOG_RHO_T_1,
+    bound_values,
     lw=5,
     color=rho_color,
     linestyle="dashed",
@@ -63,18 +72,19 @@ ax_loss.set_xlabel(r"$T$", fontsize=32)
 # ax_rho.set_ylabel(r"$\rho_{t,1}$", fontsize=32)
 
 ax_loss.set_xticks(T_VALUES)
-ax_loss.tick_params(axis="both", labelsize=28)
-ax_rho.tick_params(axis="y", labelsize=28)
+ax_loss.tick_params(axis="both", labelsize=32)
+ax_rho.tick_params(axis="y", labelsize=32)
 ax_loss.tick_params(axis="y")
 ax_rho.tick_params(axis="y")
-ax_loss.set_ylim(-0.4, 9.0)
-ax_loss.set_yticks([0, 2, 4, 6, 8])
-ax_rho.set_ylim(-0.3e8, 8e8)
-ax_rho.set_yticks([0, 2e8, 4e8, 6e8, 8e8])
+ax_loss.set_ylim(-0.2, 4.0)
+ax_loss.set_yticks([0, 1, 2, 3, 4])
+ax_rho.set_ylim(-0.8, 16)
+ax_rho.set_yticks([0, 4, 8, 12, 16])
 
 ax_loss.grid(ls=":", lw=0.8)
-ax_rho.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
-ax_rho.yaxis.get_offset_text().set_fontsize(26)
+# ax_rho.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+ax_rho.yaxis.get_offset_text().set_fontsize(32)
+plt.title(r"$\mathrm{Dijkstra}$" + "" + r"$\mathrm{~algorithm}$", fontsize=32)
 
 # ax_loss.legend(
 #     handles=[loss_line, rho_line],
